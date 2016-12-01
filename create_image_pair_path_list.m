@@ -43,11 +43,11 @@ function [file_list_01, file_list_02] = create_image_pair_path_list(JOBFILE, PAS
     num_pairs = length(image_numbers_01);
     
     % Loop over the pairs
-    for k = 1 : num_pairs
+    for pair_number = 1 :  num_pairs
         
         % Numbers of the images
-        num_str_01 = sprintf(sprintf('%s', number_format), image_numbers_01(k));
-        num_str_02 = sprintf(sprintf('%s', number_format), image_numbers_02(k));
+        num_str_01 = sprintf(sprintf('%s', number_format), image_numbers_01(pair_number));
+        num_str_02 = sprintf(sprintf('%s', number_format), image_numbers_02(pair_number));
         
         % Name of the first image;
         image_name_01 = sprintf('%s%s%s%s', ...
@@ -63,11 +63,34 @@ function [file_list_01, file_list_02] = create_image_pair_path_list(JOBFILE, PAS
             input_image_trailer_02,...
             input_image_file_extension);
         
-        % File paths to each image
-        file_list_01{k} = fullfile(input_image_directory, image_name_01);
-        file_list_02{k} = fullfile(input_image_directory, image_name_02);
+        % Construct file paths
+        file_path_01 = fullfile(input_image_directory, image_name_01);
+        file_path_02 = fullfile(input_image_directory, image_name_02);
         
-    end
+        % Check the paths
+        if exist(file_path_01, 'file') && exist(file_path_02, 'file');
+            file_list_01{pair_number} = file_path_01;
+            file_list_02{pair_number} = file_path_02; 
+        else
+            
+            % Print a warning if the first image isn't found.
+            if ~exist(file_path_01, 'file')
+                fprintf(1, 'WARNING: File not found:%s\n', file_path_01);
+            end 
+            
+            % Print a warning if the second image isn't found.
+            if ~exist(file_path_02, 'file')
+                 fprintf(1, 'WARNING: File not found:%s\n', file_path_02);
+            end 
+        end % END (if exist(file_path_01, 'file') && exist(file_path_02, 'file'));
+        
+    end % END (while pair_number <= num_pairs)
+end % END OF FUNCTION
 
 
-end
+
+
+
+
+
+
