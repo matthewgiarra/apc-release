@@ -64,26 +64,9 @@ function [file_list_01, file_list_02] = create_image_pair_path_list(JOBFILE, PAS
             input_image_file_extension);
         
         % Construct file paths
-        file_path_01 = fullfile(input_image_directory, image_name_01);
-        file_path_02 = fullfile(input_image_directory, image_name_02);
-        
-        % Check the paths
-        if exist(file_path_01, 'file') && exist(file_path_02, 'file');
-            file_list_01{pair_number} = file_path_01;
-            file_list_02{pair_number} = file_path_02; 
-        else
-            
-            % Print a warning if the first image isn't found.
-            if ~exist(file_path_01, 'file')
-                fprintf(1, 'WARNING: File not found:%s\n', file_path_01);
-            end 
-            
-            % Print a warning if the second image isn't found.
-            if ~exist(file_path_02, 'file')
-                 fprintf(1, 'WARNING: File not found:%s\n', file_path_02);
-            end 
-        end % END (if exist(file_path_01, 'file') && exist(file_path_02, 'file'));
-        
+        file_list_01{pair_number} = fullfile(input_image_directory, image_name_01);
+        file_list_02{pair_number} = fullfile(input_image_directory, image_name_02);
+       
     end % END (while pair_number <= num_pairs)
 end % END OF FUNCTION
 
