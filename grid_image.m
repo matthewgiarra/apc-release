@@ -6,11 +6,7 @@ if nargin < 2
 end
 
 % Get the image size.
-JOBFILE = read_image_size(JOBFILE, PASS_NUMBER);
-
-% Read the image sizes
-image_height = JOBFILE.Processing(PASS_NUMBER).Frames.Height;
-image_width = JOBFILE.Processing(PASS_NUMBER).Frames.Height;
+[image_height, image_width] = read_image_size(JOBFILE, PASS_NUMBER);
 
 % Vector containing the image size
 image_size = [image_height, image_width];

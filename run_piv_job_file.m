@@ -12,15 +12,15 @@ for p = 1 : num_passes
     % Update the job file with images to correlate
     JOBFILE = create_image_pair_path_list(JOBFILE, p);
     
-    % Read the region sizes
-    JOBFILE = measure_region_size(JOBFILE, p);
-  
-    % Subpixel weights (this is a leftover requirement from Prana)
-    subpixel_weights_array = ones(region_height, region_width);
-    
-     % Make the spatial windows
-    [spatial_window_01{p}, spatial_window_02{p}] = ...
-        make_spatial_windows(JOBFILE, p);
+    % Read the image sizes
+    JOBFILE = measure_image_size(JOBFILE, p);
+%   
+%     % Subpixel weights (this is a leftover requirement from Prana)
+%     subpixel_weights_array = ones(region_height, region_width);
+%     
+%      % Make the spatial windows
+%     [spatial_window_01{p}, spatial_window_02{p}] = ...
+%         make_spatial_windows(JOBFILE, p);
  
     %% Grid stuff
     
