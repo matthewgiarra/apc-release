@@ -49,6 +49,7 @@ Processing(1).Correlation.Method = 'scc';
 Processing(1).Correlation.Step = 0;
 Processing(1).Correlation.Ensemble.DoEnsemble = 1;
 Processing(1).Correlation.Ensemble.NumberOfPairs = 10;
+Processing(1).Correlation.Ensemble.Domain = 'spatial';
 
 % Parameters specific to APC
 Processing(1).Correlation.APC.EnsembleLength = 10;
