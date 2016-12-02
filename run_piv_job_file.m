@@ -12,20 +12,38 @@ for p = 1 : num_passes
     % Update the job file with images to correlate
     JOBFILE = create_image_pair_path_list(JOBFILE, p);
     
-    % Read the image sizes
-    JOBFILE = measure_image_size(JOBFILE, p);
-%   
+    % Grid stuff
+    
+    % Grid the image
+    JOBFILE = grid_image(JOBFILE, p);
+    
+    % Run the PIV pass
+% % % % % % %     %
+% % % % % % %     % Was deform specified?
+% % % % % % %     % Deform parameters
+% % % % % % %     if p > 1
+% % % % % % %         % On subsequent passes, make a deform structure to
+% % % % % % %         % give to the APC filter code
+% % % % % % %         deform_params.Grid.X = gx{p-1};
+% % % % % % %         deform_params.Grid.Y = gy{p-1};
+% % % % % % %         deform_params.Displacement.Y = ty_smoothed_apc{p-1}(:, end);
+% % % % % % %         deform_params.Displacement.X = tx_smoothed_apc{p-1}(:, end);
+% % % % % % %         deform_params.Method = deform_method;
+% % % % % % %     else
+% % % % % % %         % On the first pass, make an empty deform parameters structure.
+% % % % % % %         deform_params = [];
+% % % % % % %     end
+    
+    
+    
+    %   
 %     % Subpixel weights (this is a leftover requirement from Prana)
 %     subpixel_weights_array = ones(region_height, region_width);
 %     
 %      % Make the spatial windows
 %     [spatial_window_01{p}, spatial_window_02{p}] = ...
 %         make_spatial_windows(JOBFILE, p);
- 
-    %% Grid stuff
     
-    % Grid the image
-    JOBFILE = grid_image(JOBFILE, p);
 %     
 %     % Count the total number of grid points
 %     num_regions = length(grid_x{p});
