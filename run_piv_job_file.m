@@ -17,6 +17,9 @@ for p = 1 : num_passes
     % Grid the image
     JOBFILE = grid_image(JOBFILE, p);
     
+    % Run the pass. 
+    JOBFILE = run_correlation_pass(JOBFILE, p);
+    
     % Run the PIV pass
 % % % % % % %     %
 % % % % % % %     % Was deform specified?

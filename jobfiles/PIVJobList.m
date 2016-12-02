@@ -77,6 +77,17 @@ Processing(1).Iterative.Method = 'deform';
 Processing(1).Iterative.Deform.Interpolation = 'interp2'; 
 Processing(1).Iterative.Deform.ConvergenceCriterion = 0.1;
 Processing(1).Iterative.Deform.MaxIterations = 1;
+Processing(1).Iterative.Source.Directory = '';
+Processing(1).Iterative.Source.Name = '';
+Processing(1).Iterative.Source.PassNumber = 0;
+Processing(1).Iterative.Source.VariableNames.Displacements.X = 'tx_smoothed';
+Processing(1).Iterative.Source.VariableNames.Displacements.Y = 'ty_smoothed';
+Processing(1).Iterative.Source.VariableNames.Grid.X = 'gy';
+Processing(1).Iterative.Source.VariableNames.Grid.Y = 'gx';
+
+
+
+
 
 % Copy the first processing pass to the second one.
 Processing(2) = Processing(1);

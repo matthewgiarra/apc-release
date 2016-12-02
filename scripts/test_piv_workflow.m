@@ -1,4 +1,7 @@
 
+% Add paths
+addpaths();
+
 % Load the job list
 JobList = PIVJobList();
 
