@@ -4,25 +4,92 @@ function run_piv_job_file(JOBFILE)
 num_passes = determine_number_of_passes(JOBFILE);
    
 % Loop over all the passes.
-for pass_number = 1 : num_passes
+for p = 1 : num_passes
     % Build list of files to correlate
 
     %% Everything that doesn't depend on what correlation type
     %
-    % Images to correlate
-    [input_image_path_list_01, input_image_path_list_02] = create_image_pair_path_list(JOBFILE, pass_number);
+    % Update the job file with images to correlate
+    JOBFILE = create_image_pair_path_list(JOBFILE, p);
     
-    % Load the first image to determine the image size
-    [image_height, image_width, ~] = size(double(imread(input_image_path_list_01{1})));
-
-    % Make the spatial windows
-    [WINDOW_01, WINDOW_02] = ...
-        make_spatial_windows(JOBFILE.Processing(pass_number));
+    % Number of image pairs
+    num_pairs = length(input_image_path_list_01);
     
-
+    % Read the region sizes
+    [region_height, region_width] = get_region_size(JOBFILE, p);
+  
+    % Subpixel weights (this is a leftover requirement from Prana)
+    subpixel_weights_array = ones(region_height, region_width);
+    
+     % Make the spatial windows
+    [spatial_window_01{p}, spatial_window_02{p}] = ...
+        make_spatial_windows(JOBFILE, p);
+ 
+    %% Grid stuff
+    
+    % Grid the image
+    JOBFILE = grid_image(JOBFILE, p);
+    
+    % Count the total number of grid points
+    num_regions = length(grid_x{p});
+    
+    % Number of grid points in each direction
+    num_regions_x{p} = length(unique(grid_x{p}(:)));
+    num_regions_y{p} = length(unique(grid_y{p}(:)));
+    
+    % Allocate arrays for the 
+    % correlation displacements
+    % for all of the regions,
+    % even the masked ones
+    % This is so the grid is compatible
+    % with UOD, deform etc.
+    tx_raw{p} = nan(num_regions, num_pairs);
+    ty_raw{p} = nan(num_regions, num_pairs);
+    
+    % Validated fields
+    tx_val{p} = nan(num_regions, num_pairs);
+    ty_val{p} = nan(num_regions, num_pairs);
+    
+    % Smoothed fields
+    tx_smoothed{p} = zeros(num_regions, num_pairs);
+    ty_smoothed{p} = zeros(num_regions, num_pairs);
+    
+    % Outlier identification array
+    is_outlier{p} = zeros(num_regions, num_pairs);
+    
+    %% Masking
+    % Find which grid points to
+    % correlate, based on the mask
+    [grid_x_correlate, grid_y_correlate, correlate_inds] = mask_grid(JOBFILE, p);
+    
+    % 
+    
+    % Number of regions to correlate
+    num_regions_correlate = length(grid_x_correlate);
+    
+    % Allocate arrays for the ensemble
+    % correlation displacements
+    % for only the correlated regions
+    tx_valid = zeros(num_regions_correlate, 1);
+    ty_valid = zeros(num_regions_correlate, 1);
+    
+    % Ensemble correlation
+    do_ensemble_correlation = JOBFILE.Processing(p).Correlation.Ensemble.DoEnsemble;
+    
     %% Everything that DOES depend on what correlation type
+    
 
 
 end
    
 end
+
+
+
+
+
+
+
+
+
+

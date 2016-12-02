@@ -1,4 +1,4 @@
-function [file_list_01, file_list_02] = create_image_pair_path_list(JOBFILE, PASS_NUMBER)
+function JOBFILE = create_image_pair_path_list(JOBFILE, PASS_NUMBER)
 
     % Do everything that doesn't change with
     % the number of passes
@@ -68,6 +68,11 @@ function [file_list_01, file_list_02] = create_image_pair_path_list(JOBFILE, PAS
         file_list_02{pair_number} = fullfile(input_image_directory, image_name_02);
        
     end % END (while pair_number <= num_pairs)
+    
+    % Add the list of files to the jobfile
+    JOBFILE.Processing(PASS_NUMBER).Frames.Paths{1} = file_list_01;
+    JOBFILE.Processing(PASS_NUMBER).Frames.Paths{2} = file_list_02;
+    
 end % END OF FUNCTION
 
 

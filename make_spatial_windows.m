@@ -1,8 +1,13 @@
 function [WINDOW_01, WINDOW_02] = ...
-        make_spatial_windows(PROCESSING_PARAMETERS);
+        make_spatial_windows(JOBFILE, PASS_NUMBER);
+    
+    % Default to pass 1
+    if nargin < 2
+        PASS_NUMBER = 1;
+    end
     
     % Parameters
-    parameters = PROCESSING_PARAMETERS;
+    parameters = JOBFILE.Processing(PASS_NUMBER);
 
     % Region sizes
     region_height = parameters.Region.Height;

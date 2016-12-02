@@ -34,6 +34,8 @@ Processing(1).Grid.Spacing.Y = 64;
 Processing(1).Grid.Spacing.X = 64;
 Processing(1).Grid.Shift.Y = -16;
 Processing(1).Grid.Shift.X = 0;
+Processing(1).Grid.Buffer.Y = 0;
+Processing(1).Grid.Buffer.X = 0;
 Processing(1).Grid.Mask.Directory = '/Users/matthewgiarra/Documents/School/VT/Research/Aether/piv_test_images/pivchallenge/2014/A/images/masks';
 Processing(1).Grid.Mask.Name = 'imgAmask3.tif';
 
@@ -45,6 +47,7 @@ Processing(1).Frames.Step = 1;
 % Correlation parameters
 Processing(1).Correlation.Method = 'apc';
 Processing(1).Correlation.Step = 0;
+Processing(1).Correlation.Ensemble.DoEnsemble = 1;
 Processing(1).Correlation.Ensemble.NumberOfPairs = 10;
 
 % Parameters specific to APC
