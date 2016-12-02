@@ -10,7 +10,7 @@ grid_field = JOBFILE.Processing(PASS_NUMBER).Grid;
 
 % Create an empty mask (set to ones everywhere)
 % Measure the image size and set the mask to ones.
-[image_height, image_width] = get_image_size(JOBFILE, PASS_NUMBER);
+[image_height, image_width] = read_image_size(JOBFILE, PASS_NUMBER);
 
 % Set the mask to ones everywhere
 grid_mask = ones(image_height, image_width);

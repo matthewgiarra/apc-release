@@ -1,4 +1,4 @@
-function JOBFILE = get_image_size(JOBFILE, PASS_NUMBER);
+function [JOBFILE, image_height, image_width] = measure_image_size(JOBFILE, PASS_NUMBER);
 
 % Default to first pass.
 if nargin < 2
@@ -50,7 +50,7 @@ end
 
 % Append the image size to the job file.
 JOBFILE.Processing(PASS_NUMBER).Frames.Height = image_height;
-JOBFILE.Processing(PASS_NUMBER).Frames.Width= image_width;
+JOBFILE.Processing(PASS_NUMBER).Frames.Width  = image_width;
 
 end
 

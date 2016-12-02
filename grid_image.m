@@ -6,21 +6,29 @@ if nargin < 2
 end
 
 % Get the image size.
-[image_height, image_width] = get_image_size(JOBFILE, PASS_NUMBER);
+JOBFILE = read_image_size(JOBFILE, PASS_NUMBER);
+
+% Read the image sizes
+image_height = JOBFILE.Processing(PASS_NUMBER).Frames.Height;
+image_width = JOBFILE.Processing(PASS_NUMBER).Frames.Height;
 
 % Vector containing the image size
 image_size = [image_height, image_width];
 
+% Grid spacing
 grid_spacing_y = JOBFILE.Processing(PASS_NUMBER).Grid.Spacing.Y;
 grid_spacing_x = JOBFILE.Processing(PASS_NUMBER).Grid.Spacing.X;
 grid_spacing = [grid_spacing_y, grid_spacing_x];
 
+% Grid buffer
 grid_buffer_y = JOBFILE.Processing(PASS_NUMBER).Grid.Buffer.Y;
 grid_buffer_x = JOBFILE.Processing(PASS_NUMBER).Grid.Buffer.X;
 
+% Grid shift
 grid_shift_y = JOBFILE.Processing(PASS_NUMBER).Grid.Shift.Y;
 grid_shift_x = JOBFILE.Processing(PASS_NUMBER).Grid.Shift.X;
 
+% Full grid
 [grid_full_x, grid_full_y] = grid_image_subfunction(image_size, grid_spacing,...
     grid_buffer_y, grid_buffer_x, grid_shift_y, grid_shift_x);
 
