@@ -186,18 +186,54 @@ for n = 1 : num_pairs_correlate
         
         % Spectral correlation
         cross_corr_spectral = FT_01 .* conj(FT_02);
-        
-        % Spatial correlation
-        cross_corr_spatial = fftshift(abs(ifft2(cross_corr_spectral)));
-        
-        % Add the spatial correlation to the ensemble
-        cross_corr_ensemble(:, :, k) = cross_corr_ensemble(:, :, k) + ...
-            cross_corr_spatial;   
+                
+        % Switch between spatial and spectral ensemble
+        switch lower(ensemble_domain_string)
+            case 'spatial'
+                % For spatial ensemble, take the inverse
+                % FT of the spectral correlation (i.e., the spatial
+                % correlation) and add this to the purely real 
+                % ensemble correlation
+                %
+                % Add the correlation to the ensemble
+                % (spatial domain)
+                cross_corr_ensemble(:, :, k) = ...
+                    cross_corr_ensemble(:, :, k) + ...
+                    fftshift(abs(ifft2(cross_corr_spectral)));
+                
+            case 'spectral'   
+                % For spectral ensemble, add the current complex
+                % correlation to the ensemble complex correlation
+                cross_corr_ensemble(:, :, k) = ...
+                    cross_corr_ensemble(:, :, k) + ...
+                    fftshift(cross_corr_spectral);
+        end 
     end  
     
     % Print a carriage return after
     % the image pair is done processing
     fprintf(1, '\n');
+end
+
+% If the spectral ensemble was performed,
+% then the spectal ensemble correlations
+% need to be inverse-Fourier transformed
+% back into the spatial domain. 
+% This checks which type of ensemble was run
+% (spatial or spectral) and does the inverse
+% transform if necessary. Note that this transform
+% happens in-place, i.e., the value of 
+% the variable cross_corr_ensemble is changed
+% after this result, rather than the transformed
+% correlations being saved as a separate variable.
+% This is to save memory, and also to reduce
+% the number of variables we have to keep track of.
+switch lower(ensemble_domain_string)
+    case 'spectral'
+        % Do the inverse transform for each region.
+        for k = 1 : num_regions_correlate
+            cross_corr_ensemble(:, :, k) = fftshift(abs(ifft2(cross_corr_ensemble(:, :, k))));
+        end  
 end
 
 
@@ -208,7 +244,7 @@ for k = 1 : num_regions_correlate
     
     % Extract the grid index
     grid_index = grid_indices(k);
-
+        
     % Do the subpixel displacement estimate.
     [tx_raw_full(grid_index), ty_raw_full(grid_index)] = subpixel(cross_corr_ensemble(:, :, k),...
             region_width, region_height, sub_pixel_weights, ...
@@ -275,6 +311,22 @@ if do_smoothing == true
     JOBFILE.Processing(PASS_NUMBER).Results.Displacement.Smoothed.Y = ty_smoothed_full;
 
 end
+
+% Plotting for debugging
+
+% nx = length(unique(grid_full_x));
+% ny = length(unique(grid_full_y));
+% 
+% tx_mat = reshape(tx_smoothed_full, [ny, nx]);
+% 
+% imagesc(grid_full_x, grid_full_y, tx_mat);
+% hold on
+% quiver(grid_full_x, grid_full_y, tx_smoothed_full, ty_smoothed_full, 2, 'black', 'linewidth', 2);
+% axis image;
+% hold off
+% drawnow;
+% 
+% end
 
 end
 
