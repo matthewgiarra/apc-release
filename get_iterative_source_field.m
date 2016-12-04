@@ -56,8 +56,8 @@ if isfield(JOBFILE.Processing(PASS_NUMBER), 'Iterative');
             % Default to taking the smoothed
             % displacements from the previous pass.
             if isfield(previous_pass_struct, 'Results')
-                tx_source = previous_pass_struct.Results.Displacements.X.Smoothed;
-                ty_source = previous_pass_struct.Results.Displacements.Y.Smoothed;        
+                tx_source = previous_pass_struct.Results.Displacement.Smoothed.X;
+                ty_source = previous_pass_struct.Results.Displacement.Smoothed.Y;        
             end            
         end
 

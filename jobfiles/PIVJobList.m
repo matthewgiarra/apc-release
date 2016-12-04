@@ -41,14 +41,14 @@ Processing(1).Grid.Mask.Name = 'imgAmask3.tif';
 
 % Frame parameters.
 Processing(1).Frames.Start = 1;
-Processing(1).Frames.End = 300;
+Processing(1).Frames.End = 5;
 Processing(1).Frames.Step = 1;
 
 % Correlation parameters
 Processing(1).Correlation.Method = 'scc';
 Processing(1).Correlation.Step = 0;
 Processing(1).Correlation.Ensemble.DoEnsemble = 1;
-Processing(1).Correlation.Ensemble.NumberOfPairs = 10;
+Processing(1).Correlation.Ensemble.NumberOfPairs = 8;
 Processing(1).Correlation.Ensemble.Domain = 'spatial';
 
 % Parameters specific to APC
