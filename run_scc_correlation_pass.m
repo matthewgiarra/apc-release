@@ -42,8 +42,8 @@ particle_diameter = JOBFILE.Processing(PASS_NUMBER).SubPixel.EstimatedParticleDi
 % Determine if deform is requested
 iterative_method = JOBFILE.Processing(1).Iterative.Method;
 
-% Determine whether deform is being performed
-do_deform = ~isempty(regexpi(iterative_method, 'def'));
+% Determine whether deform is requested
+deform_requested = ~isempty(regexpi(iterative_method, 'def'));
 
 % Subpixel method
 % % % For now ignore this and always do three-point fit.
@@ -87,10 +87,22 @@ for n = 1 : num_pairs_correlate
     % Load the images
     image_raw_01 = double(imread(image_path_01));
     image_raw_02 = double(imread(image_path_02));
-    
+
+    % Before any deform action happens,
+    % set the images to be processed 
+    % (image_01 and image_02) to be equal
+    % to the raw input images.
+    % This is the "default" configuration.
+    % If deform proceeds
+    % then the data stored in
+    % image_01 and image_02 (the raw images) will 
+    % be replaced with the deformed images.
+    image_01 = image_raw_01;
+    image_02 = image_raw_02;
+
     % If doing deformation, 
     % then execute deformation
-    if do_deform
+    if deform_requested
     
         % Read the deform parameters
         %
@@ -108,23 +120,45 @@ for n = 1 : num_pairs_correlate
         % Deform method
         deform_interpolation_method = JOBFILE.Processing(1).Iterative.Deform.Interpolation;
 
-        % Inform the user that
-        % deform is happening.
-        fprintf(1, 'Deforming images...\n');
-        
-        % Deform the images if requested.
-        [image_01, image_02] = ...
-            deform_image_pair(image_raw_01, image_raw_02, ...
-            deform_source_grid_x, deform_source_grid_y, ...
-            deform_source_displacement_x, deform_source_displacement_y, ...
-            deform_interpolation_method);
-        
-    % If deform isn't specified,
-    % then just use the raw images.
-    else  
-        image_01 = image_raw_01;
-        image_02 = image_raw_02;
+        % Determine if the data present
+        % would result in any deformation happening
+        %
+        % If all of the source displacements are zero,
+        % then the images shouldn't be deformed, 
+        % even if deformation is requested.
+        % I (Matt Giarra) wrote the deform code
+        % to check internally check for this condition
+        % and to skip deformation if all the source
+        % displacements are zero. Because of that,
+        % this if-else block (the one you're reading right now)
+        % is kind of redundant.
+        % The reason I've put it here anyway
+        % is to make the code more understandable:
+        % I don't want it to look like deform is
+        % always run no matter what. Without this block
+        % that's how the code would read (I think), and you'd have
+        % to go into the deform code itself to realize that 
+        % zero-everywhere displacement fields result
+        % in the image deformation getting skipped.
+        deform_data_exist = or(any(deform_source_displacement_x ~= 0), ...
+            any(deform_source_displacement_y ~= 0));
 
+        % Determine whether to do deform
+        deform_can_proceed = and(deform_requested, deform_data_exist);
+
+        % Do the deform if conditions are satisfied
+        if deform_can_proceed
+            % Inform the user that
+            % deform is happening.
+            fprintf(1, 'Deforming images...\n');
+
+            % Deform the images if requested.
+            [image_01, image_02] = ...
+                deform_image_pair(image_raw_01, image_raw_02, ...
+                deform_source_grid_x, deform_source_grid_y, ...
+                deform_source_displacement_x, deform_source_displacement_y, ...
+                deform_interpolation_method);
+        end
     end
     
     % Extract the regions
@@ -134,6 +168,10 @@ for n = 1 : num_pairs_correlate
     region_mat_02 = extract_sub_regions(image_02, ...
         [region_height, region_width], ...
         grid_correlate_x, grid_correlate_y);
+    
+    % Inform the user that correlations 
+    % are about to happen.
+    fprintf(1, 'Correlating image pair...\n');
     
     % Loop over the regions
     for k = 1 : num_regions_correlate
@@ -155,7 +193,11 @@ for n = 1 : num_pairs_correlate
         % Add the spatial correlation to the ensemble
         cross_corr_ensemble(:, :, k) = cross_corr_ensemble(:, :, k) + ...
             cross_corr_spatial;   
-    end   
+    end  
+    
+    % Print a carriage return after
+    % the image pair is done processing
+    fprintf(1, '\n');
 end
 
 
@@ -185,7 +227,7 @@ do_validation = JOBFILE.Processing(PASS_NUMBER).Validation.DoValidation;
 if do_validation == true;
     
     % Inform the user
-    fprintf(1, 'Performing validation...\n');
+    fprintf(1, 'Validating vector field...\n');
     
     % Calculate the validated field.
     [tx_val_full, ty_val_full, is_outlier_full] = ...
@@ -220,7 +262,7 @@ do_smoothing = JOBFILE.Processing(PASS_NUMBER).Smoothing.DoSmoothing;
 if do_smoothing == true
     
     % Inform the user
-    fprintf(1, 'Performing smoothing...\n');
+    fprintf(1, 'Smoothing vector field...\n');
     
     % Extract the smoothing parameters
     smoothing_kernel_diameter = JOBFILE.Processing(PASS_NUMBER).Smoothing.KernelDiameter;
@@ -233,9 +275,6 @@ if do_smoothing == true
     JOBFILE.Processing(PASS_NUMBER).Results.Displacement.Smoothed.Y = ty_smoothed_full;
 
 end
-
-% quiver(grid_full_x, grid_full_y, tx_smoothed_full, ty_smoothed_full, 3, 'black');
-% axis image
 
 end
 
