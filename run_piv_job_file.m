@@ -18,6 +18,9 @@ for p = 1 : num_passes
 
 end
 
+% Save the results.
+output_file_path = save_piv_jobfile_results(JOBFILE);
+
 end
 
 

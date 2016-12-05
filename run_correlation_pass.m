@@ -498,18 +498,18 @@ end
 JOBFILE.Processing(PASS_NUMBER).Results.Displacement.Final.X = tx_full_output;
 JOBFILE.Processing(PASS_NUMBER).Results.Displacement.Final.Y = ty_full_output;
 
-% Plotting for debugging
-nx = length(unique(grid_full_x));
-ny = length(unique(grid_full_y));
-
-tx_mat = reshape(tx_full_output, [ny, nx]);
-
-imagesc(grid_full_x, grid_full_y, tx_mat);
-hold on
-quiver(grid_full_x, grid_full_y, tx_full_output, ty_full_output, 2, 'black', 'linewidth', 2);
-axis image;
-hold off
-drawnow;
+% % Plotting for debugging
+% nx = length(unique(grid_full_x));
+% ny = length(unique(grid_full_y));
+% 
+% tx_mat = reshape(tx_full_output, [ny, nx]);
+% 
+% imagesc(grid_full_x, grid_full_y, tx_mat);
+% hold on
+% quiver(grid_full_x, grid_full_y, tx_full_output, ty_full_output, 2, 'black', 'linewidth', 2);
+% axis image;
+% hold off
+% drawnow;
 
 
 end
