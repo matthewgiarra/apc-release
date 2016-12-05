@@ -76,18 +76,18 @@ particle_diameter_list_x = particle_diameter .* ...
 particle_diameter_list_y = particle_diameter .* ...
     ones(num_regions_correlate, 1);
 
+% Make some filters. 
+% These are to let the parfor loops run
+rpc_filter = ...
+    spectral_energy_filter(region_height, region_width, particle_diameter);
 
-% Spectral filter
-% Allocate the spectral filter 
-switch lower(correlation_method)
-    case 'rpc'
-        spectral_filter = spectral_energy_filter(region_height, region_width, particle_diameter);
-    case 'gcc'
-        spectral_filter = ones(region_height, region_width);
-    otherwise
-        spectral_filter = zeros(region_height, region_width);
-end
+% GCC filter is just ones
+gcc_filter = ones(region_height, region_width);
 
+% Allocate the spectral filter
+% just so the parallel loops don't give warnings
+% spectral_filter = zeros(region_height, region_width);
+% spectral_filter_temp = zeros(region_height, region_width);
 
 % Fit method
 % % % For now ignore this and always do three-point fit.
@@ -215,7 +215,7 @@ for n = 1 : num_pairs_correlate
     fprintf(1, 'Correlating image pair...\n');
     
     % Loop over the regions
-    for k = 1 : num_regions_correlate
+    parfor k = 1 : num_regions_correlate
         
         % Extract the subregions
         region_01 = region_mat_01(:, :, k);
@@ -258,6 +258,12 @@ for n = 1 : num_pairs_correlate
                         spectral_filter = ...
                             calculate_apc_filter(cross_corr_spectral, ...
                             particle_diameter);
+                        
+                    case 'rpc'
+                        spectral_filter = rpc_filter;
+                        
+                    case 'gcc'
+                        spectral_filter = gcc_filter;
                 end
                 
                 % Apply the phase filter to the spectral plane.
@@ -309,8 +315,13 @@ end
 % the number of variables we have to keep track of.
 switch lower(ensemble_domain_string)
     case 'spectral'
+        
+        % Inform the user
+        fprintf(1, 'Calculating inverse FTs...\n');
+        
         % Do the inverse transform for each region.
-        for k = 1 : num_regions_correlate
+        parfor k = 1 : num_regions_correlate
+            
             
             % Extract the given region
             cross_corr_spectral = cross_corr_ensemble(:, :, k);
@@ -322,12 +333,19 @@ switch lower(ensemble_domain_string)
             % Switch between correlation methods
             switch lower(correlation_method)
                 case 'scc'           
-                    spectral_filter = spectral_corr_mag;
+                    spectral_filter_temp = spectral_corr_mag;
 
-                case 'apc' 
-                    spectral_filter = ...
+                case 'apc'
+                    
+                    % Calculate the APC filter
+                    spectral_filter_temp = ...
                     calculate_apc_filter(cross_corr_spectral, ...
                     particle_diameter);
+                
+                case 'rpc'
+                    spectral_filter_temp = rpc_filter;
+                case 'gcc'
+                    spectral_filter_temp = gcc_filter;
             end
             
             % Apply the phase filter to the spectral plane.
@@ -339,12 +357,11 @@ switch lower(ensemble_domain_string)
             % simplify the control flow. Not sure if this will
             % turn out to be a nice way to do it.
             cross_corr_spectral_filtered = ...
-            spectral_filter .* spectral_corr_phase;
+            spectral_filter_temp .* spectral_corr_phase;
                 
             % Take the inverse FT of the "filtered" correlation.
             cross_corr_ensemble(:, :, k) = fftshift(abs(ifft2(fftshift(...
-                        cross_corr_spectral_filtered))));
-                    
+                        cross_corr_spectral_filtered))));                    
         end  
 end
 
