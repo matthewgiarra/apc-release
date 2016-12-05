@@ -321,8 +321,7 @@ switch lower(ensemble_domain_string)
         
         % Do the inverse transform for each region.
         parfor k = 1 : num_regions_correlate
-            
-            
+                  
             % Extract the given region
             cross_corr_spectral = cross_corr_ensemble(:, :, k);
             
@@ -334,14 +333,23 @@ switch lower(ensemble_domain_string)
             switch lower(correlation_method)
                 case 'scc'           
                     spectral_filter_temp = spectral_corr_mag;
-
+                    
                 case 'apc'
                     
                     % Calculate the APC filter
-                    spectral_filter_temp = ...
+                    [spectral_filter_temp, filter_std_y, filter_std_x] = ...
                     calculate_apc_filter(cross_corr_spectral, ...
                     particle_diameter);
                 
+                    % Equivalent particle diameter in the columns
+                    % direction, calculated from the APC filter.
+                    particle_diameter_list_x(k) = calculate_equivalent_particle_diameter(...
+                        filter_std_x, region_width);
+                    
+                    % Equivalent particle diameter in the rows
+                    % direction, calculated from the APC filter.
+                    particle_diameter_list_y(k) = calculate_equivalent_particle_diameter(...
+                        filter_std_y, region_height);       
                 case 'rpc'
                     spectral_filter_temp = rpc_filter;
                 case 'gcc'
@@ -376,14 +384,21 @@ for k = 1 : num_regions_correlate
     % Effective particle diameters
     dp_x = particle_diameter_list_x(k);
     dp_y = particle_diameter_list_y(k);
-    
+      
     % Extract the grid index
     grid_index = grid_indices(k);
         
     % Do the subpixel displacement estimate.
-    [tx_temp(grid_index), ty_temp(grid_index)] = subpixel(cross_corr_ensemble(:, :, k),...
+    [tx_temp(grid_index), ty_temp(grid_index)] = ...
+        subpixel(cross_corr_ensemble(:, :, k),...
             region_width, region_height, sub_pixel_weights, ...
-                1, 0, [dp_x, dp_y]);                       
+                1, 0, [dp_x, dp_y]);
+            
+   % If APC was done, then save the APC  
+   % filter diameter to the jobfile results
+   JOBFILE.Processing(PASS_NUMBER).Results.Filtering.APC.Diameter.X(grid_index, 1) = dp_x;
+   JOBFILE.Processing(PASS_NUMBER).Results.Filtering.APC.Diameter.Y(grid_index, 1) = dp_y;
+   
 end
 
 % Resample the source displacement

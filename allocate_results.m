@@ -29,5 +29,17 @@ JOBFILE.Processing(PASS_NUMBER).Results.Displacement.Validated.IsOutlier = zeros
 JOBFILE.Processing(PASS_NUMBER).Results.Displacement.Smoothed.X = zeros(num_regions_full, num_pairs_correlate);
 JOBFILE.Processing(PASS_NUMBER).Results.Displacement.Smoothed.Y = zeros(num_regions_full, num_pairs_correlate);
 
+% Read the correlation method
+correlation_method_str = lower(read_correlation_method(JOBFILE, PASS_NUMBER));
+
+% Allocate APC diameters
+switch lower(correlation_method_str)
+    case 'apc'
+        JOBFILE.Processing(PASS_NUMBER).Results.Filtering.APC.Diameter.X ...
+            = nan(num_regions_full, num_pairs_correlate);
+        JOBFILE.Processing(PASS_NUMBER).Results.Filtering.APC.Diameter.Y ...
+            = nan(num_regions_full, num_pairs_correlate);
+end
+
 
 end
