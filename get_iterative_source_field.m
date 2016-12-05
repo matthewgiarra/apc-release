@@ -53,11 +53,11 @@ if isfield(JOBFILE.Processing(PASS_NUMBER), 'Iterative');
             gx_source = previous_pass_struct.Grid.Points.Full.X;
             gy_source = previous_pass_struct.Grid.Points.Full.Y;
 
-            % Default to taking the smoothed
-            % displacements from the previous pass.
+            % Read the final output displacement
+            % field from the previous pass.
             if isfield(previous_pass_struct, 'Results')
-                tx_source = previous_pass_struct.Results.Displacement.Smoothed.X;
-                ty_source = previous_pass_struct.Results.Displacement.Smoothed.Y;        
+                tx_source = previous_pass_struct.Results.Displacement.Final.X;
+                ty_source = previous_pass_struct.Results.Displacement.Final.Y;        
             end            
         end
 

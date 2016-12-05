@@ -3,6 +3,7 @@
 addpaths();
 
 % Load the job list
+% JobList = PIVJobList_synthetic();
 JobList = PIVJobList();
 
 % Run the job list

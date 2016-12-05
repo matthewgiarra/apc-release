@@ -36,10 +36,19 @@ function [WINDOW_01, WINDOW_02] = ...
         
     else
         
-        % Set the window fractions to be the same
-        % if the field is just an array. 
-        window_fraction_01 = window_fraction_field{1};
-        window_fraction_02 = window_fraction_01;
+        % Number of window fractions specified
+        num_fractions_specified = size(window_fraction_field, 1);
+        
+        % Read the first window size.
+        window_fraction_01 = window_fraction_field(1, :);
+        
+        % If a different size is specified for
+        % the second window, then read it. 
+        if num_fractions_specified > 1
+            window_fraction_02 = window_fraction_field(2, :);
+        else
+            window_fraction_02 = window_fraction_01;
+        end
         
     end
     

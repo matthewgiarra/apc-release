@@ -5,6 +5,12 @@ if nargin < 2
     PASS_NUMBER = 1; 
 end
 
+% Create image path list.
+JOBFILE = create_image_pair_path_list(JOBFILE, PASS_NUMBER);
+
+% Grid the image
+JOBFILE = grid_image(JOBFILE, PASS_NUMBER);
+
 % Get the source field for any iterative methods
 % This should run even if no iterative method was specified
 JOBFILE = get_iterative_source_field(JOBFILE, PASS_NUMBER);
@@ -416,6 +422,19 @@ end
 tx_raw_full = tx_temp + source_field_interp_tx;
 ty_raw_full = ty_temp + source_field_interp_ty;
 
+% Save the current fields as 
+% the "output" fields.
+% This variable gets updated
+% after each post-processing step
+% is performed. The reason for this
+% is that the deform methods
+% should chose the final field
+% from the previous pass, and 
+% this way the "final" field
+% is always saved.
+tx_full_output = tx_raw_full;
+ty_full_output = ty_raw_full;
+
 % Save the results to the structure
 JOBFILE.Processing(PASS_NUMBER).Results.Displacement.Raw.X(:, 1) = ...
     tx_raw_full;
@@ -440,21 +459,9 @@ if do_validation == true;
     JOBFILE.Processing(PASS_NUMBER).Results.Displacement.Validated.Y = ty_val_full;
     JOBFILE.Processing(PASS_NUMBER).Results.Displacement.Validated.IsOutlier = is_outlier_full;
     
-    % Temporary vector of displacements
-    % which will be passed to smoothing if requested
-    tx_temp_full = tx_val_full;
-    ty_temp_full = ty_val_full;
-   
-else
-    
-    % If velidation wasn't requested, 
-    % then set the temporary vector
-    % field to be equal to
-    % the raw vector field.
-    % This will be passed to the smoother
-    % (but only if smoothing is requested).
-    tx_temp_full = tx_raw_full;
-    ty_temp_full = ty_raw_full;
+    % Update the "output" fields
+    tx_full_output = tx_val_full;
+    ty_full_output = ty_val_full;
 end
 
 % Determine whether to do smoothing.
@@ -471,23 +478,29 @@ if do_smoothing == true
     smoothing_kernel_std = JOBFILE.Processing(PASS_NUMBER).Smoothing.KernelStdDev;
 
     % Calculate smoothed field
-    tx_smoothed_full = smoothField(tx_temp_full, smoothing_kernel_diameter, smoothing_kernel_std);
-    ty_smoothed_full = smoothField(ty_temp_full, smoothing_kernel_diameter, smoothing_kernel_std);
+    tx_smoothed_full = smoothField(tx_full_output, smoothing_kernel_diameter, smoothing_kernel_std);
+    ty_smoothed_full = smoothField(ty_full_output, smoothing_kernel_diameter, smoothing_kernel_std);
     JOBFILE.Processing(PASS_NUMBER).Results.Displacement.Smoothed.X = tx_smoothed_full;
     JOBFILE.Processing(PASS_NUMBER).Results.Displacement.Smoothed.Y = ty_smoothed_full;
-
+    
+    % Update the "output" fields
+    tx_full_output = tx_smoothed_full;
+    ty_full_output = ty_smoothed_full;
 end
 
-% Plotting for debugging
+% Save the "output" fields to the jobfile results field.
+JOBFILE.Processing(PASS_NUMBER).Results.Displacement.Final.X = tx_full_output;
+JOBFILE.Processing(PASS_NUMBER).Results.Displacement.Final.Y = ty_full_output;
 
+% Plotting for debugging
 nx = length(unique(grid_full_x));
 ny = length(unique(grid_full_y));
 
-tx_mat = reshape(tx_smoothed_full, [ny, nx]);
+tx_mat = reshape(tx_full_output, [ny, nx]);
 
 imagesc(grid_full_x, grid_full_y, tx_mat);
 hold on
-quiver(grid_full_x, grid_full_y, tx_smoothed_full, ty_smoothed_full, 2, 'black', 'linewidth', 2);
+quiver(grid_full_x, grid_full_y, tx_full_output, ty_full_output, 2, 'black', 'linewidth', 2);
 axis image;
 hold off
 drawnow;
