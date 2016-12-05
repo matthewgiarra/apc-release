@@ -147,6 +147,12 @@ for n = 1 : num_pairs_correlate
     image_01 = image_raw_01;
     image_02 = image_raw_02;
 
+    % Initialize the source grid
+    source_grid_x = JOBFILE.Processing(PASS_NUMBER).Grid.Points.Full.X;
+    source_grid_y = JOBFILE.Processing(PASS_NUMBER).Grid.Points.Full.Y;
+    source_displacement_x = zeros(size(source_grid_x));
+    source_displacement_y = zeros(size(source_grid_y));
+    
     % If doing deformation, 
     % then execute deformation
     if deform_requested

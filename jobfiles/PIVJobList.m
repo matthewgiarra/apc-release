@@ -51,7 +51,7 @@ Processing(1).Grid.Mask.Name = 'imgAmask3.tif';
 
 % Frame parameters.
 Processing(1).Frames.Start = 1;
-Processing(1).Frames.End = 10;
+Processing(1).Frames.End = 1;
 Processing(1).Frames.Step = 1;
 
 % Correlation parameters
@@ -85,7 +85,7 @@ Processing(1).Smoothing.KernelDiameter = 7;
 Processing(1).Smoothing.KernelStdDev = 1;
 
 % Parameters for iterative method
-Processing(1).Iterative.Method = 'deform';
+Processing(1).Iterative.Method = 'none';
 Processing(1).Iterative.Deform.Interpolation = 'interp2'; 
 Processing(1).Iterative.Deform.ConvergenceCriterion = 0.1;
 Processing(1).Iterative.Deform.MaxIterations = 1;
