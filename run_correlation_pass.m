@@ -21,17 +21,7 @@ JOBFILE = allocate_results(JOBFILE, PASS_NUMBER);
 % Check the correlation method
 correlation_method = lower(read_correlation_method(JOBFILE, PASS_NUMBER));
 
-% Pick between correlation methods
-switch lower(correlation_method)
-    case 'scc';
-        
-        % Run the SCC pass
-        JOBFILE = run_scc_correlation_pass(JOBFILE, PASS_NUMBER);
-    case 'rpc';
-    case 'apc';
-    case 'spc';
-    case 'gcc';
-end
+JOBFILE = run_scc_correlation_pass(JOBFILE, PASS_NUMBER);
 
 
 

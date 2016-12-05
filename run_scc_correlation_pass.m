@@ -10,6 +10,9 @@ end
 % ensemble shouldn't be run.
 ensemble_length = read_ensemble_length(JOBFILE, PASS_NUMBER);
 
+% Read the correlation method
+correlation_method = lower(JOBFILE.Processing(PASS_NUMBER).Correlation.Method);
+
 % Correlation grid points
 grid_correlate_x = JOBFILE.Processing(PASS_NUMBER).Grid.Points.Correlate.X;
 grid_correlate_y = JOBFILE.Processing(PASS_NUMBER).Grid.Points.Correlate.Y;
@@ -36,7 +39,6 @@ num_pairs_correlate = read_num_pairs(JOBFILE, PASS_NUMBER);
 % Subpixel weights
 sub_pixel_weights = ones(region_height, region_width);
 
-
 % Determine if deform is requested
 iterative_method = JOBFILE.Processing(1).Iterative.Method;
 
@@ -60,6 +62,19 @@ particle_diameter_list_x = particle_diameter .* ...
     ones(num_regions_correlate, 1);
 particle_diameter_list_y = particle_diameter .* ...
     ones(num_regions_correlate, 1);
+
+
+% Spectral filter
+% Allocate the spectral filter 
+switch lower(correlation_method)
+    case 'rpc'
+        spectral_filter = spectral_energy_filter(region_height, region_width, particle_diameter);
+    case 'gcc'
+        spectral_filter = ones(region_height, region_width);
+    otherwise
+        spectral_filter = zeros(region_height, region_width);
+end
+
 
 % Fit method
 % % % For now ignore this and always do three-point fit.
@@ -198,8 +213,8 @@ for n = 1 : num_pairs_correlate
         FT_02 = fft2(spatial_window_02 .* (region_02 - mean(region_02(:))));
         
         % Spectral correlation
-        cross_corr_spectral = FT_01 .* conj(FT_02);
-                
+        cross_corr_spectral = fftshift((FT_01 .* conj(FT_02)));
+          
         % Switch between spatial and spectral ensemble
         switch lower(ensemble_domain_string)
             case 'spatial'
@@ -207,19 +222,57 @@ for n = 1 : num_pairs_correlate
                 % FT of the spectral correlation (i.e., the spatial
                 % correlation) and add this to the purely real 
                 % ensemble correlation
-                %
-                % Add the correlation to the ensemble
-                % (spatial domain)
-                cross_corr_ensemble(:, :, k) = ...
-                    cross_corr_ensemble(:, :, k) + ...
-                    fftshift(abs(ifft2(cross_corr_spectral)));
                 
+                % Split the correlation into 
+                % magnitude and phase. This will
+                % be used for filtering 
+                % (note this happens even if "no filtering"
+                % is specified). 
+                % Spectral correlation phase and magnitude
+                [spectral_corr_phase, spectral_corr_mag] = ...
+                    split_complex(cross_corr_spectral);
+ 
+                % Switch between correlation methods
+                switch lower(correlation_method)
+                    case 'scc'    
+                        
+                        % For SCC, take the original magnitude
+                        % as the spectral filter. 
+                        spectral_filter = spectral_corr_mag;
+                        
+                    case 'apc'
+                        % Automatically calculate the APC filter.
+                        spectral_filter = ...
+                            calculate_apc_filter(cross_corr_spectral, ...
+                            particle_diameter);
+                end
+                
+                % Apply the phase filter to the spectral plane.
+                % Note that this operation is legitimate even
+                % if SCC or GCC is selected. The reason for this
+                % is that if SCC is selected, then the "filter"
+                % is just the original magnitude. 
+                % I (Matt Giarra) have coded it this way to
+                % simplify the control flow. Not sure if this will
+                % turn out to be a nice way to do it.
+                cross_corr_spectral_filtered = ...
+                    spectral_filter .* spectral_corr_phase;
+                
+                % Take the inverse FT of the "filtered" correlation.
+                cross_corr_spatial = fftshift(abs(ifft2(fftshift(...
+                            cross_corr_spectral_filtered))));
+                        
+                % Add this correlation to the spatial ensemble
+                cross_corr_ensemble(:, :, k) = ...
+                    cross_corr_ensemble(:, :, k) + cross_corr_spatial;
+  
             case 'spectral'   
+                
                 % For spectral ensemble, add the current complex
                 % correlation to the ensemble complex correlation
                 cross_corr_ensemble(:, :, k) = ...
                     cross_corr_ensemble(:, :, k) + ...
-                    fftshift(cross_corr_spectral);
+                    cross_corr_spectral;
         end 
     end  
     
@@ -245,10 +298,42 @@ switch lower(ensemble_domain_string)
     case 'spectral'
         % Do the inverse transform for each region.
         for k = 1 : num_regions_correlate
-            cross_corr_ensemble(:, :, k) = fftshift(abs(ifft2(cross_corr_ensemble(:, :, k))));
+            
+            % Extract the given region
+            cross_corr_spectral = cross_corr_ensemble(:, :, k);
+            
+            % Spectral correlation phase and magnitude
+            [spectral_corr_phase, spectral_corr_mag] = ...
+                split_complex(cross_corr_spectral);
+            
+            % Switch between correlation methods
+            switch lower(correlation_method)
+                case 'scc'           
+                    spectral_filter = spectral_corr_mag;
+
+                case 'apc' 
+                    spectral_filter = ...
+                    calculate_apc_filter(cross_corr_spectral, ...
+                    particle_diameter);
+            end
+            
+            % Apply the phase filter to the spectral plane.
+            % Note that this operation is legitimate even
+            % if SCC or GCC is selected. The reason for this
+            % is that if SCC is selected, then the "filter"
+            % is just the original magnitude. 
+            % I (Matt Giarra) have coded it this way to
+            % simplify the control flow. Not sure if this will
+            % turn out to be a nice way to do it.
+            cross_corr_spectral_filtered = ...
+            spectral_filter .* spectral_corr_phase;
+                
+            % Take the inverse FT of the "filtered" correlation.
+            cross_corr_ensemble(:, :, k) = fftshift(abs(ifft2(fftshift(...
+                        cross_corr_spectral_filtered))));
+                    
         end  
 end
-
 
 % Allocate arrays to hold vectors
 tx_temp = zeros(num_regions_full, 1);
