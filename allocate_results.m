@@ -15,7 +15,7 @@ image_paths_list_01 = image_paths_list_full{1};
 num_pairs_correlate = length(image_paths_list_01);
 
 % Extract the full list of grid points (masked AND unmasked)
-grid_full_x = JOBFILE.Processing(1).Grid.Points.Full.X;
+grid_full_x = JOBFILE.Processing(PASS_NUMBER).Grid.Points.Full.X;
 
 % Count the number of points to correlate
 num_regions_full = length(grid_full_x);
