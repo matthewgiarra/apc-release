@@ -36,7 +36,7 @@ interpolant_ty = griddedInterpolant(y_array, x_array, v_array, 'spline', 'linear
 UI = interpolant_tx(YI, XI);
 VI = interpolant_ty(YI, XI);
 
-% These are the coordinates at which to resample image 2.
+% These are the coordinates at which to resample the image.
 XD = XI + UI;
 YD = YI + VI;
 

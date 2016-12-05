@@ -108,14 +108,14 @@ for n = 1 : num_pairs_correlate
         %
         % This is the grid from the previous pass, 
         % which will inform the deform method.
-        deform_source_grid_x = JOBFILE.Processing(PASS_NUMBER).Iterative.Source.Grid.X;
-        deform_source_grid_y = JOBFILE.Processing(PASS_NUMBER).Iterative.Source.Grid.Y;
+        source_grid_x = JOBFILE.Processing(PASS_NUMBER).Iterative.Source.Grid.X;
+        source_grid_y = JOBFILE.Processing(PASS_NUMBER).Iterative.Source.Grid.Y;
         %
         % These are the displacements from the
         % previous pass, which will inform
         % the deform method.
-        deform_source_displacement_x = JOBFILE.Processing(PASS_NUMBER).Iterative.Source.Displacement.X;
-        deform_source_displacement_y = JOBFILE.Processing(PASS_NUMBER).Iterative.Source.Displacement.Y;
+        source_displacement_x = JOBFILE.Processing(PASS_NUMBER).Iterative.Source.Displacement.X;
+        source_displacement_y = JOBFILE.Processing(PASS_NUMBER).Iterative.Source.Displacement.Y;
 
         % Deform method
         deform_interpolation_method = JOBFILE.Processing(1).Iterative.Deform.Interpolation;
@@ -140,8 +140,8 @@ for n = 1 : num_pairs_correlate
         % to go into the deform code itself to realize that 
         % zero-everywhere displacement fields result
         % in the image deformation getting skipped.
-        deform_data_exist = or(any(deform_source_displacement_x ~= 0), ...
-            any(deform_source_displacement_y ~= 0));
+        deform_data_exist = or(any(source_displacement_x ~= 0), ...
+            any(source_displacement_y ~= 0));
 
         % Determine whether to do deform
         deform_can_proceed = and(deform_requested, deform_data_exist);
@@ -155,8 +155,8 @@ for n = 1 : num_pairs_correlate
             % Deform the images if requested.
             [image_01, image_02] = ...
                 deform_image_pair(image_raw_01, image_raw_02, ...
-                deform_source_grid_x, deform_source_grid_y, ...
-                deform_source_displacement_x, deform_source_displacement_y, ...
+                source_grid_x, source_grid_y, ...
+                source_displacement_x, source_displacement_y, ...
                 deform_interpolation_method);
         end
     end
@@ -255,9 +255,24 @@ for k = 1 : num_regions_correlate
                        
 end
 
+% Add the source displacement from
+% the iterative method to
+% the measured displacement
+%
+% Resample the source displacement
+% from the source grid
+% onto the current grid.
+[source_field_interp_tx, source_field_interp_ty] = ...
+    resample_vector_field(...
+    source_grid_x, source_grid_y, ...
+    source_displacement_x, source_displacement_y, ...
+    grid_full_x, grid_full_y);
+
 % Save the results to the structure
-JOBFILE.Processing(PASS_NUMBER).Results.Displacement.Raw.X(:, 1) = tx_raw_full;
-JOBFILE.Processing(PASS_NUMBER).Results.Displacement.Raw.Y(:, 1) = ty_raw_full;
+JOBFILE.Processing(PASS_NUMBER).Results.Displacement.Raw.X(:, 1) = ...
+    tx_raw_full + source_field_interp_tx;
+JOBFILE.Processing(PASS_NUMBER).Results.Displacement.Raw.Y(:, 1) = ...
+    ty_raw_full + source_field_interp_ty;
 
 % Do the validation if requested
 do_validation = JOBFILE.Processing(PASS_NUMBER).Validation.DoValidation;
@@ -317,19 +332,18 @@ end
 
 % Plotting for debugging
 
-% nx = length(unique(grid_full_x));
-% ny = length(unique(grid_full_y));
-% 
-% tx_mat = reshape(tx_smoothed_full, [ny, nx]);
-% 
-% imagesc(grid_full_x, grid_full_y, tx_mat);
-% hold on
-% quiver(grid_full_x, grid_full_y, tx_smoothed_full, ty_smoothed_full, 2, 'black', 'linewidth', 2);
-% axis image;
-% hold off
-% drawnow;
-% 
-% end
+nx = length(unique(grid_full_x));
+ny = length(unique(grid_full_y));
+
+tx_mat = reshape(tx_smoothed_full, [ny, nx]);
+
+imagesc(grid_full_x, grid_full_y, tx_mat);
+hold on
+quiver(grid_full_x, grid_full_y, tx_smoothed_full, ty_smoothed_full, 2, 'black', 'linewidth', 2);
+axis image;
+hold off
+drawnow;
+
 
 end
 
