@@ -1,4 +1,4 @@
-function run_piv_job_file(JOBFILE)
+function JOBFILE = run_piv_job_file(JOBFILE)
 
 % Determine the number of passes to run.
 num_passes = determine_number_of_passes(JOBFILE);
@@ -23,7 +23,6 @@ for p = 1 : num_passes
     % Run the pass. 
     JOBFILE = run_correlation_pass(JOBFILE, p);
 
-    
     % Print a carriage return after the pass compeltes.
     fprintf(1, '\n');
     

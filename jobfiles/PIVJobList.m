@@ -55,12 +55,12 @@ Processing(1).Frames.End = 5;
 Processing(1).Frames.Step = 1;
 
 % Correlation parameters
-Processing(1).Correlation.Method = 'apc';
+Processing(1).Correlation.Method = 'scc';
 Processing(1).Correlation.Step = 0;
 % Processing(1).Correlation.Step = 1;
 Processing(1).Correlation.Ensemble.DoEnsemble = 1;
 Processing(1).Correlation.Ensemble.NumberOfPairs = 1;
-Processing(1).Correlation.Ensemble.Domain = 'spectral';
+Processing(1).Correlation.Ensemble.Domain = 'spatial';
 
 % Parameters specific to APC
 Processing(1).Correlation.APC.EnsembleLength = 10;
