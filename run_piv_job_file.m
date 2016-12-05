@@ -22,6 +22,7 @@ for p = 1 : num_passes
     
     % Run the pass. 
     JOBFILE = run_correlation_pass(JOBFILE, p);
+
     
     % Print a carriage return after the pass compeltes.
     fprintf(1, '\n');
