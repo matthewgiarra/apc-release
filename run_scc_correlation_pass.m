@@ -36,8 +36,6 @@ num_pairs_correlate = read_num_pairs(JOBFILE, PASS_NUMBER);
 % Subpixel weights
 sub_pixel_weights = ones(region_height, region_width);
 
-% Estimated particle diameter
-particle_diameter = JOBFILE.Processing(PASS_NUMBER).SubPixel.EstimatedParticleDiameter;
 
 % Determine if deform is requested
 iterative_method = JOBFILE.Processing(1).Iterative.Method;
@@ -45,12 +43,27 @@ iterative_method = JOBFILE.Processing(1).Iterative.Method;
 % Determine whether deform is requested
 deform_requested = ~isempty(regexpi(iterative_method, 'def'));
 
-% Subpixel method
-% % % For now ignore this and always do three-point fit.
+% Subpixel fit parameters
+%
+% Estimated particle diameter
+particle_diameter = JOBFILE.Processing(PASS_NUMBER).SubPixel.EstimatedParticleDiameter;
+%
+% Make the particle diameters a list
+% because the adaptive methods
+% can have a different effective
+% particle diameter for each window.
+%
+% Also, there are separate diameters
+% in X and Y to allow asymmetric
+% (elliptical) particle shapes. 
+particle_diameter_list_x = particle_diameter .* ...
+    ones(num_regions_correlate, 1);
+particle_diameter_list_y = particle_diameter .* ...
+    ones(num_regions_correlate, 1);
 
-% Allocate displacements (raw)
-tx_raw_full = zeros(num_regions_full, 1);
-ty_raw_full = zeros(num_regions_full, 1);
+% Fit method
+% % % For now ignore this and always do three-point fit.
+%%%%%%
 
 % Make the spatial windows
 [spatial_window_01, spatial_window_02] = ...
@@ -245,21 +258,17 @@ ty_temp = zeros(num_regions_full, 1);
 % do the subpixel peak detection.
 for k = 1 : num_regions_correlate
     
+    % Effective particle diameters
+    dp_x = particle_diameter_list_x(k);
+    dp_y = particle_diameter_list_y(k);
+    
     % Extract the grid index
     grid_index = grid_indices(k);
         
     % Do the subpixel displacement estimate.
-%     [tx_raw_full(grid_index), ty_raw_full(grid_index)] = subpixel(cross_corr_ensemble(:, :, k),...
-%             region_width, region_height, sub_pixel_weights, ...
-%                 1, 0, particle_diameter * [1, 1]);
-
     [tx_temp(grid_index), ty_temp(grid_index)] = subpixel(cross_corr_ensemble(:, :, k),...
             region_width, region_height, sub_pixel_weights, ...
-                1, 0, particle_diameter * [1, 1]);
-            
-    % Add to the calculated displacement
-    % whatever source displacement 
-                       
+                1, 0, [dp_x, dp_y]);                       
 end
 
 % Resample the source displacement
