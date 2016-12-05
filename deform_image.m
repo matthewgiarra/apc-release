@@ -1,4 +1,4 @@
-function IMAGEOUT = deformImage(IMAGEIN, X, Y, U, V, METHOD)
+function IMAGEOUT = deform_image(IMAGEIN, X, Y, U, V, METHOD)
 
 % Default to no method sepecified
 if nargin < 6

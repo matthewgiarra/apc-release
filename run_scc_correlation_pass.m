@@ -249,6 +249,9 @@ for k = 1 : num_regions_correlate
     [tx_raw_full(grid_index), ty_raw_full(grid_index)] = subpixel(cross_corr_ensemble(:, :, k),...
             region_width, region_height, sub_pixel_weights, ...
                 1, 0, particle_diameter * [1, 1]);
+            
+    % Add to the calculated displacement
+    % whatever source displacement 
                        
 end
 
