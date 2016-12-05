@@ -237,16 +237,23 @@ switch lower(ensemble_domain_string)
 end
 
 
+% Allocate arrays to hold vectors
+tx_temp = zeros(num_regions_full, 1);
+ty_temp = zeros(num_regions_full, 1);
+
 % After adding all the pairs to the ensemble
 % do the subpixel peak detection.
-
 for k = 1 : num_regions_correlate
     
     % Extract the grid index
     grid_index = grid_indices(k);
         
     % Do the subpixel displacement estimate.
-    [tx_raw_full(grid_index), ty_raw_full(grid_index)] = subpixel(cross_corr_ensemble(:, :, k),...
+%     [tx_raw_full(grid_index), ty_raw_full(grid_index)] = subpixel(cross_corr_ensemble(:, :, k),...
+%             region_width, region_height, sub_pixel_weights, ...
+%                 1, 0, particle_diameter * [1, 1]);
+
+    [tx_temp(grid_index), ty_temp(grid_index)] = subpixel(cross_corr_ensemble(:, :, k),...
             region_width, region_height, sub_pixel_weights, ...
                 1, 0, particle_diameter * [1, 1]);
             
@@ -255,10 +262,6 @@ for k = 1 : num_regions_correlate
                        
 end
 
-% Add the source displacement from
-% the iterative method to
-% the measured displacement
-%
 % Resample the source displacement
 % from the source grid
 % onto the current grid.
@@ -268,11 +271,17 @@ end
     source_displacement_x, source_displacement_y, ...
     grid_full_x, grid_full_y);
 
+% Add the source displacement from
+% the iterative method to
+% the measured displacement
+tx_raw_full = tx_temp + source_field_interp_tx;
+ty_raw_full = ty_temp + source_field_interp_ty;
+
 % Save the results to the structure
 JOBFILE.Processing(PASS_NUMBER).Results.Displacement.Raw.X(:, 1) = ...
-    tx_raw_full + source_field_interp_tx;
+    tx_raw_full;
 JOBFILE.Processing(PASS_NUMBER).Results.Displacement.Raw.Y(:, 1) = ...
-    ty_raw_full + source_field_interp_ty;
+    ty_raw_full;
 
 % Do the validation if requested
 do_validation = JOBFILE.Processing(PASS_NUMBER).Validation.DoValidation;

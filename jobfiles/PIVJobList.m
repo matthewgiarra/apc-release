@@ -4,11 +4,14 @@ function JOBLIST = PIVJobList()
 JobOptions.NumberOfPasses = 0;
 
 % Data: Input images
-Data.Inputs.Images.Directory = '/Users/matthewgiarra/Documents/School/VT/Research/Aether/piv_test_images/pivchallenge/2014/A/images/proc/ghost';
-Data.Inputs.Images.BaseName = 'A_deghost_';
+% Data.Inputs.Images.Directory = '/Users/matthewgiarra/Documents/School/VT/Research/Aether/piv_test_images/pivchallenge/2014/A/images/proc/ghost';
+Data.Inputs.Images.Directory = '/Users/matthewgiarra/Documents/School/VT/Research/Aether/piv_test_images/poiseuille_diffusion_0.00/raw';
+% Data.Inputs.Images.BaseName = 'A_deghost_';
+Data.Inputs.Images.BaseName = 'poiseuille_diffusion_0.00_';
 Data.Inputs.Images.Digits = 5;
 Data.Inputs.Images.Extension = '.tif';
-Data.Inputs.Images.Trailers = {'_a', '_b'};
+% Data.Inputs.Images.Trailers = {'_a', '_b'};
+Data.Inputs.Images.Trailers = {''};
 
 % Data: Input vectors for initializing, e.g., image deformation.
 Data.Inputs.Vectors.Directory = '';
@@ -23,33 +26,44 @@ Data.Outputs.Vectors.Digits = 5;
 Data.Outputs.Vectors.Extension = '.mat';
 
 % Interrogation region dimensions
-Processing(1).Region.Height = 64;
+% Processing(1).Region.Height = 64;
+% Processing(1).Region.Width = 128;
+Processing(1).Region.Height = 128;
 Processing(1).Region.Width = 128;
 
+
 % Spatial window
-Processing(1).Window.Fraction = {[0.25, 0.5], [0.25, 1]};
+% Processing(1).Window.Fraction = {[0.25, 0.5], [0.25, 1]};
+Processing(1).Window.Fraction = {0.5};
 
 % Grid parameters
 Processing(1).Grid.Spacing.Y = 64;
-Processing(1).Grid.Spacing.X = 64;
-Processing(1).Grid.Shift.Y = -16;
+Processing(1).Grid.Spacing.X = 128;
+% Processing(1).Grid.Shift.Y = -16;
+Processing(1).Grid.Shift.Y = 0;
 Processing(1).Grid.Shift.X = 0;
 Processing(1).Grid.Buffer.Y = 0;
 Processing(1).Grid.Buffer.X = 0;
-Processing(1).Grid.Mask.Directory = '/Users/matthewgiarra/Documents/School/VT/Research/Aether/piv_test_images/pivchallenge/2014/A/images/masks';
-Processing(1).Grid.Mask.Name = 'imgAmask3.tif';
+% Processing(1).Grid.Mask.Directory = '/Users/matthewgiarra/Documents/School/VT/Research/Aether/piv_test_images/pivchallenge/2014/A/images/masks';
+% Processing(1).Grid.Mask.Name = 'imgAmask3.tif';
+% 
+
+Processing(1).Grid.Mask.Directory = '';
+Processing(1).Grid.Mask.Name = '';
+
 
 % Frame parameters.
 Processing(1).Frames.Start = 1;
-Processing(1).Frames.End = 5;
+Processing(1).Frames.End = 1;
 Processing(1).Frames.Step = 1;
 
 % Correlation parameters
 Processing(1).Correlation.Method = 'scc';
-Processing(1).Correlation.Step = 0;
+% Processing(1).Correlation.Step = 0;
+Processing(1).Correlation.Step = 1;
 Processing(1).Correlation.Ensemble.DoEnsemble = 1;
-Processing(1).Correlation.Ensemble.NumberOfPairs = 8;
-Processing(1).Correlation.Ensemble.Domain = 'spectral';
+Processing(1).Correlation.Ensemble.NumberOfPairs = 1;
+Processing(1).Correlation.Ensemble.Domain = 'spatial';
 
 % Parameters specific to APC
 Processing(1).Correlation.APC.EnsembleLength = 10;
@@ -87,11 +101,11 @@ Processing(1).Iterative.Source.VariableNames.Grid.X = 'gy';
 Processing(1).Iterative.Source.VariableNames.Grid.Y = 'gx';
 
 
-
-
-
 % Copy the first processing pass to the second one.
 Processing(2) = Processing(1);
+
+Processing(2).Grid.Spacing.Y = 16;
+Processing(2).Grid.Spacing.X = 64;
 
 % Add the fields to the jobfile structure.
 JobFile.Data = Data;
