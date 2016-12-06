@@ -18,6 +18,9 @@ image_parent_dir = '/home/shannon/b/aether/piv_test_images/pivchallenge/2014/A/i
 image_dir_list{1} = fullfile(image_parent_dir, 'raw');
 image_dir_list{2} = fullfile(image_parent_dir, 'proc', 'ghost');
 
+% Mask directory
+mask_dir = fullfile(image_parent_dir, 'masks');
+
 % Image base names
 image_base_name_list{1} = 'A_';
 image_base_name_list{2} = 'A_deghost_';
@@ -106,6 +109,9 @@ for k = 1 : num_image_cases
             % Update the start and end frames
             jobfile_current.Processing(p).Frames.Start = start_frame;
             jobfile_current.Processing(p).Frames.End = end_frame;
+            
+            % Update the mask directory
+            jobfile_current.Processing(p).Grid.Mask.Directory = mask_dir;
             
         end
         
