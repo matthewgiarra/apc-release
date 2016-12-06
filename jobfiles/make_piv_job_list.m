@@ -4,18 +4,23 @@ function JOBLIST = make_piv_job_list()
 correlation_method_list = {'scc', 'rpc', 'apc'};
 
 % % Frames list
-% end_frames_list = [600, 600];
+% Start frame and end frame
+start_frame = 1;
+end_frame = 600;
+
+% Number of passes
+num_passes_spec = 5;
 
 % Image parent directory
 image_parent_dir = '/Users/matthewgiarra/Documents/School/VT/Research/Aether/piv_test_images/pivchallenge/2014/A/images/';
 
 % Image directory lists
 image_dir_list{1} = fullfile(image_parent_dir, 'raw');
-% image_dir_list{2} = fullfile(image_parent_dir, 'proc', 'ghost');
+image_dir_list{2} = fullfile(image_parent_dir, 'proc', 'ghost');
 
 % Image base names
 image_base_name_list{1} = 'A_';
-% image_base_name_list{2} = 'A_deghost_';
+image_base_name_list{2} = 'A_deghost_';
 
 % Number of correlation methods
 num_corr_methods = length(correlation_method_list);
@@ -26,8 +31,8 @@ num_image_cases = length(image_base_name_list);
 % Load the default job list
 joblist_default = PIVJobList_default;
 
-% Number of passes
-num_passes = determine_number_of_passes(joblist_default(1));
+% Number of passes specified in the job file
+num_passes_in_jobfile = determine_number_of_passes(joblist_default(1));
 
 % Results base directory
 results_base_dir = fullfile(image_parent_dir, '..', 'vect');
@@ -35,11 +40,21 @@ results_base_dir = fullfile(image_parent_dir, '..', 'vect');
 % Initialize the job number
 job_num = 0;
 
+% Number of passes in the job file
+if num_passes_spec > 0
+    num_passes = min(num_passes_spec, num_passes_in_jobfile);
+else
+    num_passes = num_passes_in_jobfile;
+end
+
 % Loop over all the image cases
 for k = 1 : num_image_cases
 
     % Copy the jobfile
     jobfile_current = joblist_default;
+    
+    % Get rid of unused passes
+    jobfile_current.Processing = jobfile_current.Processing(1 : num_passes);
     
     % image directory
     image_dir = image_dir_list{k};
@@ -86,7 +101,12 @@ for k = 1 : num_image_cases
             
             % Update the ensemble domain
             jobfile_current.Processing(p).Correlation.Ensemble.Domain = ...
-                ensemble_domain_string; 
+                ensemble_domain_string;
+            
+            % Update the start and end frames
+            jobfile_current.Processing(p).Frames.Start = start_frame;
+            jobfile_current.Processing(p).Frames.End = end_frame;
+            
         end
         
         % Add this job file to the job list.
