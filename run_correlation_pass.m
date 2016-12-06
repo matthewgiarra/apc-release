@@ -119,13 +119,19 @@ end
 % Loop over all the images
 for n = 1 : num_pairs_correlate
     
-    % Inform the user
-    fprintf(1, 'On image pair %d of %d...\n', n, num_pairs_correlate);
-    
     % Image paths
     image_path_01 = JOBFILE.Processing(PASS_NUMBER).Frames.Paths{1}{n};
     image_path_02 = JOBFILE.Processing(PASS_NUMBER).Frames.Paths{2}{n};
     
+    % Get image names
+    [~, file_name_01] = fileparts(image_path_01);
+    [~, file_name_02] = fileparts(image_path_02);
+    
+    % Inform the use
+    fprintf(1, '%s Pass %d, pair %d of %d\n', ...
+        upper(correlation_method), PASS_NUMBER, n, num_pairs_correlate);
+    fprintf(1, '%s and %s\n', file_name_01, file_name_02);
+   
     % Load the images
     image_raw_01 = double(imread(image_path_01));
     image_raw_02 = double(imread(image_path_02));

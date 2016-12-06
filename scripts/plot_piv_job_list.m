@@ -19,7 +19,7 @@ plot_smoothed = ~isempty(regexpi(VECT_TO_PLOT, 'sm'));
 plot_raw = ~isempty(regexpi(VECT_TO_PLOT, 'raw'));
 
 % Vector scale
-vect_scale = 2;
+vect_scale = 8;
 
 % Vector skip
 skip_x = 4;
@@ -96,11 +96,10 @@ for n = 1 : num_jobs
     ty_mat = reshape(ty, [ny, nx]);
     
     % Create a figure
-    figure(n);
+    subplot(2, 3, n);
     imagesc(gx, gy, tx_mat);
     axis image;
     hold on;
-    quiver(gx, gy, vect_scale * tx, vect_scale * ty, 0, '-k', 'linewidth', 1.5);
     quiver(             gx_mat(1 : skip_y : end, 1 : skip_x : end), ...
                         gy_mat(1 : skip_y : end, 1 : skip_x : end), ...
            vect_scale * tx_mat(1 : skip_y : end, 1 : skip_x : end), ...
@@ -136,7 +135,7 @@ for n = 1 : num_jobs
 end
 
 % Tile the figures
-tilefigs;
+
 
 end
 
