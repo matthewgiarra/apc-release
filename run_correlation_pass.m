@@ -227,7 +227,7 @@ for n = 1 : num_pairs_correlate
     fprintf(1, 'Correlating image pair...\n');
     
     % Loop over the regions
-    parfor k = 1 : num_regions_correlate
+    for k = 1 : num_regions_correlate
         
         % Extract the subregions
         region_01 = region_mat_01(:, :, k);

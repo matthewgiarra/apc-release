@@ -1,7 +1,7 @@
 function JOBLIST = PIVJobList_default()
 
 % Number of passes to run
-num_passes_spec = 5;
+num_passes_spec = 1;
 
 % Pass parameters
 region_height_list_raw = [64,  64,  64, 32, 32, 32];
@@ -65,7 +65,7 @@ Processing(1).Window.Fraction = [0.5, 0.5; 0.5, 1];
 % Grid parameters
 Processing(1).Grid.Spacing.Y = 64;
 Processing(1).Grid.Spacing.X = 64;
-Processing(1).Grid.Shift.Y = 0;
+Processing(1).Grid.Shift.Y = -16;
 Processing(1).Grid.Shift.X = 0;
 Processing(1).Grid.Buffer.Y = 0;
 Processing(1).Grid.Buffer.X = 0;
@@ -76,7 +76,7 @@ Processing(1).Grid.Mask.Name = 'imgAmask3.tif';
 
 % Frame parameters.
 Processing(1).Frames.Start = 1;
-Processing(1).Frames.End = 20;
+Processing(1).Frames.End = 10;
 Processing(1).Frames.Step = 1;
 
 % Correlation parameters
@@ -105,7 +105,7 @@ Processing(1).Validation.DoValidation = 1;
 Processing(1).Validation.ValidationMethod = 'uod';
 
 % Parameters for smoothing
-Processing(1).Smoothing.DoSmoothing = 1;
+Processing(1).Smoothing.DoSmoothing = 0;
 Processing(1).Smoothing.KernelDiameter = 7;
 Processing(1).Smoothing.KernelStdDev = 1;
 
@@ -130,6 +130,10 @@ for p = 1 : num_passes_total
    % Region size
    piv_pass.Region.Height = region_height_list(p);
    piv_pass.Region.Width  = region_width_list(p);
+   
+   % Grid buffers
+   piv_pass.Grid.Buffer.X = region_width_list(p)/2;
+   piv_pass.Grid.buffer.Y = region_height_list(p)/2;
    
    % Window
    piv_pass.Window.Fraction = window_fract_list{p};

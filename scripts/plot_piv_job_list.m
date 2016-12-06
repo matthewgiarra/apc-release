@@ -1,10 +1,14 @@
 function plot_piv_job_list(JOBLIST)
 
 % Vector scale
-vect_scale = 2;
+vect_scale = 4;
 
 % Count the number of jobs
 num_jobs = length(JOBLIST);
+
+% Initialize the max and min velocities.
+vel_max = -inf;
+vel_min = inf;
 
 % Loop over the jobs
 for n = 1 : num_jobs
@@ -28,9 +32,16 @@ for n = 1 : num_jobs
     tx = JobFile.Processing(end).Results.Displacement.Raw.X(:, 1);
     ty = JobFile.Processing(end).Results.Displacement.Raw.Y(:, 1);
     
+    % Set zeros to nans for plotting.
+    tx(tx == 0) = nan;
+    ty(ty == 0) = nan;
+    
+    % Measure the number of passes
+    num_passes = length(JobFile.Processing);
+    
     % Extract the grid
-    gx = JobFile.Processing(end).Grid.Points.Full.X;
-    gy = JobFile.Processing(end).Grid.Points.Full.Y;
+    gx = JobFile.Processing(num_passes).Grid.Points.Full.X;
+    gy = JobFile.Processing(num_passes).Grid.Points.Full.Y;
     
     % Count the grid points
     nx = length(unique(gx(:)));
@@ -44,17 +55,34 @@ for n = 1 : num_jobs
     imagesc(gx, gy, tx_mat);
     axis image;
     hold on;
-    quiver(gx, gy, vect_scale * tx, vect_scale * ty, 0, '-k', 'linewidth', 2);
+    quiver(gx, gy, vect_scale * tx, vect_scale * ty, 0, '-k', 'linewidth', 1.5);
+
+    % Load the mask
+    grid_mask = load_mask(JobFile, num_passes);
+    [mask_points_y, mask_points_x] = get_mask_outline(grid_mask);
+    
+    % Plot the mask points.
+    plot(mask_points_x, mask_points_y, 'ok');
     hold off;
     
     % Title
     title(file_name_plot, 'fontsize', 20);
     
-    if n == 1
-        ca = caxis;
-    else
-        caxis(ca)
-    end
+    % Calculate the max and min velocities
+    % of all the plotted data.
+    vel_max = max(vel_max, max(tx(:)));
+    vel_min = min(vel_min, min(tx(:)));
+
+    % Set the color scale
+    caxis([vel_min, vel_max]);
+    
+    % Image size
+    [image_height, ~] = read_image_size(JobFile);
+    
+    % Set the horizontal plot limits
+    xlim([min(gx(:)), max(gx(:))]);
+    ylim([1, image_height]);
+    
    
 end
 
