@@ -1,17 +1,31 @@
 function JOBLIST = PIVJobList_default()
 
+% Number of passes to run
+num_passes_spec = 5;
 
 % Pass parameters
-region_height_list = [64,  64,  64, 32, 32, 32];
-region_width_list  = [128, 128, 64, 32, 32, 32];
-window_fract_list = {[0.5, 0.5; 0.5, 1.0], 0.5, 0.5, 1.0, 24/32, 24/32};
-grid_spacing_list = [64, 64, 32, 16, 16, 2];
-grid_spacing_list_x = grid_spacing_list;
-grid_spacing_list_y = grid_spacing_list;
+region_height_list_raw = [64,  64,  64, 32, 32, 32];
+region_width_list_raw  = [128, 128, 64, 32, 32, 32];
+window_fract_list_raw = {[0.5, 0.5; 0.5, 1.0], 0.5, 0.5, 1.0, 24/32, 24/32};
+grid_spacing_list_raw = [64, 64, 32, 16, 16, 2];
+grid_spacing_list_raw_x = grid_spacing_list_raw;
+grid_spacing_list_raw_y = grid_spacing_list_raw;
+
+region_height_list = region_height_list_raw(1 : num_passes_spec);
+region_width_list = region_width_list_raw(1 : num_passes_spec);
+window_fract_list = window_fract_list_raw(1 : num_passes_spec);
+grid_spacing_list_x = grid_spacing_list_raw_x(1 : num_passes_spec);
+grid_spacing_list_y = grid_spacing_list_raw_y(1 : num_passes_spec);
+
+% region_height_list = [64, 64];
+% region_width_list  = [128, 64];
+% window_fract_list = {[0.5, 0.5; 0.5, 1.0], 0.5};
+% grid_spacing_list = [64, 64];
+% grid_spacing_list_x = grid_spacing_list;
+% grid_spacing_list_y = grid_spacing_list;
 
 % Total number of passes
 num_passes_total = length(region_height_list);
-
 
 % Number of passes
 % zero means run all of them.
@@ -62,7 +76,7 @@ Processing(1).Grid.Mask.Name = 'imgAmask3.tif';
 
 % Frame parameters.
 Processing(1).Frames.Start = 1;
-Processing(1).Frames.End = 1;
+Processing(1).Frames.End = 20;
 Processing(1).Frames.Step = 1;
 
 % Correlation parameters
@@ -104,7 +118,6 @@ Processing(1).Iterative.Source.Directory = '';
 Processing(1).Iterative.Source.Name = '';
 Processing(1).Iterative.Source.PassNumber = 0;
 
-
 % Default Processing
 default_processing = Processing(1);
 
@@ -116,7 +129,7 @@ for p = 1 : num_passes_total
    
    % Region size
    piv_pass.Region.Height = region_height_list(p);
-   piv_pass.Region.Width = region_width_list(p);
+   piv_pass.Region.Width  = region_width_list(p);
    
    % Window
    piv_pass.Window.Fraction = window_fract_list{p};
