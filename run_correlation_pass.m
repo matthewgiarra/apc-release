@@ -90,11 +90,6 @@ rpc_filter = ...
 % GCC filter is just ones
 gcc_filter = ones(region_height, region_width);
 
-% Allocate the spectral filter
-% just so the parallel loops don't give warnings
-% spectral_filter = zeros(region_height, region_width);
-% spectral_filter_temp = zeros(region_height, region_width);
-
 % Fit method
 % % % For now ignore this and always do three-point fit.
 %%%%%%
@@ -150,8 +145,8 @@ for n = 1 : num_pairs_correlate
     % Initialize the source grid
     source_grid_x = JOBFILE.Processing(PASS_NUMBER).Grid.Points.Full.X;
     source_grid_y = JOBFILE.Processing(PASS_NUMBER).Grid.Points.Full.Y;
-    source_displacement_x = zeros(size(source_grid_x));
-    source_displacement_y = zeros(size(source_grid_y));
+    source_displacement_x = nan(size(source_grid_x));
+    source_displacement_y = nan(size(source_grid_y));
     
     % If doing deformation, 
     % then execute deformation
@@ -386,8 +381,8 @@ switch lower(ensemble_domain_string)
 end
 
 % Allocate arrays to hold vectors
-tx_temp = zeros(num_regions_full, 1);
-ty_temp = zeros(num_regions_full, 1);
+tx_temp = nan(num_regions_full, 1);
+ty_temp = nan(num_regions_full, 1);
 
 % After adding all the pairs to the ensemble
 % do the subpixel peak detection.
@@ -497,20 +492,6 @@ end
 % Save the "output" fields to the jobfile results field.
 JOBFILE.Processing(PASS_NUMBER).Results.Displacement.Final.X = tx_full_output;
 JOBFILE.Processing(PASS_NUMBER).Results.Displacement.Final.Y = ty_full_output;
-
-% % Plotting for debugging
-% nx = length(unique(grid_full_x));
-% ny = length(unique(grid_full_y));
-% 
-% tx_mat = reshape(tx_full_output, [ny, nx]);
-% 
-% imagesc(grid_full_x, grid_full_y, tx_mat);
-% hold on
-% quiver(grid_full_x, grid_full_y, tx_full_output, ty_full_output, 2, 'black', 'linewidth', 2);
-% axis image;
-% hold off
-% drawnow;
-
 
 end
 

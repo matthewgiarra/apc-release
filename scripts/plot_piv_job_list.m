@@ -32,10 +32,6 @@ for n = 1 : num_jobs
     tx = JobFile.Processing(end).Results.Displacement.Raw.X(:, 1);
     ty = JobFile.Processing(end).Results.Displacement.Raw.Y(:, 1);
     
-    % Set zeros to nans for plotting.
-    tx(tx == 0) = nan;
-    ty(ty == 0) = nan;
-    
     % Measure the number of passes
     num_passes = length(JobFile.Processing);
     
@@ -82,8 +78,7 @@ for n = 1 : num_jobs
     % Set the horizontal plot limits
     xlim([min(gx(:)), max(gx(:))]);
     ylim([1, image_height]);
-    
-   
+      
 end
 
 % Tile the figures

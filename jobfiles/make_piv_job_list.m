@@ -10,9 +10,8 @@ correlation_method_list = {'scc', 'rpc', 'apc'};
 image_parent_dir = '/Users/matthewgiarra/Documents/School/VT/Research/Aether/piv_test_images/pivchallenge/2014/A/images/';
 
 % Image directory lists
-% image_dir_list{2} = fullfile(image_parent_dir, 'proc', 'ghost');
-
 image_dir_list{1} = fullfile(image_parent_dir, 'raw');
+% image_dir_list{2} = fullfile(image_parent_dir, 'proc', 'ghost');
 
 % Image base names
 image_base_name_list{1} = 'A_';

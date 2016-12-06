@@ -51,6 +51,10 @@ end
 % % Find indices where the velocity was measured
 % measured_inds = find(x_rect == X & y_rect == Y);
 
+% Convert nans to zeros
+U(isnan(U)) = 0;
+V(isnan(V)) = 0;
+
 % This line checks whether all
 % the input deform displacements
 % were zero. If this is the case,
