@@ -1,9 +1,7 @@
 function JOBLIST = make_piv_job_list()
 
 % List of correlation methods
-% correlation_method_list = {'scc', 'rpc', 'apc'};
-
-correlation_method_list = {'apc'};
+correlation_method_list = {'scc', 'rpc', 'apc'};
 
 % % Frames list
 % Start frame and end frame
@@ -18,11 +16,11 @@ image_parent_dir = '/Users/matthewgiarra/Documents/School/VT/Research/Aether/piv
 
 % Image directory lists
 image_dir_list{1} = fullfile(image_parent_dir, 'raw');
-% image_dir_list{2} = fullfile(image_parent_dir, 'proc', 'ghost');
+image_dir_list{2} = fullfile(image_parent_dir, 'proc', 'ghost');
 
 % Image base names
 image_base_name_list{1} = 'A_';
-% image_base_name_list{2} = 'A_deghost_';
+image_base_name_list{2} = 'A_deghost_';
 
 % Number of correlation methods
 num_corr_methods = length(correlation_method_list);

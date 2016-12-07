@@ -95,12 +95,6 @@ for n = 1 : num_jobs
     tx_mat = reshape(tx, [ny, nx]);
     ty_mat = reshape(ty, [ny, nx]);
     
-    
-%     [c, r] = ind2sub([2, 3], n);
-%     sub2ind([r, c], r, c);
-%     
-%     [r, c] = ind2sub([3, 2], n)
-    
     % Create a figure
     subplot(2, 3, n);
     imagesc(gx, gy, tx_mat);

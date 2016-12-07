@@ -92,7 +92,7 @@ Processing(1).Correlation.APC.EnsembleLength = 10;
 Processing(1).Correlation.APC.FilterDiameterUpperBound = 6;
 Processing(1).Correlation.APC.Shuffle.Range = [0, 0];
 Processing(1).Correlation.APC.Shuffle.Step = [0, 0];
-Processing(1).Correlation.APC.Method = 'phase';
+Processing(1).Correlation.APC.Method = 'magnitude';
 
 % Parameters specific to RPC
 Processing(1).Correlation.RPC.EffectiveDiameter = 6;

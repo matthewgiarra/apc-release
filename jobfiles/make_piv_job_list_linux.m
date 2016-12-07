@@ -6,10 +6,10 @@ correlation_method_list = {'scc', 'rpc', 'apc'};
 % % Frames list
 % Start frame and end frame
 start_frame = 1;
-end_frame = 1;
+end_frame = 600;
 
 % Number of passes
-num_passes_spec = 1;
+num_passes_spec = 5;
 
 % Image parent directory
 image_parent_dir = '/home/shannon/b/aether/piv_test_images/pivchallenge/2014/A/images';
