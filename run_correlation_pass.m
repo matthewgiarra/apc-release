@@ -132,6 +132,10 @@ switch lower(ensemble_domain_string)
             region_height, region_width, num_regions_correlate);
 end
 
+% Count the number of passes
+% that the job will perform
+% (this is just for printing)
+num_passes = determine_number_of_passes(JOBFILE);
 
 % Loop over all the images
 for n = 1 : num_pairs_correlate
@@ -145,8 +149,8 @@ for n = 1 : num_pairs_correlate
     [~, file_name_02] = fileparts(image_path_02);
     
     % Inform the use
-    fprintf(1, '%s Pass %d, pair %d of %d\n', ...
-        upper(correlation_method), PASS_NUMBER, n, num_pairs_correlate);
+    fprintf(1, '%s Pass %d of %d, pair %d of %d\n', ...
+        upper(correlation_method), PASS_NUMBER, num_passes, n, num_pairs_correlate);
     fprintf(1, '%s and %s\n', file_name_01, file_name_02);
    
     % Load the images
@@ -349,12 +353,9 @@ switch lower(ensemble_domain_string)
         
         % Inform the user
         fprintf(1, 'Calculating inverse FTs...\n');
-        
         % Do the inverse transform for each region.
         parfor k = 1 : num_regions_correlate
             
-            fprintf(1, '%d of %d\n', k, num_regions_correlate);
-                  
             % Extract the given region
             cross_corr_spectral = cross_corr_ensemble(:, :, k);
             
