@@ -10,5 +10,6 @@ end
 % Add the paths
 addpath(fullfile(ROOT, 'jobfiles'));
 addpath(fullfile(ROOT, 'scripts'));
+addpath(fullfile(ROOT, 'apc_phase_quality_method'));
 
 end

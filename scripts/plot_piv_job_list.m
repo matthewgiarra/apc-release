@@ -19,11 +19,11 @@ plot_smoothed = ~isempty(regexpi(VECT_TO_PLOT, 'sm'));
 plot_raw = ~isempty(regexpi(VECT_TO_PLOT, 'raw'));
 
 % Vector scale
-vect_scale = 8;
+vect_scale = 0;
 
 % Vector skip
-skip_x = 4;
-skip_y = 4;
+skip_x = 1;
+skip_y = 1;
 
 % Count the number of jobs
 num_jobs = length(JOBLIST);
@@ -95,6 +95,12 @@ for n = 1 : num_jobs
     tx_mat = reshape(tx, [ny, nx]);
     ty_mat = reshape(ty, [ny, nx]);
     
+    
+%     [c, r] = ind2sub([2, 3], n);
+%     sub2ind([r, c], r, c);
+%     
+%     [r, c] = ind2sub([3, 2], n)
+    
     % Create a figure
     subplot(2, 3, n);
     imagesc(gx, gy, tx_mat);
@@ -105,17 +111,21 @@ for n = 1 : num_jobs
            vect_scale * tx_mat(1 : skip_y : end, 1 : skip_x : end), ...
            vect_scale * ty_mat(1 : skip_y : end, 1 : skip_x : end), ...
            0, '-k', 'linewidth', 1.5);
-
+       
+   % Format axes
+   axis off
+   
     % Load the mask
     grid_mask = load_mask(JobFile, num_passes);
     [mask_points_y, mask_points_x] = get_mask_outline(grid_mask);
     
     % Plot the mask points.
-    plot(mask_points_x, mask_points_y, 'ok');
+    plot(mask_points_x, mask_points_y, 'ow', 'markersize', 1, 'markerfacecolor', 'white');
     hold off;
     
     % Title
-    title(file_name_plot, 'fontsize', 20);
+%     title(file_name_plot, 'fontsize', 20);
+    
     
     % Calculate the max and min velocities
     % of all the plotted data.
@@ -130,7 +140,7 @@ for n = 1 : num_jobs
     
     % Set the horizontal plot limits
     xlim([min(gx(:)), max(gx(:))]);
-    ylim([1, image_height]);
+    ylim([min(gy(:)), max(gy(:))]);
       
 end
 

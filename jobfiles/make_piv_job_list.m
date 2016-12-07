@@ -1,26 +1,28 @@
 function JOBLIST = make_piv_job_list()
 
 % List of correlation methods
-correlation_method_list = {'scc', 'rpc', 'apc'};
+% correlation_method_list = {'scc', 'rpc', 'apc'};
+
+correlation_method_list = {'apc'};
 
 % % Frames list
 % Start frame and end frame
-start_frame = 1;
-end_frame = 600;
+start_frame = 400;
+end_frame = 400;
 
 % Number of passes
-num_passes_spec = 5;
+num_passes_spec = 1;
 
 % Image parent directory
 image_parent_dir = '/Users/matthewgiarra/Documents/School/VT/Research/Aether/piv_test_images/pivchallenge/2014/A/images/';
 
 % Image directory lists
 image_dir_list{1} = fullfile(image_parent_dir, 'raw');
-image_dir_list{2} = fullfile(image_parent_dir, 'proc', 'ghost');
+% image_dir_list{2} = fullfile(image_parent_dir, 'proc', 'ghost');
 
 % Image base names
 image_base_name_list{1} = 'A_';
-image_base_name_list{2} = 'A_deghost_';
+% image_base_name_list{2} = 'A_deghost_';
 
 % Number of correlation methods
 num_corr_methods = length(correlation_method_list);

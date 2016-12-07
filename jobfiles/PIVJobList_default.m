@@ -3,11 +3,18 @@ function JOBLIST = PIVJobList_default()
 % Number of passes to run
 num_passes_spec = 5;
 
-% Pass parameters
+% % Pass parameters
+% region_height_list_raw = [64,  64,  64, 32, 32, 32];
+% region_width_list_raw  = [128, 128, 64, 32, 32, 32];
+% window_fract_list_raw = {[0.5, 0.5; 0.5, 1.0], 0.5, 0.5, 1.0, 24/32, 24/32};
+% grid_spacing_list_raw = [64, 64, 32, 16, 16, 2];
+% grid_spacing_list_raw_x = grid_spacing_list_raw;
+% grid_spacing_list_raw_y = grid_spacing_list_raw;
+
 region_height_list_raw = [64,  64,  64, 32, 32, 32];
 region_width_list_raw  = [128, 128, 64, 32, 32, 32];
-window_fract_list_raw = {[0.5, 0.5; 0.5, 1.0], 0.5, 0.5, 1.0, 24/32, 24/32};
-grid_spacing_list_raw = [64, 64, 32, 16, 16, 2];
+window_fract_list_raw = {[0.5, 0.5; 0.5, 1], 0.5, 0.5, 1.0, 24/32, 24/32};
+grid_spacing_list_raw = [32, 64, 32, 16, 16, 2];
 grid_spacing_list_raw_x = grid_spacing_list_raw;
 grid_spacing_list_raw_y = grid_spacing_list_raw;
 
@@ -16,13 +23,6 @@ region_width_list = region_width_list_raw(1 : num_passes_spec);
 window_fract_list = window_fract_list_raw(1 : num_passes_spec);
 grid_spacing_list_x = grid_spacing_list_raw_x(1 : num_passes_spec);
 grid_spacing_list_y = grid_spacing_list_raw_y(1 : num_passes_spec);
-
-% region_height_list = [64, 64];
-% region_width_list  = [128, 64];
-% window_fract_list = {[0.5, 0.5; 0.5, 1.0], 0.5};
-% grid_spacing_list = [64, 64];
-% grid_spacing_list_x = grid_spacing_list;
-% grid_spacing_list_y = grid_spacing_list;
 
 % Total number of passes
 num_passes_total = length(region_height_list);
@@ -92,6 +92,7 @@ Processing(1).Correlation.APC.EnsembleLength = 10;
 Processing(1).Correlation.APC.FilterDiameterUpperBound = 6;
 Processing(1).Correlation.APC.Shuffle.Range = [0, 0];
 Processing(1).Correlation.APC.Shuffle.Step = [0, 0];
+Processing(1).Correlation.APC.Method = 'phase';
 
 % Parameters specific to RPC
 Processing(1).Correlation.RPC.EffectiveDiameter = 6;
@@ -105,7 +106,7 @@ Processing(1).Validation.DoValidation = 1;
 Processing(1).Validation.ValidationMethod = 'uod';
 
 % Parameters for smoothing
-Processing(1).Smoothing.DoSmoothing = 0;
+Processing(1).Smoothing.DoSmoothing = 1;
 Processing(1).Smoothing.KernelDiameter = 7;
 Processing(1).Smoothing.KernelStdDev = 1;
 

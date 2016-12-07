@@ -90,6 +90,22 @@ rpc_filter = ...
 % GCC filter is just ones
 gcc_filter = ones(region_height, region_width);
 
+% Extract any method-specific parameters
+% 
+% Might want to move this
+% out of the correlation pass code.
+switch lower(correlation_method)
+    case 'apc'
+        apc_field = JOBFILE.Processing(PASS_NUMBER).Correlation.APC;
+        if isfield(apc_field, 'Method')
+            apc_method = lower(...
+            JOBFILE.Processing(PASS_NUMBER).Correlation.APC.Method);
+        else
+            apc_method = 'magnitude';
+        end       
+end
+
+
 % Fit method
 % % % For now ignore this and always do three-point fit.
 %%%%%%
@@ -115,6 +131,7 @@ switch lower(ensemble_domain_string)
         cross_corr_ensemble = zeros(...
             region_height, region_width, num_regions_correlate);
 end
+
 
 % Loop over all the images
 for n = 1 : num_pairs_correlate
@@ -267,10 +284,11 @@ for n = 1 : num_pairs_correlate
                         spectral_filter = spectral_corr_mag;
                         
                     case 'apc'
+                        
                         % Automatically calculate the APC filter.
                         spectral_filter = ...
                             calculate_apc_filter(cross_corr_spectral, ...
-                            particle_diameter);
+                            particle_diameter, apc_method);
                         
                     case 'rpc'
                         spectral_filter = rpc_filter;
@@ -334,6 +352,8 @@ switch lower(ensemble_domain_string)
         
         % Do the inverse transform for each region.
         parfor k = 1 : num_regions_correlate
+            
+            fprintf(1, '%d of %d\n', k, num_regions_correlate);
                   
             % Extract the given region
             cross_corr_spectral = cross_corr_ensemble(:, :, k);
@@ -352,16 +372,16 @@ switch lower(ensemble_domain_string)
                     % Calculate the APC filter
                     [spectral_filter_temp, filter_std_y, filter_std_x] = ...
                     calculate_apc_filter(cross_corr_spectral, ...
-                    particle_diameter);
+                    particle_diameter, apc_method);
                 
                     % Equivalent particle diameter in the columns
                     % direction, calculated from the APC filter.
-                    particle_diameter_list_x(k) = calculate_equivalent_particle_diameter(...
+                    particle_diameter_list_x(k) = filter_std_dev_to_particle_diameter(...
                         filter_std_x, region_width);
                     
                     % Equivalent particle diameter in the rows
                     % direction, calculated from the APC filter.
-                    particle_diameter_list_y(k) = calculate_equivalent_particle_diameter(...
+                    particle_diameter_list_y(k) = filter_std_dev_to_particle_diameter(...
                         filter_std_y, region_height);       
                 case 'rpc'
                     spectral_filter_temp = rpc_filter;
