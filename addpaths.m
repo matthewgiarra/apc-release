@@ -11,5 +11,7 @@ end
 addpath(fullfile(ROOT, 'jobfiles'));
 addpath(fullfile(ROOT, 'scripts'));
 addpath(fullfile(ROOT, 'apc_phase_quality_method'));
+addpath(fullfile(ROOT, 'plotting'));
+addpath(fullfile(ROOT, 'plotting', 'export_fig'));
 
 end
