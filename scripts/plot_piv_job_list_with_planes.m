@@ -1,4 +1,4 @@
-function plot_piv_job_list(JOBLIST, PASS_NUMBER, VECT_TO_PLOT)
+function plot_piv_job_list_with_planes(JOBLIST, PASS_NUMBER, VECT_TO_PLOT)
 
 % Add paths
 addpaths();
@@ -10,14 +10,38 @@ fSize_textbox = 24;
 fSize_colorbar = 20;
 
 % Vector scale
-vect_scale = 4;
+% Dense plot:
+vect_scale = 7;
+
 
 % Vector line width
+% Sparse plot: 
 vector_line_width = 0.1;
 
+% Dense plot:
+vector_line_width = 0.5;
+
 % Vector skip
+
+% Sparse plot: 
 skip_x = 4;
-skip_y = 4;
+skip_y = 1;
+
+% Dense plot:
+% skip_x = 4;
+% skip_y = 4;
+
+% Vector offset
+x_offset = 0;
+y_offset = 0;
+
+yc = 625;
+xc = 1600;
+
+plot_width = 500;
+
+xl_sub = xc + (round(plot_width/2) * [-1, 1]);
+yl_sub = yc + (round(plot_width/2) * [-1, 1]);
 
 % Color scale
 color_scale = [-20, 50];
@@ -101,27 +125,9 @@ end
 % Number of different correlation methods
 num_correlation_methods = length(unique(corr_strings));
 
-% Number of different image base names
-num_image_types = length(unique(image_base_names));
-
-% Reoder the job list vector
-job_numbers = 1 : num_jobs;
-
 % Subplot rows and cols
-subplot_rows = num_correlation_methods;
-subplot_cols = num_image_types;
-
-% Subplot vector
-subplot_arrangement = [subplot_cols, subplot_rows];
-
-% Allocate subplot indices
-subplot_inds = zeros(subplot_arrangement);
-
-% Populate subplot indices
-subplot_inds(job_numbers) = job_numbers(:);
-
-% Subplot indices vector
-subplot_inds_vect = reshape(subplot_inds', [num_jobs, 1]);
+subplot_rows = num_jobs;
+subplot_cols = 3;
 
 % Loop over the jobs
 for n = 1 : num_jobs
@@ -131,13 +137,7 @@ for n = 1 : num_jobs
     
     % Determine the save path
     output_file_path = determine_jobfile_save_path(JobFile);
-    
-    % File name
-    [~, file_name, ~] = fileparts(output_file_path);
-    
-    % File name for the plots
-    file_name_plot = strrep(file_name, '_', '\_');
-    
+
     % Load the output file
     loaded_jobfile = load(output_file_path);
     
@@ -186,12 +186,12 @@ for n = 1 : num_jobs
     tx_mat = reshape(tx, [ny, nx]);
     ty_mat = reshape(ty, [ny, nx]);
     
-    % Deterine subplot row and column
-    [subplot_col, subplot_row] = ind2sub([subplot_cols, subplot_rows], subplot_inds_vect(n));
+    % Subplot row
+    subplot_row = n;
     
     % Create a figure
     subtightplot(subplot_rows, subplot_cols, ...
-        subplot_inds_vect(n), ...
+        subplot_cols * (n - 1) + 1, ...
         subplot_gap, ...
         subplot_margin_height, ...
         subplot_margin_width);
@@ -202,10 +202,10 @@ for n = 1 : num_jobs
     imagesc(gx, gy, tx_mat);
     axis image;
     hold on;
-    quiver(             gx_mat(1 : skip_y : end, 1 : skip_x : end), ...
-                        gy_mat(1 : skip_y : end, 1 : skip_x : end), ...
-           vect_scale * tx_mat(1 : skip_y : end, 1 : skip_x : end), ...
-           vect_scale * ty_mat(1 : skip_y : end, 1 : skip_x : end), ...
+    quiver(             gx_mat((1 + y_offset) : skip_y : end, (1 + x_offset) : skip_x : end), ...
+                        gy_mat((1 + y_offset) : skip_y : end, (1 + x_offset) : skip_x : end), ...
+           vect_scale * tx_mat((1 + y_offset) : skip_y : end, (1 + x_offset) : skip_x : end), ...
+           vect_scale * ty_mat((1 + y_offset) : skip_y : end, (1 + x_offset) : skip_x : end), ...
            0, '-k', 'linewidth', vector_line_width);
        
     % Format axes
@@ -230,24 +230,88 @@ for n = 1 : num_jobs
     else
         caxis(color_scale);
     end
-    
-    % Set the horizontal plot limits
+ 
+    % Plot limits
     xlim([min(gx(:)), max(gx(:))]);
     ylim([min(gy(:)), max(gy(:))]);
+
+    % Move the plot vertically 
+    % because subtightplot() seems
+    % to not be able to make the vertical
+    % gap small enough for my preferences.
+    ax_pos_current = get(gca, 'outerposition');
+    ax_pos_current(2) = ax_pos_current(2) + ...
+        (n - 1) * dy_subplot;
+    set(gca, 'outerposition', ax_pos_current);
+    
+    ax_height_main = ax_pos_current(4);
+    
+    % Flip the axis direction
+    set(gca, 'ydir', 'normal');  
+
+    % Axes' positions
+    ax_pos(n, :) = get(gca, 'position');
+    
+    % Create a subplot
+    subtightplot(subplot_rows, subplot_cols, ...
+        subplot_cols * (n - 1) + 2, ...
+        subplot_gap, ...
+        subplot_margin_height, ...
+        subplot_margin_width);
+    set(gca, 'units', 'pixels');
+    
+    % Make a plot
+    % This will probably screw up the positions?
+    imagesc(gx, gy, tx_mat);
+    axis image;
+    hold on;
+    quiver(             gx_mat((1 + y_offset) : skip_y : end, (1 + x_offset) : skip_x : end), ...
+                        gy_mat((1 + y_offset) : skip_y : end, (1 + x_offset) : skip_x : end), ...
+           vect_scale * tx_mat((1 + y_offset) : skip_y : end, (1 + x_offset) : skip_x : end), ...
+           vect_scale * ty_mat((1 + y_offset) : skip_y : end, (1 + x_offset) : skip_x : end), ...
+           0, '-k', 'linewidth', vector_line_width);
+     
+    % Format axes
+    axis off
+   
+    % Load the mask
+    grid_mask = load_mask(JobFile, num_passes);
+    [mask_points_y, mask_points_x] = get_mask_outline(grid_mask);
+
+    % Plot the mask points.
+    plot(mask_points_x, mask_points_y, 'ow', 'markersize', 1, 'markerfacecolor', 'white');
+    hold off;    
+    
+    % Calculate the max and min velocities
+    % of all the plotted data.
+    vel_max = max(vel_max, max(tx(:)));
+    vel_min = min(vel_min, min(tx(:)));
+
+    % Set the color scale
+    if isempty(color_scale)
+        caxis([vel_min, vel_max]);
+    else
+        caxis(color_scale);
+    end
+    
+    xlim(xl_sub);
+    ylim(yl_sub);
     
     % Move the plot vertically 
     % because subtightplot() seems
     % to not be able to make the vertical
     % gap small enough for my preferences.
     ax_pos_current = get(gca, 'outerposition');
-    ax_pos_current(4) = ax_pos_current(4) + ...
-        (subplot_row - 1) * dy_subplot;
+    ax_pos_current(2) = ax_pos_current(2) + ...
+        (n - 1) * dy_subplot;
     set(gca, 'outerposition', ax_pos_current);
-    % Axes' positions
-    ax_pos(n, :) = get(gca, 'position');
     
     % Flip the axis direction
     set(gca, 'ydir', 'normal');
+    
+    
+    
+    
       
 end
 
@@ -263,8 +327,13 @@ ax_pos_end = ax_pos(end, :);
 set(gca, 'position', ax_pos_end);
 
 dx_cbar = 3;
+
+% Full plots: use 57
+% Subplots: use ....
 dy_cbar = 57;
-height_fract_cbar = 0.815;
+
+% Full plots: Use 0.817
+height_fract_cbar = 0.817;
 
 % Figure out the location of
 % the bottom edge of the bottom-most plot
@@ -296,6 +365,10 @@ pos_colorbar(4) = height_fract_cbar * (plot_top_edge - plot_bottom_edge);
 
 % Update the position of the color bar
 set(h_colorbar, 'position', pos_colorbar);
+
+
+
+
 
 % Set colorbar tick font size
 set(h_colorbar, 'fontsize', 0.8 * fSize_colorbar);
