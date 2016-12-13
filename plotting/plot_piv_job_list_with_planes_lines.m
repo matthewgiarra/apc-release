@@ -1,4 +1,4 @@
-function plot_piv_job_list_with_planes(JOBLIST, PASS_NUMBER, VECT_TO_PLOT)
+function plot_piv_job_list_with_planes_lines(JOBLIST, PASS_NUMBER, VECT_TO_PLOT)
 
 % Add paths
 addpaths();
@@ -8,6 +8,8 @@ fSize_textbox = 20;
 
 % Font size for the colorbar
 fSize_colorbar = 20;
+
+fSize_title = 12;
 
 % Vector scale
 % Dense plot:
@@ -23,21 +25,35 @@ vector_line_width = 0.5;
 % Vector skip
 
 % Sparse plot: 
-skip_x = 5;
-skip_y = 1;
+skip_x = 10;
+skip_y = 2;
+
 
 % Dense plot:
 % skip_x = 4;
 % skip_y = 4;
 
 % Vector offset
-x_offset = 0;
+x_offset = 1;
 y_offset = 0;
 
-yc = 580;
-xc = 1650;
+% Plane X and Y spots
+gx_plane = 1792;
+gy_plane = 657;
 
-plot_width = 400;
+gx_plane = 1664;
+gy_plane = 689;
+
+% gx_plane = 1680;
+% gy_lane = 689;
+
+plane_skip_x = 3;
+plane_skip_y = 3;
+
+yc = 580;
+xc = 1600;
+
+plot_width = 550;
 
 xl_sub = xc + (round(plot_width/2) * [-1, 1]);
 yl_sub = yc + (round(plot_width/2) * [-1, 1]);
@@ -52,10 +68,12 @@ subplot_margin_height = 0.1 * [0.1 1];
 subplot_gap = [];
 
 % Plot vertical shift
-dy_subplot = 65;
+dy_subplot = 60;
 
 % Plot horizontal shift;
-dx_subplot = -175;
+dx_subplot = -45;
+
+dx_meshplot = -30;
 
 % Location of the bottom edge of the top-left plot
 ax_pos_bottom_main = 245;
@@ -146,8 +164,15 @@ for n = 1 : num_jobs
     % Determine the save path
     output_file_path = determine_jobfile_save_path(JobFile);
 
+    % Sub job with just the little
+    % region done and containing planes.
+    sub_job_path = strrep(output_file_path, 'c_0', 'c_test_0');
+    
     % Load the output file
     loaded_jobfile = load(output_file_path);
+    
+    % Loaded subjob
+    loaded_subjobfile = load(sub_job_path);
     
     % Loaded job file
     JobFile_Loaded = loaded_jobfile.JobFile;
@@ -232,6 +257,8 @@ for n = 1 : num_jobs
     rect_x = [xl_sub(1), xl_sub(2), xl_sub(2), xl_sub(1), xl_sub(1)];
     h_rect = plot(rect_x, rect_y, '--w');
     
+    plot(gx_plane, gy_plane, 'ow', 'markerfacecolor', 'w', 'markersize', 1.5);
+    
     
     hold off;    
     
@@ -290,6 +317,33 @@ for n = 1 : num_jobs
     % Second subplot % % % %
     % % % % % % % %
     
+    gx_val = gx(gx >= xl_sub(1) & gx <= xl_sub(2) & ...
+                gy >= yl_sub(1) & gy <= yl_sub(2));
+
+    gy_val = gy(gx >= xl_sub(1) & gx <= xl_sub(2) & ...
+        gy >= yl_sub(1) & gy <= yl_sub(2));
+    
+    tx_val = tx(gx >= xl_sub(1) & gx <= xl_sub(2) & ...
+                gy >= yl_sub(1) & gy <= yl_sub(2));
+
+    ty_val = ty(gx >= xl_sub(1) & gx <= xl_sub(2) & ...
+        gy >= yl_sub(1) & gy <= yl_sub(2));
+    
+    % Number in each direction
+    nx_val = length(unique(gx_val));
+    ny_val = length(unique(gy_val));
+    
+    % Reshape displacements into grids
+    tx_val_mat = reshape(tx_val, [ny_val, nx_val]);
+    ty_val_mat = reshape(ty_val, [ny_val, nx_val]);
+    
+    % average along X
+    tx_val_mean = mean(tx_val_mat, 2);
+    ty_val_mean = mean(ty_val_mat, 2);
+    
+    tx_val_std = std(tx_val_mat, [], 2);
+    ty_val_std = std(ty_val_mat, [], 2);
+
     % Create a subplot
     subtightplot(subplot_rows, subplot_cols, ...
         subplot_cols * (n - 1) + 2, ...
@@ -298,54 +352,29 @@ for n = 1 : num_jobs
         subplot_margin_width);
     set(gca, 'units', 'pixels');
     
-    % Make a plot
-    % This will probably screw up the positions?
-    imagesc(gx, gy, tx_mat);
-    axis image;
-    hold on;
-    quiver(             gx_mat((1 + y_offset) : skip_y : end, (1 + x_offset) : skip_x : end), ...
-                        gy_mat((1 + y_offset) : skip_y : end, (1 + x_offset) : skip_x : end), ...
-           vect_scale * tx_mat((1 + y_offset) : skip_y : end, (1 + x_offset) : skip_x : end), ...
-           vect_scale * ty_mat((1 + y_offset) : skip_y : end, (1 + x_offset) : skip_x : end), ...
-           0, '-k', 'linewidth', vector_line_width);
-     
-    % Format axes
-    axis off
-   
-    % Load the mask
-    grid_mask = load_mask(JobFile, num_passes);
-    [mask_points_y, mask_points_x] = get_mask_outline(grid_mask);
-
-    % Plot the mask points.
-    plot(mask_points_x, mask_points_y, 'ow', 'markersize', 1, 'markerfacecolor', 'white');
-    hold off;    
+    % Unique Y grid points
+    y_subplot = unique(gy_val);
     
-    % Calculate the max and min velocities
-    % of all the plotted data.
-    vel_max = max(vel_max, max(tx(:)));
-    vel_min = min(vel_min, min(tx(:)));
+    % X limits   
+    xlim_subplot = [y_subplot(1), y_subplot(end)];
 
-    % Set the color scale
-    if isempty(color_scale)
-        caxis([vel_min, vel_max]);
-    else
-        caxis(color_scale);
-    end
-    
-    xlim(xl_sub);
-    ylim(yl_sub);
+    shadedErrorBar(unique(gy_val), tx_val_mean, tx_val_std);
+%     shadedErrorBar([], tx_val_mean, tx_val_std)
+    axis square;
+    set(gca, 'xdir', 'reverse');
+    set(gca, 'view', [90, 90]);
+    xlim(xlim_subplot);
+    ylim([-18, 45]);
+    set(gca,'xaxisLocation','top')
     
     % Move the plot vertically 
     % because subtightplot() seems
     % to not be able to make the vertical
     % gap small enough for my preferences.
     ax_pos_subplot_current = get(gca, 'outerposition');
-%     ax_pos_subplot_current(2) = ax_pos_subplot_current(2) + ...
-%         (n - 1) * dy_subplot;
-    
 
     % Left edge
-    ax_pos_subplot_current(1) = ax_right_main_current + dx_subplot;
+    ax_pos_subplot_current(1) = ax_pos_subplot_current(1) + 1 * dx_subplot;
     
     % Bottom edge
     ax_pos_subplot_current(2) = ax_pos_main_bottom;
@@ -354,17 +383,75 @@ for n = 1 : num_jobs
     % aspect ratio is already fixed)
     ax_pos_subplot_current(4) = ax_height_main;
     
-    
+    % Set the plot position
     set(gca, 'outerposition', ax_pos_subplot_current);
     
     % Flip the axis direction
     set(gca, 'ydir', 'normal');
+    
+    if n < num_jobs
+        set(gca, 'yticklabel', '');
+    end
+    
+    if n == 1
+        title('$\Delta x \left( \textrm{pixels} \right)$', ...
+            'interpreter', 'latex', 'fontsize', fSize_title);
+    end
+    
+    % Turn off the other ticks
+    set(gca, 'xticklabel', '');
+    
+    
+    % % % % % % % % % % % %
+    % % % % Third Subplot
+    % % % % % % % % % % % %
+    % Create a subplot
+    subtightplot(subplot_rows, subplot_cols, ...
+        subplot_cols * (n - 1) + 3, ...
+        subplot_gap, ...
+        subplot_margin_height, ...
+        subplot_margin_width);
+    set(gca, 'units', 'pixels');
+    
+    % Extract the planes
+    c_planes   = loaded_subjobfile.JobFile.Processing(1).Results.Planes;
+    gx_subplot = loaded_subjobfile.JobFile.Processing(1).Grid.Points.Correlate.X;
+    gy_subplot = loaded_subjobfile.JobFile.Processing(1).Grid.Points.Correlate.Y;
+    
+    % Region size
+    [region_height, region_width, num_planes] = size(c_planes);
+    
+    % Find the index corresponding to
+    % the specified coordinates of the plane.
+    plane_ind = find(gx_subplot == gx_plane & gy_subplot == gy_plane);
 
+    % Extract the plane
+    cplane = c_planes(1 : plane_skip_y : end, 1 : plane_skip_x : end, plane_ind);
+    cplane_sub = cplane - min(cplane(:));
+    
+    cplane_norm = cplane_sub ./ max(cplane_sub(:));
+    
+    % Mesh plot
+    mesh(cplane_norm, 'edgecolor', 'black', 'linewidth', 0.1);
+    axis square;
+    xlim([1, region_width/plane_skip_x]);
+    ylim([1, region_height / plane_skip_y]);
+    zlim([0, 1])
+    set(gca, 'view', [-20, 10]);
+   
+    p = get(gca, 'outerposition');
+    p(1) = p(1) + 2 * dx_subplot + dx_meshplot;
+    p(2) = ax_pos_main_bottom;
+    p(4) = ax_height_main;
+    set(gca, 'outerposition', p);
+    axis off;
+    
       
 end
 
 set(gcf, 'color' ,'white');
 
+fprintf(1, '');
 
 
 

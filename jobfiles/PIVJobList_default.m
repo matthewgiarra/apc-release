@@ -14,7 +14,7 @@ num_passes_spec = 5;
 region_height_list_raw = [64,  64,  64, 32, 32, 32];
 region_width_list_raw  = [128, 128, 64, 32, 32, 32];
 window_fract_list_raw = {[0.5, 0.5; 0.5, 1], 0.5, 0.5, 1.0, 24/32, 24/32};
-grid_spacing_list_raw = [16, 16, 32, 16, 16, 2];
+grid_spacing_list_raw = [32, 16, 32, 16, 16, 2];
 grid_spacing_list_raw_x = grid_spacing_list_raw;
 grid_spacing_list_raw_y = grid_spacing_list_raw;
 
@@ -71,6 +71,7 @@ Processing(1).Grid.Buffer.Y = 0;
 Processing(1).Grid.Buffer.X = 0;
 Processing(1).Grid.Mask.Directory = '/Users/matthewgiarra/Documents/School/VT/Research/Aether/piv_test_images/pivchallenge/2014/A/images/masks';
 Processing(1).Grid.Mask.Name = 'imgAmask3.tif';
+% Processing(1).Grid.Mask.Name = 'mask_jet_subregion.tif';
 % Processing(1).Grid.Mask.Directory = '';
 % Processing(1).Grid.Mask.Name = '';
 
