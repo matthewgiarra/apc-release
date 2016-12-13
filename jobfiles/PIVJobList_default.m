@@ -87,9 +87,9 @@ Processing(1).Correlation.Step = 0;
 Processing(1).Correlation.Ensemble.DoEnsemble = 1;
 Processing(1).Correlation.Ensemble.NumberOfPairs = 1;
 Processing(1).Correlation.Ensemble.Domain = 'spatial';
+Processing(1).Correlation.Ensemble.Direction = 3;
 
 % Parameters specific to APC
-Processing(1).Correlation.APC.EnsembleLength = 10;
 Processing(1).Correlation.APC.FilterDiameterUpperBound = 6;
 Processing(1).Correlation.APC.Shuffle.Range = [0, 0];
 Processing(1).Correlation.APC.Shuffle.Step = [0, 0];

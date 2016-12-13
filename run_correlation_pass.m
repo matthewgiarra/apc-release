@@ -150,7 +150,8 @@ for n = 1 : num_pairs_correlate
     
     % Inform the use
     fprintf(1, '%s Pass %d of %d, pair %d of %d\n', ...
-        upper(correlation_method), PASS_NUMBER, num_passes, n, num_pairs_correlate);
+        upper(correlation_method),  ...
+        PASS_NUMBER, num_passes, n, num_pairs_correlate);
     fprintf(1, '%s and %s\n', file_name_01, file_name_02);
    
     % Load the images
@@ -183,17 +184,22 @@ for n = 1 : num_pairs_correlate
         %
         % This is the grid from the previous pass, 
         % which will inform the deform method.
-        source_grid_x = JOBFILE.Processing(PASS_NUMBER).Iterative.Source.Grid.X;
-        source_grid_y = JOBFILE.Processing(PASS_NUMBER).Iterative.Source.Grid.Y;
+        source_grid_x = JOBFILE.Processing(PASS_NUMBER).Iterative. ...
+            Source.Grid.X;
+        source_grid_y = JOBFILE.Processing(PASS_NUMBER). ...
+            Iterative.Source.Grid.Y;
         %
         % These are the displacements from the
         % previous pass, which will inform
         % the deform method.
-        source_displacement_x = JOBFILE.Processing(PASS_NUMBER).Iterative.Source.Displacement.X;
-        source_displacement_y = JOBFILE.Processing(PASS_NUMBER).Iterative.Source.Displacement.Y;
+        source_displacement_x = JOBFILE.Processing(PASS_NUMBER). ...
+            Iterative.Source.Displacement.X;
+        source_displacement_y = JOBFILE.Processing(PASS_NUMBER). ...
+            Iterative.Source.Displacement.Y;
 
         % Deform method
-        deform_interpolation_method = JOBFILE.Processing(1).Iterative.Deform.Interpolation;
+        deform_interpolation_method = JOBFILE.Processing(1). ...
+            Iterative.Deform.Interpolation;
 
         % Determine if the data present
         % would result in any deformation happening
@@ -256,10 +262,18 @@ for n = 1 : num_pairs_correlate
         region_02 = region_mat_02(:, :, k);
        
         % Correlate the windows
-        FT_01 = fft2(spatial_window_01 .* (region_01 - mean(region_01(:))));
-        FT_02 = fft2(spatial_window_02 .* (region_02 - mean(region_02(:))));
+        %
+        % Take the Fourier transform of the first region
+        FT_01 = fft2(spatial_window_01 .* ...
+            (region_01 - mean(region_01(:))));
+        %
+        % Take the Fourier Transform of the second region
+        FT_02 = fft2(spatial_window_02 .* ...
+            (region_02 - mean(region_02(:))));
         
-        % Spectral correlation
+        % Calculate the cross correlation by
+        % conjugate-multiplying the Fourier 
+        % transforms of the two interrogation regions.
         cross_corr_spectral = fftshift((FT_01 .* conj(FT_02)));
           
         % Switch between spatial and spectral ensemble
@@ -281,23 +295,34 @@ for n = 1 : num_pairs_correlate
  
                 % Switch between correlation methods
                 switch lower(correlation_method)
-                    case 'scc'    
-                        
+                    case 'scc'                          
                         % For SCC, take the original magnitude
                         % as the spectral filter. 
                         spectral_filter = spectral_corr_mag;
                         
-                    case 'apc'
-                        
+                    case 'apc'                    
                         % Automatically calculate the APC filter.
                         spectral_filter = ...
                             calculate_apc_filter(cross_corr_spectral, ...
                             particle_diameter, apc_method);
                         
                     case 'rpc'
+                        % If RPC was specified then 
+                        % set the spectral filter to 
+                        % be the RPC filter.
                         spectral_filter = rpc_filter;
                         
                     case 'gcc'
+                        % If GCC was specified then
+                        % set the spectral filter to 
+                        % be the GCC filter, which is
+                        % ones everywhere (i.e., 
+                        % no filter). Doing this here
+                        % lets us always "filter" 
+                        % the correlation later in the 
+                        % code by multiplying by a "filter"
+                        % array, without having to switch
+                        % between "filtering methods"
                         spectral_filter = gcc_filter;
                 end
                 
