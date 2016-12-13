@@ -140,25 +140,18 @@ end
 [spatial_window_01, spatial_window_02] = ...
     make_spatial_windows(JOBFILE, PASS_NUMBER);
 
-% Allocate correlation planes
-switch lower(ensemble_domain_string)
-    case 'spectral'
-        
-    % Allocate complex array for correlations
-    cross_corr_ensemble = zeros(...
-        region_height, region_width, num_regions_correlate) + ...
-        1i * zeros(region_height, region_width, num_regions_correlate);
-    
-    % Allocate purely real array for correlations
-    case 'spatial'
-        cross_corr_ensemble = zeros(...
+% Allocate the correlation planes
+cross_corr_ensemble = zeros(...
             region_height, region_width, num_regions_correlate);
-end
-
+        
 % Count the number of passes
 % that the job will perform
 % (this is just for printing)
 num_passes = determine_number_of_passes(JOBFILE);
+
+% Allocate arrays to hold vectors
+tx_temp = nan(num_regions_full, num_pairs_correlate);
+ty_temp = nan(num_regions_full, num_pairs_correlate);
 
 % Loop over all the images
 for n = 1 : num_pairs_correlate
@@ -166,8 +159,15 @@ for n = 1 : num_pairs_correlate
     % Unless the temporal ensemble was specified,
     % re-zero the arrays for holding the cross 
     % correlation planes. 
-    switch ensemble_direction_string
-        
+    switch lower(ensemble_direction_string)
+        case 'temporal'
+%             results_column_ind = 1;
+        case 'spatial'
+            cross_corr_ensemble(:) = 0;
+%             results_column_ind = n;
+        case 'none'
+            cross_corr_ensemble(:) = 0;
+%             results_column_ind = n;     
     end
     
     % Image paths
@@ -223,9 +223,9 @@ for n = 1 : num_pairs_correlate
         % previous pass, which will inform
         % the deform method.
         source_displacement_x = JOBFILE.Processing(PASS_NUMBER). ...
-            Iterative.Source.Displacement.X;
+            Iterative.Source.Displacement.X(:, n);
         source_displacement_y = JOBFILE.Processing(PASS_NUMBER). ...
-            Iterative.Source.Displacement.Y;
+            Iterative.Source.Displacement.Y(:, n);
 
         % Deform method
         deform_interpolation_method = JOBFILE.Processing(1). ...
@@ -422,154 +422,113 @@ for n = 1 : num_pairs_correlate
                 cross_corr_ensemble(:, :, k) = ...
                     cross_corr_ensemble(:, :, k) + cross_corr_spatial;
   
-            case 'spectral'   
-                
+            case 'spectral'                   
                 % For spectral ensemble, add the current complex
                 % correlation to the ensemble complex correlation
                 cross_corr_ensemble(:, :, k) = ...
                     cross_corr_ensemble(:, :, k) + ...
                     cross_corr_spectral;
         end 
-    end  
+    end
+    
+    % Save the correlation planes to the jobfile.
+    % This is done to avoid passing multiple variables
+    % to the different functions.
+    % These will be deleted before the jobfile is saved.
+    JOBFILE.Processing(PASS_NUMBER).Correlation.Planes = ...
+        cross_corr_ensemble;
+    
+    % Extract displacements 
+    % if the temporal enemble wasn't specified.
+    if not(do_temporal_ensemble)
+        % Measure the displacements from
+        % the correlation planes.
+        [ty, tx] = planes2vect(JOBFILE, PASS_NUMBER);
+        
+        % Add the measured displacements to the 
+        % temporary array of displacements.
+        ty_temp(grid_inds, n) = ty;
+        tx_temp(grid_inds, n) = tx;
+    end
     
     % Print a carriage return after
     % the image pair is done processing
     fprintf(1, '\n');
 end
 
-% If the spectral ensemble was performed,
-% then the spectal ensemble correlations
-% need to be inverse-Fourier transformed
-% back into the spatial domain. 
-% This checks which type of ensemble was run
-% (spatial or spectral) and does the inverse
-% transform if necessary. Note that this transform
-% happens in-place, i.e., the value of 
-% the variable cross_corr_ensemble is changed
-% after this result, rather than the transformed
-% correlations being saved as a separate variable.
-% This is to save memory, and also to reduce
-% the number of variables we have to keep track of.
-switch lower(ensemble_domain_string)
-    case 'spectral'
-        
-        % Inform the user
-        fprintf(1, 'Calculating inverse FTs...\n');
-        % Do the inverse transform for each region.
-        parfor k = 1 : num_regions_correlate
-            
-            % Extract the given region
-            cross_corr_spectral = cross_corr_ensemble(:, :, k);
-            
-            % Spectral correlation phase and magnitude
-            [spectral_corr_phase, spectral_corr_mag] = ...
-                split_complex(cross_corr_spectral);
-            
-            % Switch between correlation methods
-            switch lower(correlation_method)
-                case 'scc'           
-                    spectral_filter_temp = spectral_corr_mag;
-                    
-                case 'apc'
-                    
-                    % Calculate the APC filter
-                    [spectral_filter_temp, filter_std_y, filter_std_x] = ...
-                    calculate_apc_filter(cross_corr_spectral, ...
-                    particle_diameter, apc_method);
-                
-                    % Equivalent particle diameter in the columns
-                    % direction, calculated from the APC filter.
-                    particle_diameter_list_x(k) = filter_std_dev_to_particle_diameter(...
-                        filter_std_x, region_width);
-                    
-                    % Equivalent particle diameter in the rows
-                    % direction, calculated from the APC filter.
-                    particle_diameter_list_y(k) = filter_std_dev_to_particle_diameter(...
-                        filter_std_y, region_height);       
-                case 'rpc'
-                    spectral_filter_temp = rpc_filter;
-                case 'gcc'
-                    spectral_filter_temp = gcc_filter;
-            end
-            
-            % Apply the phase filter to the spectral plane.
-            % Note that this operation is legitimate even
-            % if SCC or GCC is selected. The reason for this
-            % is that if SCC is selected, then the "filter"
-            % is just the original magnitude. 
-            % I (Matt Giarra) have coded it this way to
-            % simplify the control flow. Not sure if this will
-            % turn out to be a nice way to do it.
-            cross_corr_spectral_filtered = ...
-            spectral_filter_temp .* spectral_corr_phase;
-                
-            % Take the inverse FT of the "filtered" correlation.
-            cross_corr_ensemble(:, :, k) = fftshift(abs(ifft2(fftshift(...
-                        cross_corr_spectral_filtered))));                    
-        end  
-end
-
-% Allocate arrays to hold vectors
-tx_temp = nan(num_regions_full, 1);
-ty_temp = nan(num_regions_full, 1);
-
-% After adding all the pairs to the ensemble
-% do the subpixel peak detection.
-for k = 1 : num_regions_correlate
+% Extract the displacements if the 
+% temporal correlation WAS specified.
+if do_temporal_ensemble
     
-    % Effective particle diameters
-    dp_x = particle_diameter_list_x(k);
-    dp_y = particle_diameter_list_y(k);
-      
-    % Extract the grid index
-    grid_index = grid_indices(k);
-        
-    % Do the subpixel displacement estimate.
-    [tx_temp(grid_index), ty_temp(grid_index)] = ...
-        subpixel(cross_corr_ensemble(:, :, k),...
-            region_width, region_height, sub_pixel_weights, ...
-                1, 0, [dp_x, dp_y]);
-            
-   % If APC was done, then save the APC  
-   % filter diameter to the jobfile results
-   JOBFILE.Processing(PASS_NUMBER).Results.Filtering.APC.Diameter.X(grid_index, 1) = dp_x;
-   JOBFILE.Processing(PASS_NUMBER).Results.Filtering.APC.Diameter.Y(grid_index, 1) = dp_y;
-   
+    % Measure the displacements from
+    % the correlation planes.
+    [ty, tx] = planes2vect(JOBFILE, PASS_NUMBER);
+    
+    % Add the measured displacements to the 
+    % temporary array of displacements.
+    % Since temporal ensemble collapses
+    % all of the displacements 
+    % onto a single grid, 
+    % the vector fields for all
+    % N of the image pairs can be said
+    % to have the same displacement.
+    % We do it this way so that 
+    % subsequent passes can use
+    % the results of this pass
+    % even if the ensemble methods
+    % are different.
+    ty_temp(grid_inds, :) = ty;
+    tx_temp(grid_inds, :) = tx;
 end
 
-% Resample the source displacement
-% from the source grid
-% onto the current grid.
-[source_field_interp_tx, source_field_interp_ty] = ...
-    resample_vector_field(...
-    source_grid_x, source_grid_y, ...
-    source_displacement_x, source_displacement_y, ...
-    grid_full_x, grid_full_y);
+% Allocate the "output" vectors
+tx_full_output = nan(num_regions_full, num_pairs_correlate);
+ty_full_output = nan(num_regions_full, num_pairs_correlate);
 
-% Add the source displacement from
-% the iterative method to
-% the measured displacement
-tx_raw_full = tx_temp + source_field_interp_tx;
-ty_raw_full = ty_temp + source_field_interp_ty;
+% Add source dispalacements 
+% to the measured displacements.
+for n = 1 : num_pairs_correlate
+     
+    % Read the source displacements
+    source_displacement_x = JOBFILE.Processing(PASS_NUMBER). ...
+        Iterative.Source.Displacement.X(:, n);
+    source_displacement_y = JOBFILE.Processing(PASS_NUMBER). ...
+        Iterative.Source.Displacement.Y(:, n);
+    
+    % Resample the source displacement
+    % from the source grid
+    % onto the current grid.
+    [source_field_interp_tx, source_field_interp_ty] = ...
+        resample_vector_field(...
+            source_grid_x, source_grid_y, ...
+            source_displacement_x, source_displacement_y, ...
+            grid_full_x, grid_full_y);
+        
+    % Add the source displacement from
+    % the iterative method to
+    % the measured displacement
+    tx_raw_full = tx_temp(:, n) + source_field_interp_tx;
+    ty_raw_full = ty_temp(:, n) + source_field_interp_ty;
+    
+    % Save the current fields as 
+    % the "output" fields.
+    % This variable gets updated
+    % after each post-processing step
+    % is performed. The reason for this
+    % is that the deform methods
+    % should chose the final field
+    % from the previous pass, and 
+    % this way the "final" field
+    % is always saved.
+    tx_full_output(:, n) = tx_raw_full;
+    ty_full_output(:, n) = ty_raw_full;
 
-% Save the current fields as 
-% the "output" fields.
-% This variable gets updated
-% after each post-processing step
-% is performed. The reason for this
-% is that the deform methods
-% should chose the final field
-% from the previous pass, and 
-% this way the "final" field
-% is always saved.
-tx_full_output = tx_raw_full;
-ty_full_output = ty_raw_full;
-
-% Save the results to the structure
-JOBFILE.Processing(PASS_NUMBER).Results.Displacement.Raw.X(:, 1) = ...
-    tx_raw_full;
-JOBFILE.Processing(PASS_NUMBER).Results.Displacement.Raw.Y(:, 1) = ...
-    ty_raw_full;
+    % Save the results to the structure
+    JOBFILE.Processing(PASS_NUMBER).Results.Displacement.Raw.X(:, n) = ...
+        tx_raw_full;
+    JOBFILE.Processing(PASS_NUMBER).Results.Displacement.Raw.Y(:, n) = ...
+        ty_raw_full;   
+end
 
 % Do the validation if requested
 do_validation = JOBFILE.Processing(PASS_NUMBER).Validation.DoValidation;
@@ -578,20 +537,33 @@ do_validation = JOBFILE.Processing(PASS_NUMBER).Validation.DoValidation;
 if do_validation == true;
     
     % Inform the user
-    fprintf(1, 'Validating vector field...\n');
+    fprintf(1, 'Validating vector fields...\n');
     
-    % Calculate the validated field.
-    [tx_val_full, ty_val_full, is_outlier_full] = ...
-        validateField_prana(grid_full_x, grid_full_y, tx_raw_full, ty_raw_full);
-    
-    % Add validated vectors to the jobfile
-    JOBFILE.Processing(PASS_NUMBER).Results.Displacement.Validated.X = tx_val_full;
-    JOBFILE.Processing(PASS_NUMBER).Results.Displacement.Validated.Y = ty_val_full;
-    JOBFILE.Processing(PASS_NUMBER).Results.Displacement.Validated.IsOutlier = is_outlier_full;
-    
-    % Update the "output" fields
-    tx_full_output = tx_val_full;
-    ty_full_output = ty_val_full;
+    % Loop over all the pairs.
+    for n = 1 : num_pairs_correlate
+        
+        % Read the raw displacements
+        tx_raw_full = JOBFILE.Processing(PASS_NUMBER). ...
+            Results.Displacement.Raw.X(:, n);
+        ty_raw_full = JOBFILE.Processing(PASS_NUMBER). ...
+            Results.Displacement.Raw.Y(:, n);
+        
+        % Calculate the validated field.
+        [tx_val_full, ty_val_full, is_outlier_full] = ...
+            validateField_prana(grid_full_x, grid_full_y, tx_raw_full, ty_raw_full);
+        
+         % Add validated vectors to the jobfile
+        JOBFILE.Processing(PASS_NUMBER).Results.Displacement. ...
+            Validated.X(:, n) = tx_val_full;
+        JOBFILE.Processing(PASS_NUMBER).Results.Displacement. ...
+            Validated.Y(:, n) = ty_val_full;
+        JOBFILE.Processing(PASS_NUMBER).Results.Displacement. ...
+            Validated.IsOutlier(:, n) = is_outlier_full;
+
+        % Update the "output" fields
+        tx_full_output(:, n) = tx_val_full;
+        ty_full_output(:, n) = ty_val_full; 
+    end
 end
 
 % Determine whether to do smoothing.
@@ -600,22 +572,29 @@ do_smoothing = JOBFILE.Processing(PASS_NUMBER).Smoothing.DoSmoothing;
 % Smoothing
 if do_smoothing == true
     
-    % Inform the user
-    fprintf(1, 'Smoothing vector field...\n');
-    
     % Extract the smoothing parameters
     smoothing_kernel_diameter = JOBFILE.Processing(PASS_NUMBER).Smoothing.KernelDiameter;
     smoothing_kernel_std = JOBFILE.Processing(PASS_NUMBER).Smoothing.KernelStdDev;
-
-    % Calculate smoothed field
-    tx_smoothed_full = smoothField(tx_full_output, smoothing_kernel_diameter, smoothing_kernel_std);
-    ty_smoothed_full = smoothField(ty_full_output, smoothing_kernel_diameter, smoothing_kernel_std);
-    JOBFILE.Processing(PASS_NUMBER).Results.Displacement.Smoothed.X = tx_smoothed_full;
-    JOBFILE.Processing(PASS_NUMBER).Results.Displacement.Smoothed.Y = ty_smoothed_full;
     
-    % Update the "output" fields
-    tx_full_output = tx_smoothed_full;
-    ty_full_output = ty_smoothed_full;
+    % Inform the user
+    fprintf(1, 'Smoothing vector fields...\n');
+    
+    % Loop over all the pairs.
+    for n = 1 : num_pairs_correlate
+        tx_full_input = tx_full_output(:, n);
+        ty_full_input = tx_full_output(:, n);
+        
+        % Calculate smoothed field
+        tx_smoothed_full = smoothField(tx_full_input, smoothing_kernel_diameter, smoothing_kernel_std);
+        ty_smoothed_full = smoothField(ty_full_input, smoothing_kernel_diameter, smoothing_kernel_std);
+        JOBFILE.Processing(PASS_NUMBER).Results.Displacement.Smoothed.X(:, n) = tx_smoothed_full;
+        JOBFILE.Processing(PASS_NUMBER).Results.Displacement.Smoothed.Y(:, n) = ty_smoothed_full;
+
+        % Update the "output" fields
+        tx_full_output(:, n) = tx_smoothed_full;
+        ty_full_output(:, n) = ty_smoothed_full;
+        
+    end
 end
 
 % Save the "output" fields to the jobfile results field.
