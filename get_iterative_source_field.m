@@ -56,8 +56,10 @@ if isfield(JOBFILE.Processing(PASS_NUMBER), 'Iterative');
             % Read the final output displacement
             % field from the previous pass.
             if isfield(previous_pass_struct, 'Results')
-                tx_source = previous_pass_struct.Results.Displacement.Final.X;
-                ty_source = previous_pass_struct.Results.Displacement.Final.Y;        
+                tx_source = previous_pass_struct.Results. ...
+                    Displacement.Final.X;
+                ty_source = previous_pass_struct.Results. ...
+                    Displacement.Final.Y;        
             end            
         end
 
@@ -65,14 +67,16 @@ if isfield(JOBFILE.Processing(PASS_NUMBER), 'Iterative');
         if isfield(JOBFILE.Processing(PASS_NUMBER).Iterative, 'Source')
 
             % IF the "source" field exists, extract it.
-            iterative_source_field = JOBFILE.Processing(PASS_NUMBER).Iterative.Source;
+            iterative_source_field = JOBFILE.Processing(PASS_NUMBER). ...
+                Iterative.Source;
 
             % Check whether the fields for the directory
             % and name of the source files exist.
             if isfield(iterative_source_field, 'Directory')
                 % Read the name of the directory that
                 % is supposed to contain the source file.
-                velocity_source_file_dir = JOBFILE.Processing(PASS_NUMBER).Iterative.Source.Directory;
+                velocity_source_file_dir = JOBFILE. ...
+                    Processing(PASS_NUMBER).Iterative.Source.Directory;
             else
                 % Default to an empty string
                 velocity_source_file_dir = '';
@@ -82,7 +86,8 @@ if isfield(JOBFILE.Processing(PASS_NUMBER), 'Iterative');
             if isfield(iterative_source_field, 'Name')
                 % Read the name of the file that is 
                 % supposed to contain the source data.
-                velocity_source_file_name = JOBFILE.Processing(PASS_NUMBER).Iterative.Source.Name;
+                velocity_source_file_name = JOBFILE. ...
+                    Processing(PASS_NUMBER).Iterative.Source.Name;
             else
                 % Default to an empty string
                 velocity_source_file_name = '';

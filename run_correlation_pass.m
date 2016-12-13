@@ -24,13 +24,38 @@ JOBFILE = discrete_window_offset(JOBFILE, PASS_NUMBER);
 % Allocate the results
 JOBFILE = allocate_results(JOBFILE, PASS_NUMBER);
 
+% Read the correlation method
+correlation_method = lower(JOBFILE.Processing(PASS_NUMBER).Correlation.Method);
+
+% Read the enemble parameters
+%
 % Get the ensmeble length
 % This will return 1 if 
 % ensemble shouldn't be run.
 ensemble_length = read_ensemble_length(JOBFILE, PASS_NUMBER);
+%
+% Ensemble domain string
+ensemble_domain_string = lower(read_ensemble_domain(JOBFILE, PASS_NUMBER));
+%
+% Ensemble direction
+% This specifies whether to do a temporal ensemble, 
+% or a spatial ensemble, or no ensemble.
+ensemble_direction_string = lower(read_ensemble_direction(JOBFILE, PASS_NUMBER));
+%
+% Parse the ensemble direction string to figure out
+% which ensemble was specified
+%
+% Flag for "Don't do any ensemble"
+do_no_ensemble = ~isempty(regexpi(lower(ensemble_direction_string), 'no'));
+%
+% Flag for "Do the temporal ensemble"
+do_temporal_ensemble = or( ...
+    ~isempty(regexpi(lower(ensemble_direction_string), 'tim')), ...
+    ~isempty(regexpi(lower(ensemble_direction_string), 'tem')));
+%
+% Flag for "Do the spatial ensemble"
+do_spatial_ensemble = ~isempty(regexpi(lower(ensemble_direction_string), 'spa'));
 
-% Read the correlation method
-correlation_method = lower(JOBFILE.Processing(PASS_NUMBER).Correlation.Method);
 
 % Correlation grid points
 grid_correlate_x = JOBFILE.Processing(PASS_NUMBER).Grid.Points.Correlate.X;
@@ -41,7 +66,8 @@ grid_full_x = JOBFILE.Processing(PASS_NUMBER).Grid.Points.Full.X;
 grid_full_y = JOBFILE.Processing(PASS_NUMBER).Grid.Points.Full.Y;
 
 % Indices of grid points to correlate
-grid_indices = JOBFILE.Processing(PASS_NUMBER).Grid.Points.Correlate.Indices;
+grid_indices = JOBFILE.Processing(PASS_NUMBER). ...
+    Grid.Points.Correlate.Indices;
 
 % Number of pairs to correlate
 num_regions_correlate = length(grid_correlate_x(:));
@@ -67,7 +93,8 @@ deform_requested = ~isempty(regexpi(iterative_method, 'def'));
 % Subpixel fit parameters
 %
 % Estimated particle diameter
-particle_diameter = JOBFILE.Processing(PASS_NUMBER).SubPixel.EstimatedParticleDiameter;
+particle_diameter = JOBFILE.Processing(PASS_NUMBER). ...
+    SubPixel.EstimatedParticleDiameter;
 %
 % Make the particle diameters a list
 % because the adaptive methods
@@ -105,7 +132,6 @@ switch lower(correlation_method)
         end       
 end
 
-
 % Fit method
 % % % For now ignore this and always do three-point fit.
 %%%%%%
@@ -113,9 +139,6 @@ end
 % Make the spatial windows
 [spatial_window_01, spatial_window_02] = ...
     make_spatial_windows(JOBFILE, PASS_NUMBER);
-
-% Ensemble domain string
-ensemble_domain_string = lower(read_ensemble_domain(JOBFILE, PASS_NUMBER));
 
 % Allocate correlation planes
 switch lower(ensemble_domain_string)
@@ -139,6 +162,13 @@ num_passes = determine_number_of_passes(JOBFILE);
 
 % Loop over all the images
 for n = 1 : num_pairs_correlate
+    
+    % Unless the temporal ensemble was specified,
+    % re-zero the arrays for holding the cross 
+    % correlation planes. 
+    switch ensemble_direction_string
+        
+    end
     
     % Image paths
     image_path_01 = JOBFILE.Processing(PASS_NUMBER).Frames.Paths{1}{n};
@@ -242,7 +272,11 @@ for n = 1 : num_pairs_correlate
         end
     end
     
-    % Extract the regions
+    % Extract the interrogation regions
+    % from the images. These are the regions
+    % that will be cross-correlated
+    % to provide the PIV displacement or 
+    % velocity estimate.
     region_mat_01 = extract_sub_regions(image_01, ...
         [region_height, region_width], ...
         grid_correlate_x, grid_correlate_y);
@@ -261,13 +295,13 @@ for n = 1 : num_pairs_correlate
         region_01 = region_mat_01(:, :, k);
         region_02 = region_mat_02(:, :, k);
        
-        % Correlate the windows
+        % Correlate the interrogation regions
         %
-        % Take the Fourier transform of the first region
+        % Take the Fourier transform of the first interroagion region
         FT_01 = fft2(spatial_window_01 .* ...
             (region_01 - mean(region_01(:))));
         %
-        % Take the Fourier Transform of the second region
+        % Take the Fourier Transform of the second interroagion region
         FT_02 = fft2(spatial_window_02 .* ...
             (region_02 - mean(region_02(:))));
         
@@ -275,6 +309,49 @@ for n = 1 : num_pairs_correlate
         % conjugate-multiplying the Fourier 
         % transforms of the two interrogation regions.
         cross_corr_spectral = fftshift((FT_01 .* conj(FT_02)));
+        
+        % Once the cross correlation has been calculated,
+        % we must decide where to put it. This decision
+        % changes depending on how and whether
+        % the ensemble correlation was specified.
+        % 
+        % Here is the "decision tree" for where
+        % to put the cross correlation plane. 
+        % I'm making this up as I go so please be gentle.
+        %
+        % No ensemble:
+        %   The array of correlation planes
+        %   can be [m x n x num_grid_points]
+        %   in size, and the vectors are
+        %   calculated after that array has
+        %   been populated.
+        %
+        % Temporal ensemble:
+        %   The array of correlation planes
+        %   can be [ m x n x num_grid_points]
+        %   in size, and the vectors are
+        %   calculated after all of the images
+        %   have contributed to the correlation.
+        %
+        % Spatial ensemble:
+        %   The array of correlation planes
+        %   can be [m x n x num_grid_points]
+        %   in size, and are all added together
+        %   after the array has been populated
+        %   and a single vector calculated 
+        %   from the result. 
+        %   A more efficient way to do this, rather
+        %   than saving all of the planes to an array,
+        %   would be to add all the planes together
+        %   as they are calculated. However, I'm 
+        %   choosing to save the planes to a larger
+        %   array because doing so is compatible with 
+        %   the other two ensemble options 
+        %   ("none" and "temporal"). Most systems
+        %   The memory requirements won't change from
+        %   the other methods, and we don't have
+        %   to make any decisions about how to 
+        %   store the correlation planes internally.
           
         % Switch between spatial and spectral ensemble
         switch lower(ensemble_domain_string)
