@@ -4,17 +4,10 @@ function JOBLIST = PIVJobList_default()
 num_passes_spec = 5;
 
 % % Pass parameters
-% region_height_list_raw = [64,  64,  64, 32, 32, 32];
-% region_width_list_raw  = [128, 128, 64, 32, 32, 32];
-% window_fract_list_raw = {[0.5, 0.5; 0.5, 1.0], 0.5, 0.5, 1.0, 24/32, 24/32};
-% grid_spacing_list_raw = [64, 64, 32, 16, 16, 2];
-% grid_spacing_list_raw_x = grid_spacing_list_raw;
-% grid_spacing_list_raw_y = grid_spacing_list_raw;
-
 region_height_list_raw = [64,  64,  64, 32, 32, 32];
 region_width_list_raw  = [128, 128, 64, 32, 32, 32];
 window_fract_list_raw = {[0.5, 0.5; 0.5, 1], 0.5, 0.5, 1.0, 24/32, 24/32};
-grid_spacing_list_raw = [32, 16, 32, 16, 16, 2];
+grid_spacing_list_raw = [64, 64, 32, 16, 16, 2];
 grid_spacing_list_raw_x = grid_spacing_list_raw;
 grid_spacing_list_raw_y = grid_spacing_list_raw;
 

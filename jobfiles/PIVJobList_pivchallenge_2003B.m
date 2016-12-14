@@ -1,13 +1,13 @@
-function JOBLIST = PIVJobList_synthetic()
+function JOBLIST = PIVJobList_pivchallenge_2003B()
 
 % Number of passes to run
-num_passes_spec = 2;
+num_passes_spec = 1;
 
 % % Pass parameters
-region_height_list_raw = [128, 64];
-region_width_list_raw = [128, 64];
+region_height_list_raw = [32, 64];
+region_width_list_raw  = [32, 64];
 window_fract_list_raw = {0.5, 0.5};
-grid_spacing_list_raw = [64, 64];
+grid_spacing_list_raw = [16, 32];
 grid_spacing_list_raw_x = grid_spacing_list_raw;
 grid_spacing_list_raw_y = grid_spacing_list_raw;
 
@@ -25,13 +25,12 @@ num_passes_total = length(region_height_list);
 JobOptions.NumberOfPasses = 0;
 
 % Data: Input images
-% Data.Inputs.Images.Directory = '/Users/matthewgiarra/Documents/School/VT/Research/Aether/piv_test_images/pivchallenge/2014/A/images/proc/ghost';
-Data.Inputs.Images.Directory = '/Users/matthewgiarra/Documents/School/VT/Research/Aether/piv_test_images/poiseuille_diffusion_0.00/raw';
-% Data.Inputs.Images.BaseName = 'A_deghost_';
-Data.Inputs.Images.BaseName = 'poiseuille_diffusion_0.00_';
-Data.Inputs.Images.Digits = 5;
-Data.Inputs.Images.Extension = '.tif';
-% Data.Inputs.Images.Trailers = {'_a', '_b'};
+Data.Inputs.Images.Directory = '/Users/matthewgiarra/Documents/School/VT/Research/Aether/piv_test_images/pivchallenge/2003/piv_challenge_2003_B/raw';
+Data.Inputs.Images.BaseName = 'B';
+% Data.Inputs.Images.BaseName = 'poiseuille_diffusion_0.00_';
+Data.Inputs.Images.Digits = 3;
+Data.Inputs.Images.Extension = '.bmp';
+Data.Inputs.Images.Trailers = {'a', 'b'};
 % Data.Inputs.Images.Trailers = {''};
 
 % Data: Input vectors for initializing, e.g., image deformation.
@@ -41,18 +40,19 @@ Data.Inputs.Vectors.Digits = 5;
 Data.Inputs.Vectors.Extension = '.mat';
 
 % Data: output vectors
-% Data.Outputs.Vectors.Directory = '/Users/matthewgiarra/Documents/School/VT/Research/Aether/piv_test_images/pivchallenge/2014/A/vect';
-Data.Outputs.Vectors.Directory = '/Users/matthewgiarra/Documents/School/VT/Research/Aether/piv_test_images/poiseuille_diffusion_0.00/raw';
-Data.Outputs.Vectors.BaseName = 'poiseuille_diffusion_0.00_';
-Data.Outputs.Vectors.Digits = 5;
+Data.Outputs.Vectors.Directory = fullfile(Data.Inputs.Images.Directory, '..', 'vect');
+Data.Outputs.Vectors.BaseName = 'B_';
+Data.Outputs.Vectors.Digits = 3;
 Data.Outputs.Vectors.Extension = '.mat';
 
 % Interrogation region dimensions
-Processing(1).Region.Height = 128;
+Processing(1).Region.Height = 64;
 Processing(1).Region.Width = 128;
+% Processing(1).Region.Height = 128;
+% Processing(1).Region.Width = 128;
 
 % Spatial window
-Processing(1).Window.Fraction = 0.5;
+Processing(1).Window.Fraction = [0.5, 0.5; 0.5, 1];
 
 % Grid parameters
 Processing(1).Grid.Spacing.Y = 64;
@@ -69,20 +69,20 @@ Processing(1).Grid.Mask.Name = '';
 
 % Frame parameters.
 Processing(1).Frames.Start = 1;
-Processing(1).Frames.End = 19;
+Processing(1).Frames.End = 100;
 Processing(1).Frames.Step = 1;
 
 % Correlation parameters
 Processing(1).Correlation.Method = 'apc';
-% Processing(1).Correlation.Step = 0;
-Processing(1).Correlation.Step = 1;
-Processing(1).Correlation.Ensemble.DoEnsemble = 1;
+Processing(1).Correlation.Step = 0;
+% Processing(1).Correlation.Step = 1;
+Processing(1).Correlation.Ensemble.DoEnsemble = 0;
 Processing(1).Correlation.Ensemble.NumberOfPairs = 1;
 Processing(1).Correlation.Ensemble.Domain = 'spectral';
 Processing(1).Correlation.Ensemble.Direction = 'temporal';
 
 % Parameters specific to APC
-Processing(1).Correlation.APC.FilterDiameterUpperBound = 3;
+Processing(1).Correlation.APC.FilterDiameterUpperBound = 1;
 Processing(1).Correlation.APC.Shuffle.Range = [0, 0];
 Processing(1).Correlation.APC.Shuffle.Step = [0, 0];
 Processing(1).Correlation.APC.Method = 'magnitude';
