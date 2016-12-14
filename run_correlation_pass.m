@@ -27,6 +27,9 @@ JOBFILE = allocate_results(JOBFILE, PASS_NUMBER);
 % Read the correlation method
 correlation_method = lower(JOBFILE.Processing(PASS_NUMBER).Correlation.Method);
 
+% Figure out if we're doing APC
+isAPC = ~isempty(regexpi(correlation_method, 'apc'));
+
 % Read the enemble parameters
 %
 % Get the ensmeble length
@@ -137,6 +140,10 @@ num_passes = determine_number_of_passes(JOBFILE);
 tx_temp = nan(num_regions_full, num_pairs_correlate);
 ty_temp = nan(num_regions_full, num_pairs_correlate);
 
+% Allocate arrays to hold particle diameters
+dp_y_full = nan(num_regions_full, num_pairs_correlate);
+dp_x_full = nan(num_regions_full, num_pairs_correlate);
+
 % Loop over all the images
 for n = 1 : num_pairs_correlate
     
@@ -144,14 +151,10 @@ for n = 1 : num_pairs_correlate
     % re-zero the arrays for holding the cross 
     % correlation planes. 
     switch lower(ensemble_direction_string)
-        case 'temporal'
-%             results_column_ind = 1;
         case 'spatial'
             cross_corr_ensemble(:) = 0;
-%             results_column_ind = n;
         case 'none'
-            cross_corr_ensemble(:) = 0;
-%             results_column_ind = n;     
+            cross_corr_ensemble(:) = 0;  
     end
     
     % Image paths
@@ -427,12 +430,24 @@ for n = 1 : num_pairs_correlate
     if not(do_temporal_ensemble)
         % Measure the displacements from
         % the correlation planes.
-        [ty, tx] = planes2vect(JOBFILE, PASS_NUMBER);
+        [ty, tx, ...
+            particle_diameters_y, ...
+            particle_diameters_x] = ...
+            planes2vect(JOBFILE, PASS_NUMBER);
         
         % Add the measured displacements to the 
         % temporary array of displacements.
         ty_temp(grid_indices, n) = ty;
         tx_temp(grid_indices, n) = tx;
+        
+        % Add the particle diameters to the arrays
+        % that hold particle diameters. This is only 
+        % done in case the particle diameters
+        % need to be saved for APC later. 
+        % There's probably a better way to do this.
+        dp_y_full(grid_indices, n) = particle_diameters_y;
+        dp_x_full(grid_indices, n) = particle_diameters_x;
+        
     end
     
     % Print a carriage return after
@@ -446,7 +461,10 @@ if do_temporal_ensemble
     
     % Measure the displacements from
     % the correlation planes.
-    [ty, tx] = planes2vect(JOBFILE, PASS_NUMBER);
+    [ty, tx, ...
+        particle_diameters_y, ...
+        particle_diameters_x] =...
+        planes2vect(JOBFILE, PASS_NUMBER);
     
     % Add the measured displacements to the 
     % temporary array of displacements.
@@ -463,6 +481,14 @@ if do_temporal_ensemble
     % are different.
     ty_temp(grid_indices, :) = repmat(ty, [1, num_pairs_correlate]);
     tx_temp(grid_indices, :) = repmat(tx, [1, num_pairs_correlate]);
+    
+    % Copy the particle diameters. 
+    % This is only done in case they need
+    % to be saved later if APC was done.
+    dp_y_full(grid_indices, :) = ...
+        repmat(particle_diameters_x, [1, num_pairs_correlate]);
+    dp_x_full(grid_indices, :) = ...
+        repmat(particle_diameters_y, [1, num_pairs_correlate]); 
 end
 
 % Allocate the "output" vectors
@@ -584,6 +610,22 @@ end
 % Save the "output" fields to the jobfile results field.
 JOBFILE.Processing(PASS_NUMBER).Results.Displacement.Final.X = tx_full_output;
 JOBFILE.Processing(PASS_NUMBER).Results.Displacement.Final.Y = ty_full_output;
+
+% If APC was done then save the effective
+% particle diameters to the pass results.
+if isAPC
+    
+    % Add the horizontal (columns direction)
+    % APC diameter to the results.
+    JOBFILE.Processing(PASS_NUMBER).Results. ...
+        Filtering.APC.Diameter.X = dp_x_full;
+    
+    % Add the vertical (rows direction)
+    % APC diameter to the results.
+    JOBFILE.Processing(PASS_NUMBER).Results. ...
+        Filtering.APC.Diameter.Y = dp_y_full;
+end
+
 
 end
 

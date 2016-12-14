@@ -1,7 +1,7 @@
+function plot_time_resolved_fields(JOBFILE)
 
-% Specify results path
-results_path = ...
-    '/Users/matthewgiarra/Documents/School/VT/Research/Aether/piv_test_images/pivchallenge/2014/A/vect/test/A_deghost_00001_00005.mat';
+% Results path 
+results_path = determine_jobfile_save_path(JOBFILE);
 
 % Load the results
 load(results_path);
@@ -25,6 +25,12 @@ skip_y = 1;
 % Measure the image size
 [image_height, image_width] = read_image_size(JobFile);
 
+temporal_ensemble = ~isempty(regexpi(JobFile(1).Processing.Correlation.Ensemble.Direction, 'tem'));
+
+if temporal_ensemble
+    num_pairs = 1;
+end
+
 % Loop over all the data
 for n = 1 : num_pairs
     
@@ -36,6 +42,9 @@ for n = 1 : num_pairs
         tx = JobFile.Processing(p).Results.Displacement.Raw.X(:, n);
         ty = JobFile.Processing(p).Results.Displacement.Raw.Y(:, n);
         
+        dp_x = JobFile.Processing(p).Results.Filtering.APC.Diameter.X(:, n);
+        dp_y = JobFile.Processing(p).Results.Filtering.APC.Diameter.Y(:, n);
+        
         % Reshapes
         nx = length(unique(gx));
         ny = length(unique(gy));
@@ -43,21 +52,37 @@ for n = 1 : num_pairs
         gy_mat = reshape(gy, [ny, nx]);
         tx_mat = reshape(tx, [ny, nx]);
         ty_mat = reshape(ty, [ny, nx]);
+        dp_x_mat = reshape(dp_x, [ny, nx]);
+        dp_y_mat = reshape(dp_y, [ny, nx]);
+        
+        % Averages
+        dp_x_mean = mean(dp_x_mat, 2);
+        dp_y_mean = mean(dp_y_mat, 2);
+        tx_mean = mean(tx_mat, 2);
+        ty_mean = mean(ty_mat, 2);
+        
   
         % Make the plot
         subtightplot(1, num_passes, p);
+        imagesc(gx_mat(:), gy_mat(:), dp_x_mat);
+        hold on;
         quiver(gx_mat(1 : skip_y : end, 1 : skip_x : end), ...
                gy_mat(1 : skip_y : end, 1 : skip_x : end), ...
                vector_scale * tx_mat(1 : skip_y : end, 1 : skip_x : end), ...
                vector_scale * ty_mat(1 : skip_y : end, 1 : skip_x : end), ...
-               0, 'black');
-           axis image;
+               0, 'white');
            
+       hold off
+        axis image; 
         xlim([1, image_width]);
         ylim([1, image_height]);
     end
   
-    pause(0.5);
+    drawnow;
     
+end
+
+
+
 end
 

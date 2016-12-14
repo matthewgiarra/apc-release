@@ -59,8 +59,8 @@ end
 
 % Make the list of particle diameters
 % for the static methods
-particle_diameter_list_x = zeros(num_correlation_planes);
-particle_diameter_list_y = zeros(num_correlation_planes);
+particle_diameter_list_x = zeros(num_correlation_planes, 1);
+particle_diameter_list_y = zeros(num_correlation_planes, 1);
 
 % Set the diameters
 particle_diameter_list_x(:) = particle_diameter;
@@ -162,7 +162,13 @@ for k = 1 : num_correlation_planes
     [TX(k), TY(k)] = ...
         subpixel(cross_corr_ensemble(:, :, k),...
             region_width, region_height, sub_pixel_weights, ...
-                1, 0, [dp_x, dp_y]);               
+                1, 0, [dp_x, dp_y]);
+            
 end
 
+
+% Add APC diameters to structure if APC is being done.
+
 end
+
+

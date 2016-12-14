@@ -1,13 +1,13 @@
 function JOBLIST = PIVJobList_pivchallenge()
 
 % Number of passes to run
-num_passes_spec = 3;
+num_passes_spec = 2;
 
 % % Pass parameters
 region_height_list_raw = [64,  64,  64, 32, 32, 32];
 region_width_list_raw  = [128, 128, 64, 32, 32, 32];
 window_fract_list_raw = {[0.5, 0.5; 0.5, 1], 0.5, 0.5, 1.0, 24/32, 24/32};
-grid_spacing_list_raw = [64, 64, 64, 16, 16, 2];
+grid_spacing_list_raw = [128, 128, 64, 16, 16, 2];
 grid_spacing_list_raw_x = grid_spacing_list_raw;
 grid_spacing_list_raw_y = grid_spacing_list_raw;
 
@@ -70,16 +70,16 @@ Processing(1).Grid.Mask.Name = 'imgAmask3.tif';
 
 % Frame parameters.
 Processing(1).Frames.Start = 1;
-Processing(1).Frames.End = 5;
+Processing(1).Frames.End = 10;
 Processing(1).Frames.Step = 1;
 
 % Correlation parameters
-Processing(1).Correlation.Method = 'scc';
+Processing(1).Correlation.Method = 'apc';
 Processing(1).Correlation.Step = 0;
 % Processing(1).Correlation.Step = 1;
-Processing(1).Correlation.Ensemble.DoEnsemble = 1;
+Processing(1).Correlation.Ensemble.DoEnsemble = 0;
 Processing(1).Correlation.Ensemble.NumberOfPairs = 1;
-Processing(1).Correlation.Ensemble.Domain = 'spatial';
+Processing(1).Correlation.Ensemble.Domain = 'spectral';
 Processing(1).Correlation.Ensemble.Direction = 'temporal';
 
 % Parameters specific to APC

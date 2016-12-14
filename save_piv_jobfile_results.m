@@ -62,6 +62,9 @@ function output_file_path = save_piv_jobfile_results(JOBFILE)
 % Determine the output file path
 output_file_path = determine_jobfile_save_path(JOBFILE);
 
+% Copy the save-file path to the jobfile
+JOBFILE.Data.Outputs.Vectors.Path = output_file_path;
+
 % Copy the job file
 JobFile = JOBFILE;
 
