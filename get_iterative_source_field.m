@@ -22,9 +22,15 @@ end
 gx_source = JOBFILE.Processing(PASS_NUMBER).Grid.Points.Full.X;
 gy_source = JOBFILE.Processing(PASS_NUMBER).Grid.Points.Full.Y;
 
+% Number of grid points
+num_grid_points = length(gx_source);
+
+% Get the number of pairs
+num_pairs_correlate = read_num_pairs(JOBFILE, PASS_NUMBER);
+
 % Set the source field to zeros
-tx_source = zeros(size(gx_source));
-ty_source = zeros(size(gy_source));
+tx_source = zeros(num_grid_points, num_pairs_correlate);
+ty_source = zeros(num_grid_points, num_pairs_correlate);
 
 % Check if the iterative field exists in the jobfile
 if isfield(JOBFILE.Processing(PASS_NUMBER), 'Iterative');

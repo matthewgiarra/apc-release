@@ -1,7 +1,7 @@
 function [TY, TX, PARTICLE_DIAMETER_Y, PARTICLE_DIAMETER_X] = planes2vect(JOBFILE, PASS_NUMBER)
 
 % Read the ensemble domain string
-ensemble_domain_string = read_ensemble_domain(JobFJOBFILEile, PASS_NUMBER);
+ensemble_domain_string = read_ensemble_domain(JOBFILE, PASS_NUMBER);
 
 % Read the ensemble direction
 ensemble_direction_string = lower( ...
@@ -85,7 +85,7 @@ switch lower(ensemble_domain_string)
         % Inform the user
         fprintf(1, 'Calculating inverse FTs...\n');
         % Do the inverse transform for each region.
-        parfor k = 1 : num_correlation_planes
+        for k = 1 : num_correlation_planes
             
             % Extract the given region
             cross_corr_spectral = cross_corr_ensemble(:, :, k);
@@ -95,11 +95,15 @@ switch lower(ensemble_domain_string)
                 split_complex(cross_corr_spectral);
             
             % Switch between correlation methods
-            switch lower(correlation_method)
+            switch lower(correlation_method_string)
                 case 'scc'           
                     spectral_filter_temp = spectral_corr_mag;
                     
-                case 'apc'       
+                case 'apc'  
+                    
+                    % Read the APC method
+                    apc_method = JOBFILE.Processing(PASS_NUMBER).Correlation.APC.Method;
+                    
                     % Calculate the APC filter
                     [spectral_filter_temp, filter_std_y, filter_std_x] = ...
                     calculate_apc_filter(cross_corr_spectral, ...

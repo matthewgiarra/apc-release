@@ -81,9 +81,6 @@ num_pairs_correlate = read_num_pairs(JOBFILE, PASS_NUMBER);
 % Region sizes
 [region_height, region_width] = get_region_size(JOBFILE, PASS_NUMBER);
 
-% Subpixel weights
-sub_pixel_weights = ones(region_height, region_width);
-
 % Determine if deform is requested
 iterative_method = JOBFILE.Processing(1).Iterative.Method;
 
@@ -95,19 +92,6 @@ deform_requested = ~isempty(regexpi(iterative_method, 'def'));
 % Estimated particle diameter
 particle_diameter = JOBFILE.Processing(PASS_NUMBER). ...
     SubPixel.EstimatedParticleDiameter;
-%
-% Make the particle diameters a list
-% because the adaptive methods
-% can have a different effective
-% particle diameter for each window.
-%
-% Also, there are separate diameters
-% in X and Y to allow asymmetric
-% (elliptical) particle shapes. 
-particle_diameter_list_x = particle_diameter .* ...
-    ones(num_regions_correlate, 1);
-particle_diameter_list_y = particle_diameter .* ...
-    ones(num_regions_correlate, 1);
 
 % Make some filters. 
 % These are to let the parfor loops run
@@ -447,8 +431,8 @@ for n = 1 : num_pairs_correlate
         
         % Add the measured displacements to the 
         % temporary array of displacements.
-        ty_temp(grid_inds, n) = ty;
-        tx_temp(grid_inds, n) = tx;
+        ty_temp(grid_indices, n) = ty;
+        tx_temp(grid_indices, n) = tx;
     end
     
     % Print a carriage return after
@@ -477,8 +461,8 @@ if do_temporal_ensemble
     % the results of this pass
     % even if the ensemble methods
     % are different.
-    ty_temp(grid_inds, :) = ty;
-    tx_temp(grid_inds, :) = tx;
+    ty_temp(grid_indices, :) = repmat(ty, [1, num_pairs_correlate]);
+    tx_temp(grid_indices, :) = repmat(tx, [1, num_pairs_correlate]);
 end
 
 % Allocate the "output" vectors
@@ -582,7 +566,7 @@ if do_smoothing == true
     % Loop over all the pairs.
     for n = 1 : num_pairs_correlate
         tx_full_input = tx_full_output(:, n);
-        ty_full_input = tx_full_output(:, n);
+        ty_full_input = ty_full_output(:, n);
         
         % Calculate smoothed field
         tx_smoothed_full = smoothField(tx_full_input, smoothing_kernel_diameter, smoothing_kernel_std);
