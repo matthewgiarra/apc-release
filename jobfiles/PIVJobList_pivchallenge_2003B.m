@@ -7,7 +7,7 @@ num_passes_spec = 1;
 region_height_list_raw = [32, 64];
 region_width_list_raw  = [32, 64];
 window_fract_list_raw = {0.5, 0.5};
-grid_spacing_list_raw = [8, 32];
+grid_spacing_list_raw = [16, 32];
 grid_spacing_list_raw_x = grid_spacing_list_raw;
 grid_spacing_list_raw_y = grid_spacing_list_raw;
 

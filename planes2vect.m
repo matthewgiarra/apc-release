@@ -32,6 +32,11 @@ end
 particle_diameter = JOBFILE.Processing(PASS_NUMBER). ...
     SubPixel.EstimatedParticleDiameter;
 
+% Allocate the static spectral filter
+% This apparently needs to be done 
+% so that the parallel loop can run
+spectral_filter_static = nan(region_height, region_width);
+
 % Method specific options
 switch lower(correlation_method_string)
     case 'rpc'   
@@ -51,10 +56,15 @@ switch lower(correlation_method_string)
     spectral_filter_static = ones(region_height, region_width);
     
     case 'apc'
+        
         % Set the upper bound for the filter
         apc_filter_upper_bound = JOBFILE.Processing(PASS_NUMBER). ...
             Correlation.APC.FilterDiameterUpperBound;
-    
+        
+        % If APC was selected, then check the APC method.
+        % Read the APC method
+        apc_method = JOBFILE.Processing(PASS_NUMBER).Correlation.APC.Method;
+  
 end
 
 % Make the list of particle diameters
@@ -85,7 +95,7 @@ switch lower(ensemble_domain_string)
         % Inform the user
         fprintf(1, 'Calculating inverse FTs...\n');
         % Do the inverse transform for each region.
-        for k = 1 : num_correlation_planes
+        parfor k = 1 : num_correlation_planes
             
             % Extract the given region
             cross_corr_spectral = cross_corr_ensemble(:, :, k);
@@ -100,9 +110,6 @@ switch lower(ensemble_domain_string)
                     spectral_filter_temp = spectral_corr_mag;
                     
                 case 'apc'  
-                    
-                    % Read the APC method
-                    apc_method = JOBFILE.Processing(PASS_NUMBER).Correlation.APC.Method;
                     
                     % Calculate the APC filter
                     [spectral_filter_temp, filter_std_y, filter_std_x] = ...

@@ -549,8 +549,20 @@ if do_validation == true;
     % Inform the user
     fprintf(1, 'Validating vector fields...\n');
     
+    % Determine whether all of the fields
+    % need to be validated. If temporal ensemble
+    % was done, then the different time steps
+    % saved in the jobfile are all identical,
+    % and only one validation needs to be performed.
+    switch ensemble_direction_string
+        case 'temporal'
+            num_pairs_validate = 1;
+        otherwise
+            num_pairs_validate = num_pairs_correlate;    
+    end
+    
     % Loop over all the pairs.
-    for n = 1 : num_pairs_correlate
+    for n = 1 : num_pairs_validate
         
         % Read the raw displacements
         tx_raw_full = JOBFILE.Processing(PASS_NUMBER). ...
@@ -574,6 +586,34 @@ if do_validation == true;
         tx_full_output(:, n) = tx_val_full;
         ty_full_output(:, n) = ty_val_full; 
     end
+    
+    % If fewer fields were validated
+    % than correlated, that means
+    % temporal ensemble was done.
+    % In this case, copy the vectors
+    % from the first frame to all
+    % the other frames.
+    if num_pairs_validate < num_pairs_correlate
+        
+        % Copy the horizontal displacements.
+        JOBFILE.Processing(PASS_NUMBER).Results.Displacement. ...
+            Validated.X = ...
+            repmat(tx_val_full, [1, num_pairs_correlate]);
+        
+        % Copy the vertical displacements
+        JOBFILE.Processing(PASS_NUMBER).Results.Displacement. ...
+            Validated.Y = ...
+            repmat(ty_val_full, [1, num_pairs_correlate]);
+        
+        % Copy the outlier flags
+        JOBFILE.Processing(PASS_NUMBER).Results.Displacement. ...
+            Validated.IsOutlier = ...
+            repmat(is_outlier_full, [1, num_pairs_correlate]);
+        
+        % Copy the output vectors
+        tx_full_output = repmat(tx_val_full, [1, num_pairs_correlate]);
+        ty_full_output = repmat(ty_val_full, [1, num_pairs_correlate]);   
+    end
 end
 
 % Determine whether to do smoothing.
@@ -589,8 +629,20 @@ if do_smoothing == true
     % Inform the user
     fprintf(1, 'Smoothing vector fields...\n');
     
+    % Determine whether all of the fields
+    % need to be smoothed. If temporal ensemble
+    % was done, then the different time steps
+    % saved in the jobfile are all identical,
+    % and only one validation needs to be performed.
+    switch ensemble_direction_string
+        case 'temporal'
+            num_pairs_smooth = 1;
+        otherwise
+            num_pairs_smooth = num_pairs_correlate;    
+    end
+    
     % Loop over all the pairs.
-    for n = 1 : num_pairs_correlate
+    for n = 1 : num_pairs_smooth
         tx_full_input = tx_full_output(:, n);
         ty_full_input = ty_full_output(:, n);
         
@@ -605,6 +657,29 @@ if do_smoothing == true
         ty_full_output(:, n) = ty_smoothed_full;
         
     end
+    
+    % If fewer fields were smoothed
+    % than correlated, that means
+    % temporal ensemble was done.
+    % In this case, copy the vectors
+    % from the first frame to all
+    % the other frames.
+    if num_pairs_smooth < num_pairs_correlate
+        
+        % Copy the horizontal displacements.
+        JOBFILE.Processing(PASS_NUMBER).Results.Displacement. ...
+            Smoothed.X = ...
+            repmat(tx_smoothed_full, [1, num_pairs_correlate]);
+        
+        % Copy the vertical displacements
+        JOBFILE.Processing(PASS_NUMBER).Results.Displacement. ...
+            Smoothed.Y = ...
+            repmat(ty_smoothed_full, [1, num_pairs_correlate]);
+        
+        % Copy the output vectors
+        tx_full_output = repmat(tx_smoothed_full, [1, num_pairs_correlate]);
+        ty_full_output = repmat(ty_smoothed_full, [1, num_pairs_correlate]);   
+    end    
 end
 
 % Save the "output" fields to the jobfile results field.
