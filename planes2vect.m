@@ -173,9 +173,6 @@ for k = 1 : num_correlation_planes
             
 end
 
-
-% Add APC diameters to structure if APC is being done.
-
 end
 
 
