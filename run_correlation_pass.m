@@ -686,6 +686,10 @@ end
 JOBFILE.Processing(PASS_NUMBER).Results.Displacement.Final.X = tx_full_output;
 JOBFILE.Processing(PASS_NUMBER).Results.Displacement.Final.Y = ty_full_output;
 
+% Delete the correlation planes
+JOBFILE.Processing(PASS_NUMBER).Correlation = ...
+    rmfield(JOBFILE.Processing(PASS_NUMBER).Correlation, 'Planes');
+
 % If APC was done then save the effective
 % particle diameters to the pass results.
 if isAPC
