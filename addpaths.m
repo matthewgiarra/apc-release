@@ -14,4 +14,9 @@ addpath(fullfile(ROOT, 'apc_phase_quality_method'));
 addpath(fullfile(ROOT, 'plotting'));
 addpath(fullfile(ROOT, 'plotting', 'export_fig'));
 
+addpath(fullfile(ROOT, 'spectral-phase-correlation'));
+addpath(fullfile(ROOT, 'spectral-phase-correlation', 'phase_unwrapping'));
+addpath(fullfile(ROOT, 'spectral-phase-correlation', 'phase_unwrapping', 'compile_scripts'));
+addpath(fullfile(ROOT, 'spectral-phase-correlation', 'spectral_filtering'));
+
 end
