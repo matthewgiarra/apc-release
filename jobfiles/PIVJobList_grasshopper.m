@@ -107,7 +107,7 @@ Processing(1).Correlation.SpectralFiltering.KernelSizeList = {''};
 % This specifies the domain in which the displacement
 % estimate is calculated ('spatial' for peak-finding/fitting 
 % or 'spectral' for SPC plane fit);
-Processing(1).Correlation.DisplacementEstimate.Domain = 'spatial';
+Processing(1).Correlation.DisplacementEstimate.Domain = 'spectral';
 
 % Options for spatial displacement estimate
 Processing(1).Correlation.DisplacementEstimate. ...
