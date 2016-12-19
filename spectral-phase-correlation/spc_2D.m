@@ -1,13 +1,13 @@
 function [TY, TX] = spc_2D(CROSS_CORRELATION_COMPLEX, WEIGHTING_MATRIX, ...
-    PHASE_FILTER_LIST, KERNEL_SIZE_LIST, UNWRAP_METHOD, COMPILED);
+    UNWRAP_METHOD, COMPILED)
+
+% Default to not running compiled codes.
+if nargin < 4
+    COMPILED = 0;
+end
 
 % Exctract the phase of the cross correlation 
 phase_plane_wrapped = split_complex(CROSS_CORRELATION_COMPLEX);
-
-% Filter plane
-phase_plane_filtered_complex = apply_filter_list_complex_phase_plane(...
-    phase_plane_wrapped, PHASE_FILTER_LIST, ...
-    KERNEL_SIZE_LIST, COMPILED);
 
 % Unwrap using the chosen unwrapping method
 % Other methods can be added.
@@ -15,7 +15,7 @@ switch lower(UNWRAP_METHOD)
     case 'herraez'
         
         % Unwrap the phase plane using the Herraez method.
-        phase_plane_unwrapped = unwrap_phase_herraez(phase_plane_filtered_complex);
+        phase_plane_unwrapped = unwrap_phase_herraez(phase_plane_wrapped);
     
     case 'goldstein'
         
@@ -24,7 +24,7 @@ switch lower(UNWRAP_METHOD)
         
         % Unwrap the phase plane using the Goldstein method.
         [phase_plane_unwrapped, branch_cut_matrix] = ...
-            GoldsteinUnwrap2D(phase_plane_filtered_complex, ...
+            GoldsteinUnwrap2D(phase_plane_wrapped, ...
             max_box_size, COMPILED);
     
         % Update the weighting matrix
@@ -32,7 +32,7 @@ switch lower(UNWRAP_METHOD)
         WEIGHTING_MATRIX(phase_plane_unwrapped == 0) = 0;
         
     case 'none'
-        phase_plane_unwrapped = angle(phase_plane_filtered_complex);
+        phase_plane_unwrapped = angle(phase_plane_wrapped);
         
     otherwise
         error('Error: invalid phase unwrapping algorithm specified: %s\n', ...

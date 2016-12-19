@@ -1,4 +1,4 @@
-function ensemble_domain_string = read_ensemble_domain(JOBFILE, PASS_NUMBER);
+function ensemble_domain_string = get_ensemble_domain(JOBFILE, PASS_NUMBER);
 
 % Default to pass number of 1
 if nargin < 2

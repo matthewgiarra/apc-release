@@ -25,25 +25,21 @@ JOBFILE = discrete_window_offset(JOBFILE, PASS_NUMBER);
 JOBFILE = allocate_results(JOBFILE, PASS_NUMBER);
 
 % Read the correlation method
-correlation_method = lower(JOBFILE.Processing(PASS_NUMBER).Correlation.Method);
+% Read the spectral weighting method ('SCC', 'GCC', 'RPC', 'APC')
+spetral_weighting_method = get_spectral_weighting_method(JOBFILE, PASS_NUMBER);
 
 % Figure out if we're doing APC
-isAPC = ~isempty(regexpi(correlation_method, 'apc'));
+isAPC = ~isempty(regexpi(spetral_weighting_method, 'apc'));
 
 % Read the enemble parameters
 %
-% Get the ensmeble length
-% This will return 1 if 
-% ensemble shouldn't be run.
-ensemble_length = read_ensemble_length(JOBFILE, PASS_NUMBER);
-%
 % Ensemble domain string
-ensemble_domain_string = lower(read_ensemble_domain(JOBFILE, PASS_NUMBER));
+ensemble_domain_string = lower(get_ensemble_domain(JOBFILE, PASS_NUMBER));
 %
 % Ensemble direction
 % This specifies whether to do a temporal ensemble, 
 % or a spatial ensemble, or no ensemble.
-ensemble_direction_string = lower(read_ensemble_direction(JOBFILE, PASS_NUMBER));
+ensemble_direction_string = lower(get_ensemble_direction(JOBFILE, PASS_NUMBER));
 %
 % Parse the ensemble direction string to figure out
 % which ensemble was specified
@@ -58,7 +54,6 @@ do_temporal_ensemble = or( ...
 %
 % Flag for "Do the spatial ensemble"
 do_spatial_ensemble = ~isempty(regexpi(lower(ensemble_direction_string), 'spa'));
-
 
 % Correlation grid points
 grid_correlate_x = JOBFILE.Processing(PASS_NUMBER).Grid.Points.Correlate.X;
@@ -93,8 +88,11 @@ deform_requested = ~isempty(regexpi(iterative_method, 'def'));
 % Subpixel fit parameters
 %
 % Estimated particle diameter
-particle_diameter = JOBFILE.Processing(PASS_NUMBER). ...
-    SubPixel.EstimatedParticleDiameter;
+% % % TO DO: 
+% % % Make a function called get_rpc_diameter(JOBFILE, PASS_NUMBER)
+particle_diameter = ...
+   JOBFILE.Processing(PASS_NUMBER). ...
+   Correlation.EstimatedParticleDiameter;
 
 % Make some filters. 
 % These are to let the parfor loops run
@@ -108,7 +106,7 @@ gcc_filter = ones(region_height, region_width);
 % 
 % Might want to move this
 % out of the correlation pass code.
-switch lower(correlation_method)
+switch lower(spetral_weighting_method)
     case 'apc'
         apc_field = JOBFILE.Processing(PASS_NUMBER).Correlation.APC;
         if isfield(apc_field, 'Method')
@@ -151,10 +149,8 @@ for n = 1 : num_pairs_correlate
     % re-zero the arrays for holding the cross 
     % correlation planes. 
     switch lower(ensemble_direction_string)
-        case 'spatial'
+        case {'spatial', 'none'}
             cross_corr_ensemble(:) = 0;
-        case 'none'
-            cross_corr_ensemble(:) = 0;  
     end
     
     % Image paths
@@ -167,7 +163,7 @@ for n = 1 : num_pairs_correlate
     
     % Inform the use
     fprintf(1, '%s Pass %d of %d, pair %d of %d\n', ...
-        upper(correlation_method),  ...
+        upper(spetral_weighting_method),  ...
         PASS_NUMBER, num_passes, n, num_pairs_correlate);
     fprintf(1, '%s and %s\n', file_name_01, file_name_02);
    
@@ -358,7 +354,7 @@ for n = 1 : num_pairs_correlate
                     split_complex(cross_corr_spectral);
  
                 % Switch between correlation methods
-                switch lower(correlation_method)
+                switch lower(spetral_weighting_method)
                     case 'scc'                          
                         % For SCC, take the original magnitude
                         % as the spectral filter. 
@@ -446,8 +442,7 @@ for n = 1 : num_pairs_correlate
         % need to be saved for APC later. 
         % There's probably a better way to do this.
         dp_y_full(grid_indices, n) = particle_diameters_y;
-        dp_x_full(grid_indices, n) = particle_diameters_x;
-        
+        dp_x_full(grid_indices, n) = particle_diameters_x;       
     end
     
     % Print a carriage return after
