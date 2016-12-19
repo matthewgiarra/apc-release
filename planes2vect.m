@@ -2,6 +2,7 @@ function [TY, TX, PARTICLE_DIAMETER_Y, PARTICLE_DIAMETER_X] = planes2vect(JOBFIL
 % This function measures displacements (TY, TX) from
 % a list of complex correlation planes. 
 
+
 % Read the ensemble domain string
 ensemble_domain_string = get_ensemble_domain(JOBFILE, PASS_NUMBER);
 
@@ -82,7 +83,14 @@ sub_pixel_weights = ones(region_height, region_width);
 switch lower(displacement_estimate_domain)
     case 'spectral'  
         % Get the list of kernel sizes for the SPC 
-        spc_unwrap_method_string = get_spc_unwrap_method(JOBFILE, PASS_NUMBER);
+        spc_unwrap_method_string = ...
+            get_spc_unwrap_method(JOBFILE, PASS_NUMBER);
+        
+        % Choose whether to run compiled codes for SPC
+        spc_run_compiled = JOBFILE.Processing(PASS_NUMBER). ...
+            Correlation.DisplacementEstimate. ...
+            Spectral.RunCompiled;
+        
 end
 
 % If the spectral ensemble was performed,

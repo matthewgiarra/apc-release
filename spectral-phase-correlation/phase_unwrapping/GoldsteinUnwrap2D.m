@@ -19,7 +19,7 @@ function [PHASE_PLANE_UNWRAPPED, BRANCH_CUT_MATRIX] = GoldsteinUnwrap2D(PHASE_PL
 
 % Default to not run compiled codes
 if nargin < 3
-    COMPILED = 0;
+    COMPILED = false;
 end
 
 % Calculate the phase angle of the complex plane

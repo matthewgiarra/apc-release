@@ -21,5 +21,4 @@ fprintf(1, 'Compiling "remove_dipoles.m" to MEX...\n\n');
 compile_remove_dipoles;
 
 
-
 end

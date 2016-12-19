@@ -30,18 +30,19 @@ JobOptions.NumberOfPasses = 0;
 % Total number of passes
 num_passes_total = length(region_height_list);
 
-
-image_parent_dir = '/Users/matthewgiarra/Documents/School/VT/Research/Aether/piv_test_images/grasshopper/';
-animal_number = 6;
-trial_name = 'mng-2-073-G';
-
+% Image parent directory
+image_parent_dir = ['/Users/matthewgiarra/Documents/' ...
+    'School/VT/Research/Aether/piv_test_images/grasshopper/'];
+animal_number = 8;
+trial_name = 'mng-1-163-C';
 
 % Case directory
-case_dir = fullfile(image_parent_dir, sprintf('grasshopper_%d', animal_number), trial_name);
+case_dir = fullfile(image_parent_dir, ...
+    sprintf('grasshopper_%d', animal_number), trial_name);
 
 % Data: Input images
 
-Data.Inputs.Images.Directory = fullfile(case_dir, 'raw');
+Data.Inputs.Images.Directory = fullfile(case_dir, 'proc', 'deriv');
 Data.Inputs.Images.BaseName = sprintf('%s_', trial_name);
 Data.Inputs.Images.Digits = 6;
 Data.Inputs.Images.Extension = '.tiff';
@@ -78,19 +79,19 @@ Processing(1).Grid.Mask.Name = sprintf('%s_mask.tiff', trial_name);
 
 % Frame parameters.
 Processing(1).Frames.Start = 1;
-Processing(1).Frames.End = 200;
-Processing(1).Frames.Step = 50;
+Processing(1).Frames.End = 960;
+Processing(1).Frames.Step = 10;
 
 
 % Correlation parameters
-Processing(1).Correlation.Step = 1;
+Processing(1).Correlation.Step = 2;
 Processing(1).Correlation.Ensemble.DoEnsemble = 1;
 Processing(1).Correlation.Ensemble.NumberOfPairs = 1;
 Processing(1).Correlation.Ensemble.Domain = 'spectral';
 Processing(1).Correlation.Ensemble.Direction = 'spatial';
 
 % Spectral weighting: SCC, RPC, GCC, APC
-Processing(1).Correlation.SpectralWeighting.Method = 'APC';
+Processing(1).Correlation.SpectralWeighting.Method = 'RPC';
 
 % APC Parameters
 % Parameters specific to APC
@@ -109,12 +110,16 @@ Processing(1).Correlation.SpectralFiltering.KernelSizeList = {''};
 % or 'spectral' for SPC plane fit);
 Processing(1).Correlation.DisplacementEstimate.Domain = 'spectral';
 
+% Choose whether to run compiled codes
+Processing(1).Correlation.DisplacementEstimate. ...
+    Spectral.RunCompiled = true;
+
 % Options for spatial displacement estimate
 Processing(1).Correlation.DisplacementEstimate. ...
     Spatial.SubPixel.Method = '3-point fit';
 
 % Estimated particle diameter
-Processing(1).Correlation.EstimatedParticleDiameter = 6;
+Processing(1).Correlation.EstimatedParticleDiameter = 8;
 
 % Options for spectral displacement estimate
 Processing(1).Correlation.DisplacementEstimate. ...

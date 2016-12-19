@@ -108,6 +108,10 @@ Processing(1).Correlation.EstimatedParticleDiameter = 3;
 Processing(1).Correlation.DisplacementEstimate. ...
     Spectral.UnwrappingMethod = 'goldstein';
 
+% Choose whether to run compiled codes
+Processing(1).Correlation.DisplacementEstimate. ...
+    Spectral.RunCompiled = true;
+
 % Parameters for vector validation
 Processing(1).Validation.DoValidation = 1;
 Processing(1).Validation.ValidationMethod = 'uod';
