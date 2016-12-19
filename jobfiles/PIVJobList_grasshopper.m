@@ -45,7 +45,6 @@ Data.Inputs.Images.Directory = fullfile(case_dir, 'raw');
 Data.Inputs.Images.BaseName = sprintf('%s_', trial_name);
 Data.Inputs.Images.Digits = 6;
 Data.Inputs.Images.Extension = '.tiff';
-% Data.Inputs.Images.Trailers = {'_a', '_b'};
 Data.Inputs.Images.Trailers = {'', ''};
 
 % Data: Input vectors for initializing, e.g., image deformation.
@@ -55,7 +54,6 @@ Data.Inputs.Vectors.Digits = 5;
 Data.Inputs.Vectors.Extension = '.mat';
 
 % Data: output vectors
-% Data.Outputs.Vectors.Directory = '/Users/matthewgiarra/Documents/School/VT/Research/Aether/piv_test_images/pivchallenge/2014/A/vect';
 Data.Outputs.Vectors.Directory = fullfile(case_dir, 'vect');
 Data.Outputs.Vectors.BaseName = sprintf('%s_', trial_name);
 Data.Outputs.Vectors.Digits = 6;
@@ -77,35 +75,50 @@ Processing(1).Grid.Buffer.Y = 0;
 Processing(1).Grid.Buffer.X = 0;
 Processing(1).Grid.Mask.Directory = fullfile(case_dir, 'mask');
 Processing(1).Grid.Mask.Name = sprintf('%s_mask.tiff', trial_name);
-% Processing(1).Grid.Mask.Directory = '';
-% Processing(1).Grid.Mask.Name = '';
 
 % Frame parameters.
 Processing(1).Frames.Start = 1;
-Processing(1).Frames.End = 1000;
+Processing(1).Frames.End = 200;
 Processing(1).Frames.Step = 50;
 
+
 % Correlation parameters
-Processing(1).Correlation.Method = 'rpc';
-% Processing(1).Correlation.Step = 0;
-Processing(1).Correlation.Step = 2;
+Processing(1).Correlation.Step = 1;
 Processing(1).Correlation.Ensemble.DoEnsemble = 1;
 Processing(1).Correlation.Ensemble.NumberOfPairs = 1;
 Processing(1).Correlation.Ensemble.Domain = 'spectral';
 Processing(1).Correlation.Ensemble.Direction = 'spatial';
 
+% Spectral weighting: SCC, RPC, GCC, APC
+Processing(1).Correlation.SpectralWeighting.Method = 'APC';
+
+% APC Parameters
 % Parameters specific to APC
-Processing(1).Correlation.APC.FilterDiameterUpperBound = 1;
-Processing(1).Correlation.APC.Shuffle.Range = [0, 0];
-Processing(1).Correlation.APC.Shuffle.Step = [0, 0];
-Processing(1).Correlation.APC.Method = 'phase';
+Processing(1).Correlation.SpectralWeighting.APC.Shuffle.Range = [0, 0];
+Processing(1).Correlation.SpectralWeighting.APC.Shuffle.Step = [0, 0];
+Processing(1).Correlation.SpectralWeighting.APC.Method = 'magnitude';
 
-% Parameters specific to RPC
-Processing(1).Correlation.RPC.EffectiveDiameter = 6;
+% Spectral filtering parameters
+% These are things like the phase median filter,
+% SVD, etc. 
+Processing(1).Correlation.SpectralFiltering.FilterList = {''};
+Processing(1).Correlation.SpectralFiltering.KernelSizeList = {''};
 
-% Subpixel fit parameters
-Processing(1).SubPixel.Method = '3-point fit';
-Processing(1).SubPixel.EstimatedParticleDiameter = 2;
+% This specifies the domain in which the displacement
+% estimate is calculated ('spatial' for peak-finding/fitting 
+% or 'spectral' for SPC plane fit);
+Processing(1).Correlation.DisplacementEstimate.Domain = 'spatial';
+
+% Options for spatial displacement estimate
+Processing(1).Correlation.DisplacementEstimate. ...
+    Spatial.SubPixel.Method = '3-point fit';
+
+% Estimated particle diameter
+Processing(1).Correlation.EstimatedParticleDiameter = 6;
+
+% Options for spectral displacement estimate
+Processing(1).Correlation.DisplacementEstimate. ...
+    Spectral.UnwrappingMethod = 'goldstein';
 
 % Parameters for vector validation
 Processing(1).Validation.DoValidation = 0;

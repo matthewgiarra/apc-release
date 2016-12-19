@@ -3,18 +3,23 @@ function [TY, TX, PARTICLE_DIAMETER_Y, PARTICLE_DIAMETER_X] = planes2vect(JOBFIL
 % a list of complex correlation planes. 
 
 % Read the ensemble domain string
-ensemble_domain_string = read_ensemble_domain(JOBFILE, PASS_NUMBER);
+ensemble_domain_string = get_ensemble_domain(JOBFILE, PASS_NUMBER);
 
 % Read the ensemble direction
 ensemble_direction_string = lower( ...
-    read_ensemble_direction(JOBFILE, PASS_NUMBER));
+    get_ensemble_direction(JOBFILE, PASS_NUMBER));
 
 % Extract the correlation planes from the job file
 cross_corr_ensemble = JOBFILE.Processing(PASS_NUMBER).Correlation.Planes;
 
-% Correlation filter
-correlation_method_string = lower(JOBFILE.Processing(PASS_NUMBER). ...
-    Correlation.Method);
+% Spectral weighting method
+spectral_weighting_method_string = ...
+    lower(JOBFILE.Processing(PASS_NUMBER). ...
+    Correlation.SpectralWeighting.Method);
+
+% Displacement estimate domain
+displacement_estimate_domain = ...
+    get_displacement_estimate_domain(JOBFILE, PASS_NUMBER);
 
 % If the ensemble direction was "spatial,"
 % then add all the planes together
@@ -31,8 +36,9 @@ end
 
 % Static particle diameters
 % Particle diameter
-particle_diameter = JOBFILE.Processing(PASS_NUMBER). ...
-    SubPixel.EstimatedParticleDiameter;
+particle_diameter = ...
+   JOBFILE.Processing(PASS_NUMBER). ...
+   Correlation.EstimatedParticleDiameter;
 
 % Allocate the static spectral filter
 % This apparently needs to be done 
@@ -40,32 +46,20 @@ particle_diameter = JOBFILE.Processing(PASS_NUMBER). ...
 spectral_weighting_filter_static = nan(region_height, region_width);
 
 % Method specific options
-switch lower(correlation_method_string)
+switch lower(spectral_weighting_method_string)
     case 'rpc'   
-        % Read the RPC diameter
-        rpc_diameter = ...
-            JOBFILE.Processing(PASS_NUMBER). ...
-            Correlation.RPC.EffectiveDiameter;
-        
-        % Particle diameter
-        particle_diameter = rpc_diameter;
-        
         % Create the RPC filter
         spectral_weighting_filter_static = spectral_energy_filter( ...
-            region_height, region_width, rpc_diameter);
+            region_height, region_width, particle_diameter);
     case 'gcc'
     % Create the GCC filter (ones everywhere)
     spectral_weighting_filter_static = ones(region_height, region_width);
     
-    case 'apc'
-        
-        % Set the upper bound for the filter
-        apc_filter_upper_bound = JOBFILE.Processing(PASS_NUMBER). ...
-            Correlation.APC.FilterDiameterUpperBound;
-        
+    case 'apc' 
         % If APC was selected, then check the APC method.
         % Read the APC method
-        apc_method = JOBFILE.Processing(PASS_NUMBER).Correlation.APC.Method; 
+        apc_method = JOBFILE.Processing(PASS_NUMBER). ...
+            Correlation.SpectralWeighting.APC.Method;
 end
 
 % Make the list of particle diameters
@@ -88,7 +82,7 @@ sub_pixel_weights = ones(region_height, region_width);
 switch lower(displacement_estimate_domain)
     case 'spectral'  
         % Get the list of kernel sizes for the SPC 
-        spc_unwrap_method = get_spc_unwrap_method(JOBFILE, PASS_NUMBER);
+        spc_unwrap_method_string = get_spc_unwrap_method(JOBFILE, PASS_NUMBER);
 end
 
 % If the spectral ensemble was performed,
@@ -120,7 +114,7 @@ switch lower(ensemble_domain_string)
                 split_complex(cross_corr_spectral);
             
             % Switch between correlation methods
-            switch lower(correlation_method_string)
+            switch lower(spectral_weighting_method_string)
                 case 'scc'           
                     spectral_filter_temp = spectral_corr_mag;
                     
@@ -129,7 +123,7 @@ switch lower(ensemble_domain_string)
                     % Calculate the APC filter
                     [spectral_filter_temp, filter_std_y, filter_std_x] = ...
                     calculate_apc_filter(cross_corr_spectral, ...
-                    apc_filter_upper_bound, apc_method);
+                    particle_diameter, apc_method);
                 
                     % Equivalent particle diameter in the columns
                     % direction, calculated from the APC filter.
@@ -185,18 +179,31 @@ switch lower(ensemble_domain_string)
                     [TY(k), TX(k)] = spc_2D(...
                         cross_corr_spectral, ...
                         spectral_filter_temp, ...
-                        spc_unwrap_method, ...
+                        spc_unwrap_method_string, ...
                         spc_run_compiled);
             end                 
-        end  
-end
-
-% After adding all the pairs to the ensemble
-% do the subpixel peak detection.
-for k = 1 : num_correlation_planes
-    
-
+        end
+        
+    % This is the case for ensembles done in the spatial
+    % domain rather than the spectral domain. This case
+    % assumes that the correlation planes passed are
+    % purely real. 
+    otherwise  
+        % Loop over the planes
+        for k = 1 : num_correlation_planes
+            cross_corr_spatial = cross_corr_ensemble(:, :, k);
             
+            % Effective particle diameters
+            dp_x = particle_diameter_list_x(k);
+            dp_y = particle_diameter_list_y(k);
+        
+            % Do the subpixel displacement estimate.
+            [TX(k), TY(k)] = ...
+                subpixel(cross_corr_spatial,...
+                region_width, region_height, sub_pixel_weights, ...
+                1, 0, [dp_x, dp_y]);   
+            
+        end
 end
 
 % Save the particle diameters

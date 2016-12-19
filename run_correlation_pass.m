@@ -108,10 +108,10 @@ gcc_filter = ones(region_height, region_width);
 % out of the correlation pass code.
 switch lower(spetral_weighting_method)
     case 'apc'
-        apc_field = JOBFILE.Processing(PASS_NUMBER).Correlation.APC;
+        apc_field = JOBFILE.Processing(PASS_NUMBER).Correlation.SpectralWeighting.APC;
         if isfield(apc_field, 'Method')
             apc_method = lower(...
-            JOBFILE.Processing(PASS_NUMBER).Correlation.APC.Method);
+            JOBFILE.Processing(PASS_NUMBER).Correlation.SpectralWeighting.APC.Method);
         else
             apc_method = 'magnitude';
         end       

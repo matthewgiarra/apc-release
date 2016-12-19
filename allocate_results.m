@@ -30,10 +30,10 @@ JOBFILE.Processing(PASS_NUMBER).Results.Displacement.Smoothed.X = zeros(num_regi
 JOBFILE.Processing(PASS_NUMBER).Results.Displacement.Smoothed.Y = zeros(num_regions_full, num_pairs_correlate);
 
 % Read the correlation method
-correlation_method_str = lower(read_correlation_method(JOBFILE, PASS_NUMBER));
+spectral_weighting_method = lower(get_spectral_weighting_method(JOBFILE, PASS_NUMBER));
 
 % Allocate APC diameters
-switch lower(correlation_method_str)
+switch lower(spectral_weighting_method)
     case 'apc'
         JOBFILE.Processing(PASS_NUMBER).Results.Filtering.APC.Diameter.X ...
             = nan(num_regions_full, num_pairs_correlate);
