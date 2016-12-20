@@ -35,6 +35,12 @@ switch lower(METHOD)
     calculate_apc_filter_phase_method(SPECTRAL_CORRELATION_COMPLEX, ...
     RPC_DIAMETER);
 
+    otherwise
+        
+        % Throw an error if an invalid method was specified.
+        error(...
+            ['Error: invalid APC method ("%s") specified.' , ...
+            '\nUse either "phase" or "magnitude".\n'], lower(METHOD));
 end
     
 end
