@@ -1,6 +1,6 @@
 function [TY, TX, PARTICLE_DIAMETER_Y, PARTICLE_DIAMETER_X] = planes2vect(JOBFILE, PASS_NUMBER)
 % This function measures displacements (TY, TX) from
-% a list of complex correlation planes. 
+% a list of either real or complex correlation planes. 
 
 % Read the ensemble direction
 ensemble_direction_string = lower( ...
@@ -34,8 +34,7 @@ else
     % so that the correct part of the switch/case statement
     % below gets chosen. 
     % This is a dumb way to handling this decision
-    ensemble_domain_string = ...
-        'spectral';
+    ensemble_domain_string = 'spectral';
 end
 
 % Spectral weighting method
@@ -239,7 +238,6 @@ switch lower(ensemble_domain_string)
                         subpixel(cross_corr_spatial,...
                         region_width, region_height, sub_pixel_weights, ...
                         1, 0, [dp_x, dp_y]);   
-
                 end
         end
 end
