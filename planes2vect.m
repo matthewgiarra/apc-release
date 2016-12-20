@@ -2,25 +2,46 @@ function [TY, TX, PARTICLE_DIAMETER_Y, PARTICLE_DIAMETER_X] = planes2vect(JOBFIL
 % This function measures displacements (TY, TX) from
 % a list of complex correlation planes. 
 
-
-% Read the ensemble domain string
-ensemble_domain_string = get_ensemble_domain(JOBFILE, PASS_NUMBER);
-
 % Read the ensemble direction
 ensemble_direction_string = lower( ...
     get_ensemble_direction(JOBFILE, PASS_NUMBER));
 
 % Extract the correlation planes from the job file
-cross_corr_ensemble = JOBFILE.Processing(PASS_NUMBER).Correlation.Planes;
+cross_corr_array = JOBFILE.Processing(PASS_NUMBER).Correlation.Planes;
+
+% Check if all the imaginary components
+% of the correlation array are equal to zero.
+% If this is the case, then spectral plane fitting
+% won't work.
+planes_are_purely_real = all(imag(cross_corr_array(:)) == 0);
+
+% Check whether correlation planes are complex.
+if planes_are_purely_real
+    % If planes are purely real, then automatically do the
+    % displacement estimate in the spatial domain (peak finding)
+   displacement_estimate_domain_string = 'spatial';
+   ensemble_domain_string = 'spatial';
+else
+    % If planes are complex, then either spatial or
+    % spectral displacement estimates will work.
+    % In this case, determine the domain in which to
+    % calculate displacement by reading the parameter
+    % from the job file.
+    displacement_estimate_domain_string = ...
+        get_displacement_estimate_domain(JOBFILE, PASS_NUMBER);
+
+    % Also set the "ensemble domain" specifier to "spectral"
+    % so that the correct part of the switch/case statement
+    % below gets chosen. 
+    % This is a dumb way to handling this decision
+    ensemble_domain_string = ...
+        'spectral';
+end
 
 % Spectral weighting method
 spectral_weighting_method_string = ...
     lower(JOBFILE.Processing(PASS_NUMBER). ...
     Correlation.SpectralWeighting.Method);
-
-% Displacement estimate domain
-displacement_estimate_domain = ...
-    get_displacement_estimate_domain(JOBFILE, PASS_NUMBER);
 
 % If the ensemble direction was "spatial,"
 % then add all the planes together
@@ -28,12 +49,12 @@ switch lower(ensemble_direction_string)
     case 'spatial'
         % If the spatial correlation was specified,
         % then add all the correlations together. 
-        cross_corr_ensemble = sum(cross_corr_ensemble, 3);
+        cross_corr_array = sum(cross_corr_array, 3);
 end
 
 % Get the number of correlation planes remaining.
 [region_height, region_width, num_correlation_planes] ...
-    = size(cross_corr_ensemble);
+    = size(cross_corr_array);
 
 % Static particle diameters
 % Particle diameter
@@ -80,7 +101,7 @@ TY = nan(num_correlation_planes, 1);
 sub_pixel_weights = ones(region_height, region_width);
 
 % Get SPC parameters if requested
-switch lower(displacement_estimate_domain)
+switch lower(displacement_estimate_domain_string)
     case 'spectral'  
         % Get the list of kernel sizes for the SPC 
         spc_unwrap_method_string = ...
@@ -115,15 +136,12 @@ switch lower(ensemble_domain_string)
         for k = 1 : num_correlation_planes
             
             % Extract the given region
-            cross_corr_spectral = cross_corr_ensemble(:, :, k);
+            cross_corr_spectral = cross_corr_array(:, :, k);
             
             % Spectral correlation phase and magnitude
             [spectral_corr_phase, spectral_corr_mag] = ...
                 split_complex(cross_corr_spectral);
-            
-            % Filter the planes if requested
-            
-            
+                        
             % Switch between correlation methods
             switch lower(spectral_weighting_method_string)
                 case 'scc'           
@@ -152,7 +170,7 @@ switch lower(ensemble_domain_string)
             % Switch between estimating the 
             % displacement in the spatial domain (peak finding)
             % or in the spectral domain (plane fitting)
-            switch lower(displacement_estimate_domain)
+            switch lower(displacement_estimate_domain_string)
                 case 'spatial'                    
                     % Apply the phase filter to the spectral plane.
                     % Note that this operation is legitimate even
@@ -199,21 +217,30 @@ switch lower(ensemble_domain_string)
     % domain rather than the spectral domain. This case
     % assumes that the correlation planes passed are
     % purely real. 
-    otherwise  
-        % Loop over the planes
-        for k = 1 : num_correlation_planes
-            cross_corr_spatial = cross_corr_ensemble(:, :, k);
-            
-            % Effective particle diameters
-            dp_x = particle_diameter_list_x(k);
-            dp_y = particle_diameter_list_y(k);
+    otherwise
         
-            % Do the subpixel displacement estimate.
-            [TX(k), TY(k)] = ...
-                subpixel(cross_corr_spatial,...
-                region_width, region_height, sub_pixel_weights, ...
-                1, 0, [dp_x, dp_y]);   
-            
+        % If the displacement estimate was specified
+        % to occur in the spatial domain (peak finding)
+        % then do the subpixel peak fitting. 
+        % For now the three-point Gaussian fit is hard coded.
+        % This should be changed.
+        switch lower(displacement_estimate_domain_string)
+            case 'spatial'
+                % Loop over the planes
+                for k = 1 : num_correlation_planes
+                    cross_corr_spatial = cross_corr_array(:, :, k);
+
+                    % Effective particle diameters
+                    dp_x = particle_diameter_list_x(k);
+                    dp_y = particle_diameter_list_y(k);
+
+                    % Do the subpixel displacement estimate.
+                    [TX(k), TY(k)] = ...
+                        subpixel(cross_corr_spatial,...
+                        region_width, region_height, sub_pixel_weights, ...
+                        1, 0, [dp_x, dp_y]);   
+
+                end
         end
 end
 

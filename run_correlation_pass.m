@@ -126,7 +126,7 @@ end
     make_spatial_windows(JOBFILE, PASS_NUMBER);
 
 % Allocate the correlation planes
-cross_corr_ensemble = zeros(...
+cross_corr_array = zeros(...
             region_height, region_width, num_regions_correlate);
         
 % Count the number of passes
@@ -142,6 +142,9 @@ ty_temp = nan(num_regions_full, num_pairs_correlate);
 dp_y_full = nan(num_regions_full, num_pairs_correlate);
 dp_x_full = nan(num_regions_full, num_pairs_correlate);
 
+% Read whether or not to do ensemble
+do_ensemble = JOBFILE.Processing(PASS_NUMBER).Correlation.Ensemble.DoEnsemble;
+
 % Loop over all the images
 for n = 1 : num_pairs_correlate
     
@@ -150,7 +153,11 @@ for n = 1 : num_pairs_correlate
     % correlation planes. 
     switch lower(ensemble_direction_string)
         case {'spatial', 'none'}
-            cross_corr_ensemble(:) = 0;
+            cross_corr_array(:) = 0;
+        otherwise
+            if not(do_ensemble)
+                cross_corr_array(:) = 0;
+            end
     end
     
     % Image paths
@@ -270,6 +277,9 @@ for n = 1 : num_pairs_correlate
     % Inform the user that correlations 
     % are about to happen.
     fprintf(1, 'Correlating image pair...\n');
+    
+    % Tic tock
+    t1 = tic;
     
     % Loop over the regions
     for k = 1 : num_regions_correlate
@@ -402,24 +412,27 @@ for n = 1 : num_pairs_correlate
                             cross_corr_spectral_filtered))));
                         
                 % Add this correlation to the spatial ensemble
-                cross_corr_ensemble(:, :, k) = ...
-                    cross_corr_ensemble(:, :, k) + cross_corr_spatial;
+                cross_corr_array(:, :, k) = ...
+                    cross_corr_array(:, :, k) + cross_corr_spatial;
   
             case 'spectral'                   
                 % For spectral ensemble, add the current complex
                 % correlation to the ensemble complex correlation
-                cross_corr_ensemble(:, :, k) = ...
-                    cross_corr_ensemble(:, :, k) + ...
+                cross_corr_array(:, :, k) = ...
+                    cross_corr_array(:, :, k) + ...
                     cross_corr_spectral;
         end 
     end
+    t2 = toc(t1);
+    fprintf(1, 'Correlated %d regions in %02f seconds.\n', ...
+        num_regions_correlate, t2);
     
     % Save the correlation planes to the jobfile.
     % This is done to avoid passing multiple variables
     % to the different functions.
     % These will be deleted before the jobfile is saved.
     JOBFILE.Processing(PASS_NUMBER).Correlation.Planes = ...
-        cross_corr_ensemble;
+        cross_corr_array;
     
     % Extract displacements 
     % if the temporal enemble wasn't specified.
