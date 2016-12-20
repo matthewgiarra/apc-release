@@ -121,6 +121,9 @@ switch lower(ensemble_domain_string)
             [spectral_corr_phase, spectral_corr_mag] = ...
                 split_complex(cross_corr_spectral);
             
+            % Filter the planes if requested
+            
+            
             % Switch between correlation methods
             switch lower(spectral_weighting_method_string)
                 case 'scc'           

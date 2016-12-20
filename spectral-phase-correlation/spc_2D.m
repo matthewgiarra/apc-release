@@ -9,13 +9,16 @@ end
 % Exctract the phase of the cross correlation 
 phase_plane_wrapped = split_complex(CROSS_CORRELATION_COMPLEX);
 
+% Wrapped phase angle
+phase_angle_wrapped = angle(phase_plane_wrapped);
+
 % Unwrap using the chosen unwrapping method
 % Other methods can be added.
 switch lower(UNWRAP_METHOD)
     case 'herraez'
         
         % Unwrap the phase plane using the Herraez method.
-        phase_plane_unwrapped = unwrap_phase_herraez(phase_plane_wrapped);
+        phase_plane_unwrapped = unwrap_phase_herraez(phase_angle_wrapped);
     
     case 'goldstein'
         
@@ -24,7 +27,7 @@ switch lower(UNWRAP_METHOD)
         
         % Unwrap the phase plane using the Goldstein method.
         [phase_plane_unwrapped, branch_cut_matrix] = ...
-            GoldsteinUnwrap2D(phase_plane_wrapped, ...
+            GoldsteinUnwrap2D(phase_angle_wrapped, ...
             max_box_size, COMPILED);
     
         % Update the weighting matrix
