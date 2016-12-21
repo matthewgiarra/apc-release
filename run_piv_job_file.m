@@ -1,4 +1,4 @@
-function JOBFILE = run_piv_job_file(JOBFILE)
+function OUTPUT_FILE_PATH = run_piv_job_file(JOBFILE)
 
 % Determine the number of passes to run.
 num_passes = determine_number_of_passes(JOBFILE);
@@ -19,7 +19,7 @@ for p = 1 : num_passes
 end
 
 % Save the results.
-output_file_path = save_piv_jobfile_results(JOBFILE);
+OUTPUT_FILE_PATH = save_piv_jobfile_results(JOBFILE);
 
 end
 

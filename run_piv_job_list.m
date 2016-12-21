@@ -1,4 +1,4 @@
-function JOBLIST_OUTPUT = run_piv_job_list(JOBLIST_INPUT)
+function OUTPUT_FILE_PATHS = run_piv_job_list(JOBLIST_INPUT)
 
 % First step: Verify that all files that the job
 % refers to can be located on the current filesystem. 
@@ -31,10 +31,7 @@ for n = 1 : num_jobs
     JobList_output(n).InputJobFile = JobFile;
         
     % Run the PIV job file
-    JobFile = run_piv_job_file(JobFile);
-    
-    % Save the results to the job list
-    JOBLIST_OUTPUT(n) = JobFile;
+     OUTPUT_FILE_PATHS{n} = run_piv_job_file(JobFile);
     
 end
 
