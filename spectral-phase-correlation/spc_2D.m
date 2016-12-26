@@ -9,8 +9,10 @@ end
 % Exctract the phase of the cross correlation 
 phase_plane_wrapped = split_complex(CROSS_CORRELATION_COMPLEX);
 
+phase_plane_wrapped_filt = apply_filter_list_complex_phase_plane(phase_plane_wrapped, {'median', 'svd'}, {[3, 3], ''}, 1);
+
 % Wrapped phase angle
-phase_angle_wrapped = angle(phase_plane_wrapped);
+phase_angle_wrapped = angle(phase_plane_wrapped_filt);
 
 % Unwrap using the chosen unwrapping method
 % Other methods can be added.
@@ -33,6 +35,7 @@ switch lower(UNWRAP_METHOD)
         % Update the weighting matrix
         WEIGHTING_MATRIX(branch_cut_matrix > 0) = 0;
         WEIGHTING_MATRIX(phase_plane_unwrapped == 0) = 0;
+        WEIGHTING_MATRIX(WEIGHTING_MATRIX < exp(-2)) = 0;
         
     case 'none'
         phase_plane_unwrapped = angle(phase_plane_wrapped);

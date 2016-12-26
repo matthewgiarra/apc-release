@@ -20,5 +20,9 @@ compile_make_flags_matrix;
 fprintf(1, 'Compiling "remove_dipoles.m" to MEX...\n\n');
 compile_remove_dipoles;
 
+% Compile the flood fill algorithm
+fprintf(1, 'Compiling "phase_median_filter.m" to MEX...\n\n');
+compile_phase_median_filter;
+
 
 end

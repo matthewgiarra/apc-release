@@ -3,6 +3,10 @@ function PHASE_PLANE_WRAPPED_COMPLEX_FILT = ...
 % This function unwraps the dominant modes of the SVD of a 2D complex phase
 % plane into two 1D phase-angle vectors.
 
+if nargin < 2
+    NUM_MODES = 1;
+end
+
 % Calculate the SVD modes of the complex phase plane.
 % Returned values are complex.
 [svd_rows, eigen_vals, svd_cols] = svd(PHASE_PLANE_WRAPPED_COMPLEX);

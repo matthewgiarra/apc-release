@@ -20,8 +20,6 @@ isolated_regions = imfill(BRANCH_CUT_MATRIX) - BRANCH_CUT_MATRIX;
 non_branch_cuts = find(BRANCH_CUT_MATRIX < 1 & isolated_regions < 1);
 % non_branch_cuts = find(BRANCH_CUT_MATRIX < 1);
 
-% Calculate the phase quality to determine where to start the unwrapping.
-phase_quality = calculate_phase_quality(IM_phase, 5);
 
 % Determine the row and column indices of these pixels
 % [y_ind, x_ind] = ind2sub([height, width], non_branch_cuts);
@@ -38,8 +36,8 @@ r = sqrt((x_ind - xc).^2 + (y_ind - yc).^2);
 % This picks the unwrapping starting position
 % At the non-branch cut pixel closest to the 
 % center of the spectrum.
-rowref = y_ind(phase_quality == min(phase_quality(:)));
-colref = x_ind(phase_quality == min(phase_quality(:)));
+rowref = y_ind(r == min(r));
+colref = x_ind(r == min(r));
 
 % Check if this 
 

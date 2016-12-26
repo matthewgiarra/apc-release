@@ -2,3 +2,5 @@
 *~
 *.dSYM
 *.mexmaci64
+*/codegen/*
+codegen/

@@ -1,31 +1,35 @@
 
-results_path = '/Users/matthewgiarra/Documents/School/VT/Research/Aether/piv_test_images/grasshopper/grasshopper_3/mng-2-072-B/vect/mng-2-072-B_000001_005450.mat';
-reg_path = '/Users/matthewgiarra/Documents/School/VT/Research/Aether/piv_test_images/grasshopper/grasshopper_3/mng-2-072-B/proc/reg/points/mng-2-072-B_reg_000000-005457.mat';
+results_path = '/Users/matthewgiarra/Documents/School/VT/Research/Aether/piv_test_images/grasshopper/grasshopper_5/mng-2-073-C/vect/mng-2-073-C_000001_005450.mat';
+% reg_path = '/Users/matthewgiarra/Documents/School/VT/Research/Aether/piv_test_images/grasshopper/grasshopper_2/mng-2-071-J/proc/reg/points/mng-2-071-J_000000-005457.mat';
 
 fSize_legend = 20;
 fSize_labels = 24;
 fSize_axes = 24;
 
+% Smoothing kernel parameters
 kernel_size = 80;
+kernel_std = 2;
 
+% Make the smoothing kernel
 x = -kernel_size/2 : kernel_size/2;
-g_std = 5;
-kern = 1 / sqrt(2 * pi * g_std^2) * exp(-x.^2/(2*g_std^2));
+kern = 1 / sqrt(2 * pi * kernel_std^2) * exp(-x.^2/(2*kernel_std^2));
 
+% Load the PIV results
 load(results_path);
 
+% 
 tx_piv_raw = -1 * max(JobFile.Processing(1).Results.Displacement.Raw.X);
 tx_piv_smoothed = conv(tx_piv_raw, kern, 'same');
 piv_time_ms = 1 : length(tx_piv_smoothed);
 piv_time_sec = 1 / 1000 * piv_time_ms;
 
-load(reg_path);
-tx_reg = tx_smoothed;
-tx_reg_diff = diff(tx_reg);
-reg_time_ms = 1 : length(tx_reg_diff);
-reg_time_sec = 1 / 1000 * reg_time_ms;
+% load(reg_path);
+% tx_reg = tx_smoothed;
+% tx_reg_diff = diff(tx_reg);
+% reg_time_ms = 1 : length(tx_reg_diff);
+% reg_time_sec = 1 / 1000 * reg_time_ms;
 
-Skip = 10;
+Skip = 1;
 plot(piv_time_sec( 1 : Skip : end), tx_piv_raw(1 : Skip : end), '-', 'color', 0.75 * [1, 1, 1], 'linewidth', 1.5)
 
 hold on;
@@ -51,7 +55,6 @@ ylabel('$\textrm{Flow velocity (mm/sec)}$', 'interpreter', 'latex', 'FontSize', 
 
 grid on;
 
-x_lim_max = max([max(piv_time_sec), max(reg_time_sec)]);
-xlim([1, x_lim_max]);
-ylim([-20, 20]);
+xlim([1, max(piv_time_sec)]);
+% ylim(15 * [-1, 1]);
 
