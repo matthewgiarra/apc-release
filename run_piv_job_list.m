@@ -19,8 +19,11 @@ JOBLIST_OUTPUT = JOBLIST_INPUT;
 % Count the number of jobs
 num_jobs = length(JOBLIST_INPUT);
 
+% Start a timer
+t1 = tic;
+
 % Loop over all the jobs
-for n = 1 : num_jobs
+parfor n = 1 : num_jobs
     
     % Extract the job file
     JobFile = JOBLIST_INPUT(n);
@@ -34,5 +37,9 @@ for n = 1 : num_jobs
      OUTPUT_FILE_PATHS{n} = run_piv_job_file(JobFile);
     
 end
+t2 = toc(t1);
+
+% Print the total time taken.
+fprintf('Total job list time: %0.1f sec\n', t2);
 
 end
