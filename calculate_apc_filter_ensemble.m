@@ -3,9 +3,9 @@ function [APC_STD_Y, APC_STD_X, ...
         DX_STD_DEV_Y, DX_STD_DEV_X] = ...
     calculate_apc_filter_ensemble(image_list_01, image_list_02, ...
     grid_y, grid_x, region_size, window_fraction, shuffle_range, shuffle_step)
-% APC_STD_Y, APC_STD_X, APC_FILTER] = ...
-%     calculate_apc_filter_from_image_pair(image_01, image_02, ...
-%     grid_y, grid_x, region_size, window_fraction, shuffle_range, shuffle_step)
+% [APC_STD_Y, APC_STD_X, FT_PDF_STD_DEV_Y, FT_PDF_STD_DEV_X, DX_STD_DEV_Y, DX_STD_DEV_X] = ...
+%    calculate_apc_filter_ensemble(image_list_01, image_list_02, ...
+%    grid_y, grid_x, region_size, window_fraction, shuffle_range, shuffle_step)
 % 
 % CALCULATE_APC_FILTER_FROM_IMAGE_PAIR calculates the standard deviations
 % of Gaussian-shaped spectral filters from a pair of images
@@ -18,7 +18,7 @@ function [APC_STD_Y, APC_STD_X, ...
 %       in image_list_01 specify the first image
 %       in each pair of images. See below for example usage.
 % 
-%     image_02: Same as image_list_02, but specifying
+%     image_list_02: Same as image_list_01, but specifying
 %       the paths to the second image in each pair.
 % 
 %     grid_y: 2D Array or 1D vector containing the pixel
@@ -76,6 +76,14 @@ function [APC_STD_Y, APC_STD_X, ...
 %         to the order of the grid points located
 %         at [grid_y(:), grid_x(:)].
 %
+%   FT_PDF_STD_DEV_Y = Vector containing the standard deviations
+%        in the rows-direction of the quotient of the CC magnitude
+%        and the autocorrelation in the Fourier domain.
+%
+%   FT_PDF_STD_DEV_X = Vector containing the standard deviations
+%        in the columns-direction of the quotient of the CC magnitude
+%        and the autocorrelation in the Fourier domain.
+%
 %     DX_STD_DEV_Y = Vector containing the standard deviations
 %       of the distribution of vertical displacements in
 %       the interrogation regions centered about each grid point.
@@ -87,7 +95,7 @@ function [APC_STD_Y, APC_STD_X, ...
 %       This code assumes that distributions are Gaussian.
 % 
 % SEE ALSO
-%     gridImage; subpixel, fit_gaussian_2D, extractSubRegions
+%     gridImage; subpixel, fit_gaussian_2D, extract_sub_regions;
 % 
 
 % Default to not shuffling
