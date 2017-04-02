@@ -125,7 +125,7 @@ if isfield(JOBFILE.Processing(PASS_NUMBER), 'Iterative');
             if source_field_exists_flag == true
 
                 % Load the source field
-                load(source_field_exists_flag);
+                load(source_field_path);
 
                 % Read the variable names that we need to load
                 %
