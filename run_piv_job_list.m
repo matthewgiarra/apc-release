@@ -4,7 +4,14 @@ function OUTPUT_FILE_PATHS = run_piv_job_list(JOBLIST_INPUT)
 % refers to can be located on the current filesystem. 
 % % % % WRITE THIS % % % % %%
 % Things to test: 
-verify_job_list_file_paths(JOBLIST_INPUT);
+job_list_is_valid = verify_job_list_file_paths(JOBLIST_INPUT);
+
+
+% Only proceed if all images were found
+if not(job_list_is_valid)
+   error('Error: Files not found. Exiting.'); 
+end
+
 % 
 % 1) Check existences of all files
 %   - Flow images
@@ -23,7 +30,7 @@ num_jobs = length(JOBLIST_INPUT);
 t1 = tic;
 
 % Loop over all the jobs
-parfor n = 1 : num_jobs
+for n = 1 : num_jobs
     
     % Extract the job file
     JobFile = JOBLIST_INPUT(n);

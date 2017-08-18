@@ -1,12 +1,12 @@
 function JOBLIST = PIVJobList_default()
 
 % Number of passes to run
-num_passes_spec = 5;
+num_passes_spec = 2;
 
 % % Pass parameters
 region_height_list_raw = [64,  64,  64, 32, 32, 32];
-region_width_list_raw  = [128, 128, 64, 32, 32, 32];
-window_fract_list_raw = {[0.5, 0.5; 0.5, 1], 0.5, 0.5, 1.0, 24/32, 24/32};
+region_width_list_raw  = [64, 128, 64, 32, 32, 32];
+window_fract_list_raw = {0.5, 0.5, 0.5, 1.0, 24/32, 24/32};
 grid_spacing_list_raw = [64, 64, 32, 16, 16, 2];
 grid_spacing_list_raw_x = grid_spacing_list_raw;
 grid_spacing_list_raw_y = grid_spacing_list_raw;
@@ -22,17 +22,15 @@ num_passes_total = length(region_height_list);
 
 % Number of passes
 % zero means run all of them.
-JobOptions.NumberOfPasses = 0;
+JobOptions.NumberOfPasses = 1;
 
 % Data: Input images
-Data.Inputs.Images.Directory = '/Users/matthewgiarra/Documents/School/VT/Research/Aether/piv_test_images/pivchallenge/2014/A/images/proc/ghost';
-% Data.Inputs.Images.Directory = '/Users/matthewgiarra/Documents/School/VT/Research/Aether/piv_test_images/poiseuille_diffusion_0.00/raw';
-Data.Inputs.Images.BaseName = 'A_deghost_';
-% Data.Inputs.Images.BaseName = 'poiseuille_diffusion_0.00_';
+Data.Inputs.Images.Directory = '/Users/matthewgiarra/Desktop/blur/raw';
+Data.Inputs.Images.BaseName = 'sinusoidal_';
 Data.Inputs.Images.Digits = 5;
-Data.Inputs.Images.Extension = '.tif';
-Data.Inputs.Images.Trailers = {'_a', '_b'};
-% Data.Inputs.Images.Trailers = {''};
+Data.Inputs.Images.Extension = '.tiff';
+% Data.Inputs.Images.Trailers = {'_a', '_b'};
+Data.Inputs.Images.Trailers = {''};
 
 % Data: Input vectors for initializing, e.g., image deformation.
 Data.Inputs.Vectors.Directory = '';
@@ -41,19 +39,17 @@ Data.Inputs.Vectors.Digits = 5;
 Data.Inputs.Vectors.Extension = '.mat';
 
 % Data: output vectors
-Data.Outputs.Vectors.Directory = '/Users/matthewgiarra/Documents/School/VT/Research/Aether/piv_test_images/pivchallenge/2014/A/vect';
-Data.Outputs.Vectors.BaseName = 'A_deghost_';
+Data.Outputs.Vectors.Directory = '/Users/matthewgiarra/Desktop/blur/raw';
+Data.Outputs.Vectors.BaseName = 'sinusoidal_';
 Data.Outputs.Vectors.Digits = 5;
 Data.Outputs.Vectors.Extension = '.mat';
 
 % Interrogation region dimensions
 Processing(1).Region.Height = 64;
-Processing(1).Region.Width = 128;
-% Processing(1).Region.Height = 128;
-% Processing(1).Region.Width = 128;
+Processing(1).Region.Width = 64;
 
 % Spatial window
-Processing(1).Window.Fraction = [0.5, 0.5; 0.5, 1];
+Processing(1).Window.Fraction = 0.5;
 
 % Grid parameters
 Processing(1).Grid.Spacing.Y = 64;
@@ -62,20 +58,20 @@ Processing(1).Grid.Shift.Y = -16;
 Processing(1).Grid.Shift.X = 0;
 Processing(1).Grid.Buffer.Y = 0;
 Processing(1).Grid.Buffer.X = 0;
-Processing(1).Grid.Mask.Directory = '/Users/matthewgiarra/Documents/School/VT/Research/Aether/piv_test_images/pivchallenge/2014/A/images/masks';
-Processing(1).Grid.Mask.Name = 'imgAmask3.tif';
+Processing(1).Grid.Mask.Directory = '';
+Processing(1).Grid.Mask.Name = '';
 
 % Frame parameters.
 Processing(1).Frames.Start = 1;
-Processing(1).Frames.End = 1;
+Processing(1).Frames.End = 10;
 Processing(1).Frames.Step = 1;
 
 % Correlation parameters
-Processing(1).Correlation.Step = 0;
+Processing(1).Correlation.Step = 1;
 Processing(1).Correlation.Ensemble.DoEnsemble = 1;
 Processing(1).Correlation.Ensemble.NumberOfPairs = 1;
-Processing(1).Correlation.Ensemble.Domain = 'spatial';
-Processing(1).Correlation.Ensemble.Direction = 'temporal';
+Processing(1).Correlation.Ensemble.Domain = 'spectral';
+Processing(1).Correlation.Ensemble.Direction = 'spatial';
 
 % Spectral weighting: SCC, RPC, GCC, APC
 Processing(1).Correlation.SpectralWeighting.Method = 'scc';
