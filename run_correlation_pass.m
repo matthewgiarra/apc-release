@@ -39,21 +39,24 @@ ensemble_domain_string = lower(get_ensemble_domain(JOBFILE, PASS_NUMBER));
 % Ensemble direction
 % This specifies whether to do a temporal ensemble, 
 % or a spatial ensemble, or no ensemble.
-ensemble_direction_string = lower(get_ensemble_direction(JOBFILE, PASS_NUMBER));
+ensemble_type_string = lower(get_ensemble_type(JOBFILE, PASS_NUMBER));
 %
 % Parse the ensemble direction string to figure out
 % which ensemble was specified
 %
 % Flag for "Don't do any ensemble"
-do_no_ensemble = ~isempty(regexpi(lower(ensemble_direction_string), 'no'));
+do_no_ensemble = ~isempty(regexpi(lower(ensemble_type_string), 'no'));
 %
 % Flag for "Do the temporal ensemble"
 do_temporal_ensemble = or( ...
-    ~isempty(regexpi(lower(ensemble_direction_string), 'tim')), ...
-    ~isempty(regexpi(lower(ensemble_direction_string), 'tem')));
-%
+    ~isempty(regexpi(lower(ensemble_type_string), 'tim')), ...
+    ~isempty(regexpi(lower(ensemble_type_string), 'tem')));
+
+% Flag for "do the hybrid ensemble"
+do_hybrid_ensemble = ~isempty(regexpi(lower(ensemble_type_string), 'hy'));
+
 % Flag for "Do the spatial ensemble"
-do_spatial_ensemble = ~isempty(regexpi(lower(ensemble_direction_string), 'spa'));
+do_spatial_ensemble = ~isempty(regexpi(lower(ensemble_type_string), 'spa'));
 
 % Correlation grid points
 grid_correlate_x = JOBFILE.Processing(PASS_NUMBER).Grid.Points.Correlate.X;
@@ -151,7 +154,7 @@ for n = 1 : num_pairs_correlate
     % Unless the temporal ensemble was specified,
     % re-zero the arrays for holding the cross 
     % correlation planes. 
-    switch lower(ensemble_direction_string)
+    switch lower(ensemble_type_string)
         case {'spatial', 'none'}
             cross_corr_array(:) = 0;
         otherwise
@@ -562,7 +565,7 @@ if do_validation == true;
     % was done, then the different time steps
     % saved in the jobfile are all identical,
     % and only one validation needs to be performed.
-    switch ensemble_direction_string
+    switch ensemble_type_string
         case 'temporal'
             num_pairs_validate = 1;
         otherwise
@@ -642,7 +645,7 @@ if do_smoothing == true
     % was done, then the different time steps
     % saved in the jobfile are all identical,
     % and only one validation needs to be performed.
-    switch ensemble_direction_string
+    switch ensemble_type_string
         case 'temporal'
             num_pairs_smooth = 1;
         otherwise

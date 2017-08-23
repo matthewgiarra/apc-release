@@ -2,9 +2,9 @@ function [TY, TX, PARTICLE_DIAMETER_Y, PARTICLE_DIAMETER_X] = planes2vect(JOBFIL
 % This function measures displacements (TY, TX) from
 % a list of either real or complex correlation planes. 
 
-% Read the ensemble direction
-ensemble_direction_string = lower( ...
-    get_ensemble_direction(JOBFILE, PASS_NUMBER));
+% Read the ensemble type
+ensemble_type_string = lower( ...
+    get_ensemble_type(JOBFILE, PASS_NUMBER));
 
 % Extract the correlation planes from the job file
 cross_corr_array = JOBFILE.Processing(PASS_NUMBER).Correlation.Planes;
@@ -42,9 +42,9 @@ spectral_weighting_method_string = ...
     lower(JOBFILE.Processing(PASS_NUMBER). ...
     Correlation.SpectralWeighting.Method);
 
-% If the ensemble direction was "spatial,"
+% If the ensemble type was "spatial,"
 % then add all the planes together
-switch lower(ensemble_direction_string)
+switch lower(ensemble_type_string)
     case 'spatial'
         % If the spatial correlation was specified,
         % then add all the correlations together. 

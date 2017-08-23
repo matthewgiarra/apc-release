@@ -71,10 +71,10 @@ Processing(1).Correlation.Step = 1;
 Processing(1).Correlation.Ensemble.DoEnsemble = 1;
 Processing(1).Correlation.Ensemble.NumberOfPairs = 1;
 Processing(1).Correlation.Ensemble.Domain = 'spectral';
-Processing(1).Correlation.Ensemble.Direction = 'spatial';
+Processing(1).Correlation.Ensemble.Type = 'hybrid';
 
 % Spectral weighting: SCC, RPC, GCC, APC
-Processing(1).Correlation.SpectralWeighting.Method = 'scc';
+Processing(1).Correlation.SpectralWeighting.Method = 'apc';
 
 % APC Parameters
 % Parameters specific to APC
