@@ -55,19 +55,25 @@ end
 [sy, sx] = findGaussianWidth(height, width, windowSizeY, windowSizeX);
 
 % Calculate center of signal
-xo = round(width/2);
-yo = round(height/2);
+xc = (width-1)/2;
+yc = (height-1)/2;
 
 % Create grid of x,y positions to hold gaussian filter data
-[x,y] = meshgrid(1:width, 1:height);
+[xo,yo] = meshgrid(0:(width-1), 0:(height-1));
+
+% Shift the coordinates to make them 
+% symmetric about the centroid of the array
+x = xo - xc;
+y = yo - yc;
 
 % Calculate gaussian distribution (X)
-WindowX = exp( - ((x - xo).^2 / (2 * sx^2)));
+WindowX = exp( - (x.^2 / (2 * sx^2)));
 
 % Calculate gaussian distribution (Y)
-WindowY = exp( - ((y - yo).^2 / (2 * sy^2)));
+WindowY = exp( - (y.^2 / (2 * sy^2)));
 
 % 2-D Gaussian Distribution
 WINDOW = WindowX .* WindowY;
+
 
 end
