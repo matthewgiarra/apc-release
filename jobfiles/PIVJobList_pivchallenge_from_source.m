@@ -25,9 +25,11 @@ num_passes_total = length(region_height_list);
 JobOptions.NumberOfPasses = 0;
 
 % Data: Input images
-Data.Inputs.Images.Directory = '/Users/matthewgiarra/Documents/School/VT/Research/Aether/data/piv/piv_challenge/2014/A/images/proc/ghost';
+% Data.Inputs.Images.Directory = '/Users/matthewgiarra/Documents/School/VT/Research/Aether/data/piv/piv_challenge/2014/A/images/proc/ghost';
+Data.Inputs.Images.Directory = '/Users/matthewgiarra/Documents/School/VT/Research/Aether/data/piv/piv_challenge/2014/A/images/raw';
 % Data.Inputs.Images.Directory = '/Users/matthewgiarra/Documents/School/VT/Research/Aether/piv_test_images/poiseuille_diffusion_0.00/raw';
 Data.Inputs.Images.BaseName = 'A_deghost_';
+Data.Inputs.Images.BaseName = 'A_';
 % Data.Inputs.Images.BaseName = 'poiseuille_diffusion_0.00_';
 Data.Inputs.Images.Digits = 5;
 Data.Inputs.Images.Extension = '.tif';
@@ -42,11 +44,13 @@ Data.Inputs.Vectors.Digits = 5;
 Data.Inputs.Vectors.Extension = '.mat';
 
 % Source file path
-Data.Inputs.SourceFilePath = '/Users/matthewgiarra/Desktop/apc/A_deghost_apc_00001_00600.mat';
+% Data.Inputs.SourceFilePath = '/Users/matthewgiarra/Desktop/apc/A_deghost_apc_00001_00600.mat';
+Data.Inputs.SourceFilePath = '/Users/matthewgiarra/Desktop/apc/A_apc_00001_00600.mat';
 
 % Data: output vectors
 Data.Outputs.Vectors.Directory = '/Users/matthewgiarra/Desktop/piv_test_images/pivchallenge/2014/A/vect/test';
-Data.Outputs.Vectors.BaseName = 'A_deghost_from_source_';
+% Data.Outputs.Vectors.BaseName = 'A_deghost_from_source_';
+Data.Outputs.Vectors.BaseName = 'A_raw_from_source_';
 Data.Outputs.Vectors.Digits = 5;
 Data.Outputs.Vectors.Extension = '.mat';
 
@@ -87,7 +91,7 @@ Processing(1).Correlation.Ensemble.Domain = 'spectral';
 Processing(1).Correlation.Ensemble.Type = 'none';
 
 % Parameters to specify spectral weighting method (APC, rpc, hybrid, etc)
-Processing(1).Correlation.SpectralWeighting.Method = 'hybrid';
+Processing(1).Correlation.SpectralWeighting.Method = 'scc';
 
 % Parameters specific to APC
 Processing(1).Correlation.SpectralWeighting.APC.FilterDiameterUpperBound = 6;
