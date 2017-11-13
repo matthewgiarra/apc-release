@@ -9,6 +9,18 @@ job_file_name_apc = 'A_raw_from_source_apc_00001_00001.mat';
 job_file_name_scc = 'A_raw_from_source_scc_00001_00001.mat';
 
 
+files = dir(fullfile(job_file_dir, './*.mat'));
+
+% Number of files
+num_files = length(files);
+
+for k = 1 : num_files
+    
+    job_file_name = files(k).name;
+    job_file_path = fullfile(job_file_dir, file_name);
+    
+    
+end
 
 
 % job_file_dir = '/Users/matthewgiarra/Desktop/apc';
