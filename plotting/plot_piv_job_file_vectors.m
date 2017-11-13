@@ -15,15 +15,15 @@ job_file_path = fullfile(job_file_dir, job_file_name);
 load(job_file_path);
 
 % Pass to plot
-pass_num = 1;
+pass_num = 5;
 
-Skip = 1;
+Skip = 2;
 
 Scale = 1;
 
 
-tx = JobFile.Processing(pass_num).Results.Displacement.Validated.X(:, 1);
-ty = JobFile.Processing(pass_num).Results.Displacement.Validated.Y(:, 1);
+tx = JobFile.Processing(pass_num).Results.Displacement.Raw.X(:, 1);
+ty = JobFile.Processing(pass_num).Results.Displacement.Raw.Y(:, 1);
 
 gx = JobFile.Processing(pass_num).Grid.Points.Full.X;
 gy = JobFile.Processing(pass_num).Grid.Points.Full.Y;
@@ -32,4 +32,8 @@ gy = JobFile.Processing(pass_num).Grid.Points.Full.Y;
 quiver(gx(1 : Skip : end, 1 : Skip : end), ...
        gy(1 : Skip : end, 1 : Skip : end), ...
        Scale * tx(1 : Skip : end, 1 : Skip : end), ...
-       Scale * ty(1 : Skip : end, 1 : Skip : end), 0, 'k');
+       Scale * ty(1 : Skip : end, 1 : Skip : end), 0, 'b', 'linewidth', 1);
+   
+axis image;
+
+% hold on;

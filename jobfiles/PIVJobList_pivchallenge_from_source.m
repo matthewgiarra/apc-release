@@ -1,7 +1,7 @@
 function JOBLIST = PIVJobList_pivchallenge_from_source()
 
 % Number of passes to run
-num_passes_spec = 2;
+num_passes_spec = 5;
 
 % % Pass parameters
 region_height_list_raw = [64,  64,  64, 32, 32, 32];
@@ -86,7 +86,7 @@ Processing(1).Correlation.Ensemble.NumberOfPairs = 10;
 Processing(1).Correlation.Ensemble.Domain = 'spectral';
 Processing(1).Correlation.Ensemble.Type = 'none';
 
-% Parameters to specify spectral weighting method (APC, rpc, etc)
+% Parameters to specify spectral weighting method (APC, rpc, hybrid, etc)
 Processing(1).Correlation.SpectralWeighting.Method = 'hybrid';
 
 % Parameters specific to APC
@@ -98,14 +98,14 @@ Processing(1).Correlation.SpectralWeighting.APC.Method = 'magnitude';
 Processing(1).Correlation.DisplacementEstimate.Domain = 'spatial';
 
 % Parameters specific to RPC
-Processing(1).Correlation.RPC.EffectiveDiameter = 6;
+Processing(1).Correlation.RPC.EffectiveDiameter = 3;
 
 % Estimated particle diameter
-Processing(1).Correlation.EstimatedParticleDiameter = 6;
+Processing(1).Correlation.EstimatedParticleDiameter = 3;
 
 % Subpixel fit parameters
 Processing(1).SubPixel.Method = '3-point fit';
-Processing(1).SubPixel.EstimatedParticleDiameter = 6;
+Processing(1).SubPixel.EstimatedParticleDiameter = 3;
 
 % Parameters for vector validation
 Processing(1).Validation.DoValidation = 1;

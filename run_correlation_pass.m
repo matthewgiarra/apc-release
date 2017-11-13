@@ -586,8 +586,8 @@ if do_validation == true
             validateField_prana(grid_full_x, grid_full_y, tx_raw_full, ty_raw_full);
 
         % Allocate displacements with nans
-        tx_val_full = nan(size(tx_val_full_temp));
-        ty_val_full = nan(size(ty_val_full_temp));
+        tx_val_full = zeros(size(tx_val_full_temp));
+        ty_val_full = zeros(size(ty_val_full_temp));
         is_outlier_full = zeros(size(is_outlier_full_temp));
         
         % Take the valid grid indices from the temporary
