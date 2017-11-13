@@ -70,17 +70,17 @@ Processing(1).Grid.Mask.Name = 'imgAmask3.tif';
 
 % Frame parameters.
 Processing(1).Frames.Start = 1;
-Processing(1).Frames.End = 2;
+Processing(1).Frames.End = 10;
 Processing(1).Frames.Step = 1;
 
 % Correlation parameters
 % Processing(1).Correlation.Method = 'apc';
 Processing(1).Correlation.Step = 0;
 % Processing(1).Correlation.Step = 1;
-Processing(1).Correlation.Ensemble.DoEnsemble = 0;
-Processing(1).Correlation.Ensemble.NumberOfPairs = 1;
+Processing(1).Correlation.Ensemble.DoEnsemble = true;
+Processing(1).Correlation.Ensemble.NumberOfPairs = 10;
 Processing(1).Correlation.Ensemble.Domain = 'spectral';
-Processing(1).Correlation.Ensemble.Direction = 'temporal';
+Processing(1).Correlation.Ensemble.Type = 'temporal';
 
 % Parameters to specify spectral weighting method (APC, rpc, etc)
 Processing(1).Correlation.SpectralWeighting.Method = 'apc';
