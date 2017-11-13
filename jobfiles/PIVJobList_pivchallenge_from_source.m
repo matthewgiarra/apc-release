@@ -7,7 +7,7 @@ num_passes_spec = 2;
 region_height_list_raw = [64,  64,  64, 32, 32, 32];
 region_width_list_raw  = [128, 128, 64, 32, 32, 32];
 window_fract_list_raw = {[0.5, 0.5; 0.5, 1], 0.5, 0.5, 1.0, 24/32, 24/32};
-grid_spacing_list_raw = [128, 128, 64, 16, 16, 2];
+grid_spacing_list_raw = [32, 32, 32, 16, 16, 2];
 grid_spacing_list_raw_x = grid_spacing_list_raw;
 grid_spacing_list_raw_y = grid_spacing_list_raw;
 
@@ -34,11 +34,15 @@ Data.Inputs.Images.Extension = '.tif';
 Data.Inputs.Images.Trailers = {'_a', '_b'};
 % Data.Inputs.Images.Trailers = {''};
 
+
 % Data: Input vectors for initializing, e.g., image deformation.
 Data.Inputs.Vectors.Directory = '/Users/matthewgiarra/Desktop/apc';
 Data.Inputs.Vectors.BaseName = 'A_deghost_';
 Data.Inputs.Vectors.Digits = 5;
 Data.Inputs.Vectors.Extension = '.mat';
+
+% Source file path
+Data.Inputs.SourceFilePath = '/Users/matthewgiarra/Desktop/apc/A_deghost_apc_00001_00600.mat';
 
 % Data: output vectors
 Data.Outputs.Vectors.Directory = '/Users/matthewgiarra/Desktop/piv_test_images/pivchallenge/2014/A/vect/test';
@@ -70,20 +74,20 @@ Processing(1).Grid.Mask.Name = 'imgAmask3.tif';
 
 % Frame parameters.
 Processing(1).Frames.Start = 1;
-Processing(1).Frames.End = 10;
+Processing(1).Frames.End = 1;
 Processing(1).Frames.Step = 1;
 
 % Correlation parameters
 % Processing(1).Correlation.Method = 'apc';
 Processing(1).Correlation.Step = 0;
 % Processing(1).Correlation.Step = 1;
-Processing(1).Correlation.Ensemble.DoEnsemble = true;
+Processing(1).Correlation.Ensemble.DoEnsemble = false;
 Processing(1).Correlation.Ensemble.NumberOfPairs = 10;
 Processing(1).Correlation.Ensemble.Domain = 'spectral';
-Processing(1).Correlation.Ensemble.Type = 'temporal';
+Processing(1).Correlation.Ensemble.Type = 'none';
 
 % Parameters to specify spectral weighting method (APC, rpc, etc)
-Processing(1).Correlation.SpectralWeighting.Method = 'apc';
+Processing(1).Correlation.SpectralWeighting.Method = 'hybrid';
 
 % Parameters specific to APC
 Processing(1).Correlation.SpectralWeighting.APC.FilterDiameterUpperBound = 6;
@@ -95,7 +99,6 @@ Processing(1).Correlation.DisplacementEstimate.Domain = 'spatial';
 
 % Parameters specific to RPC
 Processing(1).Correlation.RPC.EffectiveDiameter = 6;
-
 
 % Estimated particle diameter
 Processing(1).Correlation.EstimatedParticleDiameter = 6;

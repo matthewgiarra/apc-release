@@ -66,6 +66,15 @@ particle_diameter = ...
 % so that the parallel loop can run
 spectral_weighting_filter_static = nan(region_height, region_width);
 
+% Make the list of particle diameters
+% for the static methods
+particle_diameter_list_x = zeros(num_correlation_planes, 1);
+particle_diameter_list_y = zeros(num_correlation_planes, 1);
+
+% Set the diameters
+particle_diameter_list_x(:) = particle_diameter;
+particle_diameter_list_y(:) = particle_diameter;
+
 % Method specific options
 switch lower(spectral_weighting_method_string)
     case 'rpc'   
@@ -81,16 +90,31 @@ switch lower(spectral_weighting_method_string)
         % Read the APC method
         apc_method = JOBFILE.Processing(PASS_NUMBER). ...
             Correlation.SpectralWeighting.APC.Method;
+        
+    case 'hybrid'
+        % Hybrid spectral weighting.
+        % In this scheme, we load a file that contains the pre-computed
+        % spectral weights for each interrogation region
+        
+        
+        % Get the indicies of the regions
+        inds = JOBFILE.Data.Inputs.SourceJobFile.Processing(PASS_NUMBER). ...
+            Grid.Points.Correlate.Indices;
+        
+        % Get the filter diameters
+        particle_diameter_list_x = JOBFILE.Data.Inputs.SourceJobFile.Processing(PASS_NUMBER). ...
+            Results.Filtering.APC.Diameter.X(inds, 1);
+        particle_diameter_list_y = JOBFILE.Data.Inputs.SourceJobFile.Processing(PASS_NUMBER). ...
+            Results.Filtering.APC.Diameter.Y(inds, 1);
+        
+        % Make coordinate vectors for the correlation weighting filter
+        xv = (1 : region_width) - fourier_zero(region_width);
+        yv = (1 : region_height) - fourier_zero(region_height);
+     
+        % Make coordinate arrays
+        [X, Y] = meshgrid(xv, yv);
+  
 end
-
-% Make the list of particle diameters
-% for the static methods
-particle_diameter_list_x = zeros(num_correlation_planes, 1);
-particle_diameter_list_y = zeros(num_correlation_planes, 1);
-
-% Set the diameters
-particle_diameter_list_x(:) = particle_diameter;
-particle_diameter_list_y(:) = particle_diameter;
 
 % Allocate arrays to hold vectors
 TX = nan(num_correlation_planes, 1);
@@ -162,6 +186,26 @@ switch lower(ensemble_domain_string)
                     % direction, calculated from the APC filter.
                     particle_diameter_list_y(k) = filter_std_dev_to_particle_diameter(...
                         filter_std_y, region_height);
+                    
+                case 'hybrid'
+
+                    % Standard deviations of the
+                    % correlation weighting filter (horizontal)
+                    apc_std_dev_x = ...
+                        particle_diameter_to_filter_std_dev(...
+                        particle_diameter_list_x(k), region_width);
+                    
+                    % Standard deviations of the
+                    % correlation weighting filter (vertical)                    
+                    apc_std_dev_y = ...
+                        particle_diameter_to_filter_std_dev(...
+                        particle_diameter_list_y(k), region_height);
+                    
+                    % Make the spectral filter
+                    spectral_filter_temp = ...
+                        exp(-X.^2 / (2 * apc_std_dev_x^2) - ...
+                        Y.^2 / (2 * apc_std_dev_y^2));
+                    
                 otherwise
                     spectral_filter_temp = spectral_weighting_filter_static;
             end
