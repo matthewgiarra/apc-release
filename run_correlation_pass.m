@@ -555,7 +555,7 @@ end
 do_validation = JOBFILE.Processing(PASS_NUMBER).Validation.DoValidation;
 
 % Do validation if requested
-if do_validation == true;
+if do_validation == true
     
     % Inform the user
     fprintf(1, 'Validating vector fields...\n');
@@ -582,8 +582,23 @@ if do_validation == true;
             Results.Displacement.Raw.Y(:, n);
         
         % Calculate the validated field.
-        [tx_val_full, ty_val_full, is_outlier_full] = ...
+        [tx_val_full_temp, ty_val_full_temp, is_outlier_full_temp] = ...
             validateField_prana(grid_full_x, grid_full_y, tx_raw_full, ty_raw_full);
+
+        % Allocate displacements with nans
+        tx_val_full = nan(size(tx_val_full_temp));
+        ty_val_full = nan(size(ty_val_full_temp));
+        is_outlier_full = zeros(size(is_outlier_full_temp));
+        
+        % Take the valid grid indices from the temporary
+        % arrays and put them in the "full" arrays.
+        tx_val_full(grid_indices) = tx_val_full_temp(grid_indices);
+        ty_val_full(grid_indices) = ty_val_full_temp(grid_indices);
+        is_outlier_full(grid_indices) = is_outlier_full_temp(grid_indices);
+
+        % Update the "output" fields
+        tx_full_output(:, n) = tx_val_full;
+        ty_full_output(:, n) = ty_val_full; 
         
          % Add validated vectors to the jobfile
         JOBFILE.Processing(PASS_NUMBER).Results.Displacement. ...
@@ -592,10 +607,8 @@ if do_validation == true;
             Validated.Y(:, n) = ty_val_full;
         JOBFILE.Processing(PASS_NUMBER).Results.Displacement. ...
             Validated.IsOutlier(:, n) = is_outlier_full;
-
-        % Update the "output" fields
-        tx_full_output(:, n) = tx_val_full;
-        ty_full_output(:, n) = ty_val_full; 
+        
+        
     end
     
     % If fewer fields were validated

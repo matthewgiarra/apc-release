@@ -3,7 +3,7 @@
 
 
 job_file_dir = '/Users/matthewgiarra/Desktop/piv_test_images/pivchallenge/2014/A/vect/test/';
-job_file_name = 'A_deghost_from_source_00001_00010.mat';
+job_file_name = 'A_deghost_from_source_00001_00001.mat';
 
 
 % job_file_dir = '/Users/matthewgiarra/Desktop/apc';
