@@ -41,7 +41,7 @@ for n = 1 : num_jobs
     JobList_output(n).InputJobFile = JobFile;
         
     % Run the PIV job file
-     OUTPUT_FILE_PATHS{n} = run_piv_job_file(JobFile);
+    OUTPUT_FILE_PATHS{n} = run_piv_job_file(JobFile);
     
 end
 t2 = toc(t1);

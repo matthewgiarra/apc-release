@@ -1,4 +1,4 @@
-function output_file_path = save_piv_jobfile_results(JOBFILE)
+function output_file_path = save_piv_jobfile_results(JobFile)
 
 % % Figure out the largest range of frames run
 % num_passes = determine_number_of_passes(JOBFILE);
@@ -60,16 +60,13 @@ function output_file_path = save_piv_jobfile_results(JOBFILE)
 % output_file_path = fullfile(output_file_directory, output_file_name);
 
 % Determine the output file path
-output_file_path = determine_jobfile_save_path(JOBFILE);
+output_file_path = determine_jobfile_save_path(JobFile);
 
 % Copy the save-file path to the jobfile
-JOBFILE.Data.Outputs.Vectors.Path = output_file_path;
-
-% Copy the job file
-JobFile = JOBFILE;
+JobFile.Data.Outputs.Vectors.Path = output_file_path;
 
 % Save the output file
-save(output_file_path, 'JobFile');
+save(output_file_path, 'JobFile', '-v7.3');
 
 % Inform the user that the file was saved.
 if exist(output_file_path, 'file')
