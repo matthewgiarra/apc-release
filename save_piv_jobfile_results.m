@@ -1,4 +1,8 @@
-function output_file_path = save_piv_jobfile_results(JobFile)
+function output_file_path = save_piv_jobfile_results(JobFile, verbose)
+
+if nargin < 2
+    verbose = false;
+end
 
 % % Figure out the largest range of frames run
 % num_passes = determine_number_of_passes(JOBFILE);
@@ -70,7 +74,9 @@ save(output_file_path, 'JobFile', '-v7.3');
 
 % Inform the user that the file was saved.
 if exist(output_file_path, 'file')
-    fprintf(1, 'Output file saved to:\n%s\n', output_file_path);
+    if verbose == true
+        fprintf(1, 'Output file saved to:\n%s\n', output_file_path);
+    end
 else
     fprintf(1, 'WARNING: OUTPUT FILE NOT SAVED\n');
 end
