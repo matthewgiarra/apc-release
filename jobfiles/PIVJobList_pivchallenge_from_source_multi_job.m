@@ -1,7 +1,7 @@
 function JOBLIST = PIVJobList_pivchallenge_from_source_multi_job()
 
 % Number of passes to run
-num_passes_spec = 1;
+num_passes_spec = 2;
 
 % % Pass parameters
 region_height_list_raw = [64,  64,  64, 32, 32, 32];
@@ -78,7 +78,7 @@ Processing(1).Grid.Mask.Name = 'imgAmask3.tif';
 
 % Frame parameters.
 Processing(1).Frames.Start = 1;
-Processing(1).Frames.End = 1;
+Processing(1).Frames.End = 8;
 Processing(1).Frames.Step = 1;
 
 % Correlation parameters
