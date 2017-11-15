@@ -1,7 +1,7 @@
 function JOBLIST = PIVJobList_pivchallenge_from_source_multi_job_linux()
 
 % Number of passes to run
-num_passes_spec = 1;
+num_passes_spec = 2;
 
 % % Pass parameters
 region_height_list_raw = [64,  64,  64, 32, 32, 32];
@@ -70,7 +70,7 @@ Processing(1).Grid.Mask.Name = 'imgAmask3.tif';
 
 % Frame parameters.
 Processing(1).Frames.Start = 1;
-Processing(1).Frames.End = 8;
+Processing(1).Frames.End = 1;
 Processing(1).Frames.Step = 1;
 
 % Correlation parameters
@@ -186,7 +186,7 @@ end
 
 
 % Update where to get the images.
-JobFile.Data.Inputs.Images.Directory = '/home/shannon/b/aether/piv_test_images/pivchallenge/2014/A/images/raw';
+JobFile.Data.Inputs.Images.Directory = '/home/shannon/b/aether/piv_test_images/pivchallenge/2014/A/images/proc/ghost';
 JobFile.Data.Inputs.Images.BaseName = 'A_deghost_';
 
 
