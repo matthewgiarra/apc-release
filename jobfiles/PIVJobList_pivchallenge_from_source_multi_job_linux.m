@@ -1,7 +1,7 @@
-function JOBLIST = PIVJobList_pivchallenge_from_source_multi_job()
+function JOBLIST = PIVJobList_pivchallenge_from_source_multi_job_linux()
 
 % Number of passes to run
-num_passes_spec = 5;
+num_passes_spec = 1;
 
 % % Pass parameters
 region_height_list_raw = [64,  64,  64, 32, 32, 32];
@@ -26,7 +26,7 @@ JobOptions.NumberOfPasses = 0;
 
 % Data: Input images
 % Data.Inputs.Images.Directory = '/Users/matthewgiarra/Documents/School/VT/Research/Aether/data/piv/piv_challenge/2014/A/images/proc/ghost';
-Data.Inputs.Images.Directory = '/Users/matthewgiarra/Documents/School/VT/Research/Aether/data/piv/piv_challenge/2014/A/images/raw';
+Data.Inputs.Images.Directory = '/home/shannon/b/aether/piv_test_images/pivchallenge/2014/A/images/raw';
 % Data.Inputs.Images.Directory = '/Users/matthewgiarra/Documents/School/VT/Research/Aether/piv_test_images/poiseuille_diffusion_0.00/raw';
 % Data.Inputs.Images.BaseName = 'A_deghost_';
 Data.Inputs.Images.BaseName = 'A_';
@@ -36,20 +36,12 @@ Data.Inputs.Images.Extension = '.tif';
 Data.Inputs.Images.Trailers = {'_a', '_b'};
 % Data.Inputs.Images.Trailers = {''};
 
-
-% Data: Input vectors for initializing, e.g., image deformation.
-Data.Inputs.Vectors.Directory = '/Users/matthewgiarra/Desktop/apc';
-Data.Inputs.Vectors.BaseName = 'A_deghost_';
-Data.Inputs.Vectors.Digits = 5;
-Data.Inputs.Vectors.Extension = '.mat';
-
 % Source file path
 % Data.Inputs.SourceFilePath = '/Users/matthewgiarra/Desktop/apc/A_deghost_apc_00001_00600.mat';
-Data.Inputs.SourceFilePath = '/Users/matthewgiarra/Desktop/apc/A_apc_00001_00600.mat';
+Data.Inputs.SourceFilePath = '/home/shannon/b/aether/piv_test_images/pivchallenge/2014/A/vect/apc/A_apc_00001_00600.mat';
 
 % Data: output vectors
-Data.Outputs.Vectors.Directory = '/Users/matthewgiarra/Desktop/piv_test_images/pivchallenge/2014/A/vect/test';
-% Data.Outputs.Vectors.BaseName = 'A_deghost_from_source_';
+Data.Outputs.Vectors.Directory = '/home/shannon/b/aether/piv_test_images/pivchallenge/2014/A/vect_2017';
 Data.Outputs.Vectors.BaseName = 'A_raw_from_source_';
 Data.Outputs.Vectors.Digits = 5;
 Data.Outputs.Vectors.Extension = '.mat';
@@ -70,7 +62,7 @@ Processing(1).Grid.Shift.Y = -16;
 Processing(1).Grid.Shift.X = 0;
 Processing(1).Grid.Buffer.Y = 0;
 Processing(1).Grid.Buffer.X = 0;
-Processing(1).Grid.Mask.Directory = '/Users/matthewgiarra/Documents/School/VT/Research/Aether/data/piv/piv_challenge/2014/A/images/masks';
+Processing(1).Grid.Mask.Directory = '/home/shannon/b/aether/piv_test_images/pivchallenge/2014/A/images/masks';
 Processing(1).Grid.Mask.Name = 'imgAmask3.tif';
 % Processing(1).Grid.Mask.Name = 'mask_jet_subregion.tif';
 % Processing(1).Grid.Mask.Directory = '';
@@ -78,7 +70,7 @@ Processing(1).Grid.Mask.Name = 'imgAmask3.tif';
 
 % Frame parameters.
 Processing(1).Frames.Start = 1;
-Processing(1).Frames.End = 1;
+Processing(1).Frames.End = 8;
 Processing(1).Frames.Step = 1;
 
 % Correlation parameters
@@ -194,9 +186,11 @@ end
 
 
 % Update where to get the images.
-JobFile.Data.Inputs.Images.Directory = '/Users/matthewgiarra/Documents/School/VT/Research/Aether/data/piv/piv_challenge/2014/A/images/proc/ghost';
+JobFile.Data.Inputs.Images.Directory = '/home/shannon/b/aether/piv_test_images/pivchallenge/2014/A/images/raw';
 JobFile.Data.Inputs.Images.BaseName = 'A_deghost_';
-JobFile.Data.Inputs.SourceFilePath = '/Users/matthewgiarra/Desktop/apc/A_deghost_apc_00001_00600.mat';
+
+
+JobFile.Data.Inputs.SourceFilePath = '/home/shannon/b/aether/piv_test_images/pivchallenge/2014/A/vect/apc/A_deghost_apc_00001_00600.mat';
 JobFile.Data.Outputs.Vectors.BaseName = 'A_deghost_instantaneous_apc_hybrid_';
 
 

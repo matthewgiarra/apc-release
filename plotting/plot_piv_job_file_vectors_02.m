@@ -14,9 +14,13 @@ fsize_y = 24;
 
 job_file_dir = '/Users/matthewgiarra/Desktop/piv_test_images/pivchallenge/2014/A/vect/test/';
 % job_file_name = 'A_deghost_from_source_00001_00001.mat';
-job_file_name_rpc = 'A_raw_from_source_rpc_00001_00001.mat';
-job_file_name_apc = 'A_raw_from_source_apc_00001_00001.mat';
-job_file_name_scc = 'A_raw_from_source_scc_00001_00001.mat';
+% job_file_name_rpc = 'A_raw_from_source_rpc_00001_00001.mat';
+% job_file_name_apc = 'A_raw_from_source_apc_00001_00001.mat';
+% job_file_name_scc = 'A_raw_from_source_scc_00001_00001.mat';
+
+job_file_name_rpc = 'A_raw_instantaneous_rpc_00001_00001.mat';
+job_file_name_apc = 'A_raw_instantaneous_apc_hybrid_00001_00001.mat';
+job_file_name_scc = 'A_raw_instantaneous_scc_00001_00001.mat';
 
 
 files = dir(fullfile(job_file_dir, './*.mat'));
