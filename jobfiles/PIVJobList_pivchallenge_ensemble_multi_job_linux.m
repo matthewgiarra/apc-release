@@ -1,4 +1,4 @@
-function JOBLIST = PIVJobList_pivchallenge_from_source_apc_linux()
+function JOBLIST = PIVJobList_pivchallenge_ensemble_multi_job_linux()
 
 % Number of passes to run
 num_passes_spec = 5;
