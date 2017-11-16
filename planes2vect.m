@@ -96,11 +96,10 @@ switch lower(spectral_weighting_method_string)
         % In this scheme, we load a file that contains the pre-computed
         % spectral weights for each interrogation region
         
-        
         % Get the indicies of the regions
         inds = JOBFILE.Data.Inputs.SourceJobFile.Processing(PASS_NUMBER). ...
             Grid.Points.Correlate.Indices;
-        
+
         % Get the filter diameters
         particle_diameter_list_x = JOBFILE.Data.Inputs.SourceJobFile.Processing(PASS_NUMBER). ...
             Results.Filtering.APC.Diameter.X(inds, 1);
@@ -156,7 +155,7 @@ switch lower(ensemble_domain_string)
         % Inform the user
         fprintf(1, 'Calculating inverse FTs...\n');
         % Do the inverse transform for each region.
-        for k = 1 : num_correlation_planes
+        parfor k = 1 : num_correlation_planes
             
             % Extract the given region
             cross_corr_spectral = cross_corr_array(:, :, k);

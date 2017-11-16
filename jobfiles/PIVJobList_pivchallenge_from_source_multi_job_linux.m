@@ -1,7 +1,7 @@
 function JOBLIST = PIVJobList_pivchallenge_from_source_multi_job_linux()
 
 % Number of passes to run
-num_passes_spec = 2;
+num_passes_spec = 6;
 
 % % Pass parameters
 region_height_list_raw = [64,  64,  64, 32, 32, 32];
