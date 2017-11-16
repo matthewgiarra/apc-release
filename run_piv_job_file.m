@@ -31,9 +31,16 @@ for p = 1 : num_passes
     % Inform the user that the pass is running
     fprintf(1, 'Pass %d of %d\n', p, num_passes);
 
-    % Run the pass. 
-    JOBFILE = run_correlation_pass(JOBFILE, p);
+    % Check whether ensemble is happening
+    do_ensemble = JOBFILE.Processing(p).Correlation.Ensemble.DoEnsemble;
     
+    if do_ensemble
+        JOBFILE = run_correlation_pass_parallel(JOBFILE, p);
+    else
+         JOBFILE = run_correlation_pass(JOBFILE, p);
+    end
+
+    % Save the results
     save_piv_jobfile_results(JOBFILE);
     
     % Print a carriage return after the pass compeltes.

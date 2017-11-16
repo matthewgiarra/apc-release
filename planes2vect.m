@@ -75,6 +75,12 @@ particle_diameter_list_y = zeros(num_correlation_planes, 1);
 particle_diameter_list_x(:) = particle_diameter;
 particle_diameter_list_y(:) = particle_diameter;
 
+apc_method = 'magnitude';
+spc_unwrap_method_string = 'goldstein';
+spc_run_compiled = false;
+X = 0;
+Y = 0;
+
 % Method specific options
 switch lower(spectral_weighting_method_string)
     case 'rpc'   
@@ -149,6 +155,9 @@ end
 % correlations being saved as a separate variable.
 % This is to save memory, and also to reduce
 % the number of variables we have to keep track of.
+
+% spectral_filter_temp = zeros(region_height, region_width);
+
 switch lower(ensemble_domain_string)
     case 'spectral'
         

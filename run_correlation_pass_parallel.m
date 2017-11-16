@@ -1,4 +1,4 @@
-function JOBFILE = run_correlation_pass(JOBFILE, PASS_NUMBER)
+function JOBFILE = run_correlation_pass_parallel(JOBFILE, PASS_NUMBER)
 
 % Default to pass number one
 if nargin < 2
@@ -285,7 +285,7 @@ for n = 1 : num_pairs_correlate
     t1 = tic;
     
     % Loop over the regions
-    for k = 1 : num_regions_correlate
+    parfor k = 1 : num_regions_correlate
         
         % Extract the subregions
         region_01 = region_mat_01(:, :, k);

@@ -30,7 +30,7 @@ num_jobs = length(JOBLIST_INPUT);
 t1 = tic;
 
 % Loop over all the jobs
-parfor n = 1 : num_jobs
+for n = 1 : num_jobs
     
     % Extract the job file
     JobFile = JOBLIST_INPUT(n);
