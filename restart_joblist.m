@@ -1,5 +1,5 @@
 
-JobList = PIVJobList_pivchallenge_ensemble_multi_job;
+function JobList = restart_joblist(JobList);
 
 % Number of jobs
 num_jobs = length(JobList);
@@ -18,4 +18,6 @@ for k = 1 : num_jobs
    % Add it back in to the list.
    JobList(k) = JobFile;
     
+end
+
 end
