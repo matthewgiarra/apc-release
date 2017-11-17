@@ -23,6 +23,7 @@ num_passes_total = length(region_height_list);
 % Number of passes
 % zero means run all of them.
 JobOptions.NumberOfPasses = 0;
+JobOptions.StartPass = 6;
 
 % Data: Input images
 % Data.Inputs.Images.Directory = '/Users/matthewgiarra/Documents/School/VT/Research/Aether/data/piv/piv_challenge/2014/A/images/proc/ghost';
@@ -188,8 +189,6 @@ end
 % Update where to get the images.
 JobFile.Data.Inputs.Images.Directory = '/home/shannon/b/aether/piv_test_images/pivchallenge/2014/A/images/proc/ghost';
 JobFile.Data.Inputs.Images.BaseName = 'A_deghost_';
-
-
 JobFile.Data.Inputs.SourceFilePath = '/home/shannon/b/aether/piv_test_images/pivchallenge/2014/A/vect/apc/A_deghost_apc_00001_00600.mat';
 JobFile.Data.Outputs.Vectors.BaseName = 'A_deghost_instantaneous_apc_hybrid_';
 

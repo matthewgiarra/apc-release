@@ -23,6 +23,7 @@ num_passes_total = length(region_height_list);
 % Number of passes
 % zero means run all of them.
 JobOptions.NumberOfPasses = 0;
+JobOptions.StartPass = 6;
 
 % Data: Input images
 % Data.Inputs.Images.Directory = '/Users/matthewgiarra/Documents/School/VT/Research/Aether/data/piv/piv_challenge/2014/A/images/proc/ghost';

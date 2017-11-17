@@ -28,6 +28,8 @@ JOBFILE.Processing(PASS_NUMBER).Results.Displacement.Validated.Y = nan(num_regio
 JOBFILE.Processing(PASS_NUMBER).Results.Displacement.Validated.IsOutlier = zeros(num_regions_full, num_pairs_correlate);
 JOBFILE.Processing(PASS_NUMBER).Results.Displacement.Smoothed.X = zeros(num_regions_full, num_pairs_correlate);
 JOBFILE.Processing(PASS_NUMBER).Results.Displacement.Smoothed.Y = zeros(num_regions_full, num_pairs_correlate);
+JOBFILE.Processing(PASS_NUMBER).Results.Displacement.Final.X = zeros(num_regions_full, num_pairs_correlate);
+JOBFILE.Processing(PASS_NUMBER).Results.Displacement.Final.Y = zeros(num_regions_full, num_pairs_correlate);
 
 % Read the correlation method
 spectral_weighting_method = lower(get_spectral_weighting_method(JOBFILE, PASS_NUMBER));

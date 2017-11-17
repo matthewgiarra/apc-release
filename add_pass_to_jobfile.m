@@ -4,6 +4,17 @@ function JobFile = add_pass_to_jobfile(JobFile, source_jobfile, source_pass)
     if nargin < 3
         source_pass = length(source_jobfile.Processing);
     end
+    
+    if ischar(source_jobfile)
+        sjob = load(source_jobfile);
+        source_jobfile = sjob.JobFile;
+    end
+    
+    if ischar(JobFile)
+        jf = load(JobFile);
+        JobFile = jf.JobFile;
+    end
+
 
     JobFile.Processing(end + 1) = JobFile.Processing(end);
     

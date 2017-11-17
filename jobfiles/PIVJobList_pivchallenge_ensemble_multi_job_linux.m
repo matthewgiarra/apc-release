@@ -42,7 +42,7 @@ Data.Inputs.Images.Trailers = {'_a', '_b'};
 Data.Inputs.SourceFilePath = '/home/shannon/b/aether/piv_test_images/pivchallenge/2014/A/vect/apc/A_apc_00001_00600.mat';
 
 % Data: output vectors
-Data.Outputs.Vectors.Directory = '/home/shannon/b/aether/piv_test_images/pivchallenge/2014/A/vect_2017/apc';
+Data.Outputs.Vectors.Directory = '/home/shannon/b/aether/piv_test_images/pivchallenge/2014/A/vect_2017-11-17/apc';
 Data.Outputs.Vectors.BaseName = 'A_apc_';
 Data.Outputs.Vectors.Digits = 5;
 Data.Outputs.Vectors.Extension = '.mat';
@@ -188,9 +188,9 @@ end
 % % % DEGHOST % % % %
 
 % Update where to get the images.
-JobFile.Data.Inputs.Images.Directory = '/home/shannon/b/aether/piv_test_images/pivchallenge/2014/A/images/proc/ghost';
+JobFile.Data.Inputs.SourceFilePath = '/home/shannon/b/aether/piv_test_images/pivchallenge/2014/A/vect/apc/A_deghost_apc_00001_00600.mat';
 JobFile.Data.Inputs.Images.BaseName = 'A_deghost_';
-
+JobFile.Data.Inputs.Images.Directory = '/home/shannon/b/aether/piv_test_images/pivchallenge/2014/A/images/proc/ghost';
 
 % Increment the number of jobs
 n = n + 1;
