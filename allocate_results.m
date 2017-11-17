@@ -6,7 +6,7 @@ if nargin < 2
 end
 
 % Read the image lists
-image_paths_list_full = JOBFILE.Processing(1).Frames.Paths;
+image_paths_list_full = JOBFILE.Processing(PASS_NUMBER).Frames.Paths;
 
 % These are the paths to the images
 image_paths_list_01 = image_paths_list_full{1};

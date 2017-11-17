@@ -78,7 +78,7 @@ Processing(1).Grid.Mask.Name = 'imgAmask3.tif';
 
 % Frame parameters.
 Processing(1).Frames.Start = 1;
-Processing(1).Frames.End = 1;
+Processing(1).Frames.End = 600;
 Processing(1).Frames.Step = 1;
 
 % Correlation parameters

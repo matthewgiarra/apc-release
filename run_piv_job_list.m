@@ -20,9 +20,6 @@ end
 % 2) Check compatibility of iterative methods?
 % % % % WRITE THIS % % % % %
 
-% Copy the Job List
-JOBLIST_OUTPUT = JOBLIST_INPUT;
-
 % Count the number of jobs
 num_jobs = length(JOBLIST_INPUT);
 
@@ -34,11 +31,6 @@ for n = 1 : num_jobs
     
     % Extract the job file
     JobFile = JOBLIST_INPUT(n);
-    
-    % Save the original job file 
-    % to the structure before any
-    % modifications happen.
-    JobList_output(n).InputJobFile = JobFile;
         
     % Run the PIV job file
     OUTPUT_FILE_PATHS{n} = run_piv_job_file(JobFile);

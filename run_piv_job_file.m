@@ -1,5 +1,8 @@
 function [OUTPUT_FILE_PATH, JOBFILE] = run_piv_job_file(JOBFILE)
 
+% Starting pass
+start_pass = JOBFILE.JobOptions.StartPass;
+
 % Determine the number of passes to run.
 num_passes = determine_number_of_passes(JOBFILE);
 
@@ -25,7 +28,7 @@ if isfield(JOBFILE.Data.Inputs, 'SourceFilePath')
 end
    
 % Loop over all the passes.
-for p = 1 : num_passes
+for p = start_pass : num_passes
     % Build list of files to correlate
     
     % Inform the user that the pass is running

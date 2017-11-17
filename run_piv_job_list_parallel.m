@@ -37,7 +37,7 @@ for n = 1 : num_jobs
     
     % Extract the job file
     JobFile = JOBLIST_INPUT(n);
-    
+   
     % Split the job
     parallel_job_list = split_piv_job_file(JobFile, num_cores);
     
