@@ -2,7 +2,7 @@
 % Specify the job file to plot
 
 % Pass to plot
-pass_num = 5;
+
 
 Skip = 2;
 
@@ -12,163 +12,162 @@ fSize_colorbar = 20;
 fsize_y = 24;
 
 
-job_file_dir = '/Users/matthewgiarra/Desktop/apc';
-% job_file_name = 'A_deghost_from_source_00001_00001.mat';
-% job_file_name_rpc = 'A_raw_from_source_rpc_00001_00001.mat';
-% job_file_name_apc = 'A_raw_from_source_apc_00001_00001.mat';
-% job_file_name_scc = 'A_raw_from_source_scc_00001_00001.mat';
-
-job_file_name_rpc = 'A_raw_instantaneous_rpc_00001_00001.mat';
-job_file_name_apc = 'A_raw_instantaneous_apc_hybrid_00001_00001.mat';
-job_file_name_scc = 'A_raw_instantaneous_scc_00001_00001.mat';
-
-
+% job_file_dir = '/Users/matthewgiarra/Desktop/piv_test_images/piv_challenge/2014/A/vect_2017-11-18/apc';
+job_file_dir = '/Users/matthewgiarra/Desktop/apc/new_rpcd6';
+% job_file_dir = '/Users/matthewgiarra/Desktop/apc/old';
+% job_file_dir = '/Users/matthewgiarra/Desktop/apc/original';
 files = dir(fullfile(job_file_dir, './*.mat'));
 
 % Number of files
 num_files = length(files);
 
-% c = [-24, 55];
+% load('~/Desktop/results.mat');
 
-pts = load('~/Desktop/grid_points.mat');
+
 
 for k = 1 : num_files
-    
-    job_file_name = files(k).name;
-    job_file_path = fullfile(job_file_dir, job_file_name);
+  
+    job_file_name{k} = files(k).name;
+    job_file_path = fullfile(job_file_dir, job_file_name{k});
     
     load(job_file_path);
+  
+    % Number of passes
+    num_passes = length(JobFile.Processing);
     
-    tx{k} = JobFile.Processing(pass_num).Results.Displacement.Raw.X(:, 1);
-    ty{k} = JobFile.Processing(pass_num).Results.Displacement.Raw.Y(:, 1);
+    for p = 1 : num_passes
+    
+        tx{k, p} = JobFile.Processing(p).Results.Displacement.Raw.X(:, 1);
+        ty{k, p} = JobFile.Processing(p).Results.Displacement.Raw.Y(:, 1);
 
-    gx{k} = JobFile.Processing(pass_num).Grid.Points.Full.X;
-    gy{k} = JobFile.Processing(pass_num).Grid.Points.Full.Y;
-    
-    sx = JobFile.Processing(pass_num).Results.Filtering.APC.Diameter.X(:, 1);
-    sy = JobFile.Processing(pass_num).Results.Filtering.APC.Diameter.Y(:, 1);
-    
-    ny = length(unique(gy{k}));
-    nx = length(unique(gx{k}));
-    
-    tx_grid = reshape(tx{k}, [ny, nx]);
-    ty_grid = reshape(ty{k}, [ny, nx]);
-    sx_grid{k} = reshape(sx, [ny, nx]);
-    sy_grid{k} = reshape(sy, [ny, nx]);
+        gx{k, p} = JobFile.Processing(p).Grid.Points.Full.X;
+        gy{k, p} = JobFile.Processing(p).Grid.Points.Full.Y;
 
-    
-% pause;
+        sx = JobFile.Processing(p).Results.Filtering.APC.Diameter.X(:, 1);
+        sy = JobFile.Processing(p).Results.Filtering.APC.Diameter.Y(:, 1);
 
+        ny{k, p} = length(unique(gy{k, p}));
+        nx{k, p} = length(unique(gx{k, p}));
 
-    
+        tx_grid = reshape(tx{k, p}, [ny{k, p}, nx{k, p}]);
+        ty_grid = reshape(ty{k, p}, [ny{k, p}, nx{k, p}]);
+        sx_grid{k, p} = reshape(sx, [ny{k, p}, nx{k, p}]);
+        sy_grid{k, p} = reshape(sy, [ny{k, p}, nx{k, p}]);
+
+        % Validate the filters
+        [sx_val_temp, sy_val_temp, is_outlier_temp] = ...
+                validateField_prana(gx{k, p}, gy{k, p}, sx, sy, 0.5 * [1, 1]);
+            
+        % Set nans     
+        sx_val_temp(isnan(tx{k, p})) = nan;
+        sy_val_temp(isnan(ty{k, p})) = nan;
+        is_outlier_temp(isnan(tx{k, p})) = 0;
+        
+        sx_val{k, p} = sx_val_temp;
+        sy_val{k, p} = sy_val_temp;
+        
+        sx_val_grid{k, p} =  reshape(sx_val_temp, [ny{k, p}, nx{k, p}]);
+        sy_val_grid{k, p} =  reshape(sy_val_temp, [ny{k, p}, nx{k, p}]);
+        
+        is_outlier_grid{k, p} = reshape(is_outlier_temp, [ny{k, p}, nx{k, p}]);
+        
+    end
+
 end
 
-p = 68;
+num_files = size(tx, 1);
+p = 5;
 
+
+% p = 68;
+c = [0, 15];
+
+
+gf = [784   511   731   827];
+xl = [120, 2400];
+
+% Plotting filter diameters.
 for k = 1 : num_files
-   subtightplot(2, 2, k);
     
-    imagesc(gx{k}, gy{k}, sx_grid{k});
+    is_deghost = ~isempty(regexpi(job_file_name{k}, 'deghost'));
+    if is_deghost
+        y_label = 'Deghosted images';
+        plot_num = 2;
+    else
+        y_label = 'Raw images';
+        plot_num = 1;
+    end
+    
+    
+    subtightplot(2, 1, plot_num);
+    
+    outlier_inds = find(is_outlier_grid{k, p} > 0);
+    x = gx{k, p}(outlier_inds);
+    y = gy{k, p}(outlier_inds);
+
+    imagesc(gx{k, p}, gy{k, p}, sx_grid{k, p});
     axis image;
+    caxis(c);
     hold on;
-    plot(pts.gx, pts.gy, '.w', 'markersize', 10);
-    plot(pts.gx(p), pts.gy(p), '.k', 'markersize', 10);
+    plot(x, y, '.w', 'markersize', 5);
     hold off;
     
-    
-%     ylabel('RPC instantaneous', 'FontSize', fsize_y, 'interpreter', 'latex');
     set(gca, 'xtick', '');
     set(gca, 'ytick', '');
-%     caxis(c);
-%     cbar = colorbar;
-%     ylabel(cbar, 'Horizontal velocity (pix / frame)', 'interpreter', 'latex')
-%     set(cbar, 'fontsize', fSize_colorbar);
-    title(strrep(job_file_name, '_', '\_'), 'fontsize', 16);
-
     
+    
+    
+    ylabel(y_label, 'fontsize', 16, 'interpreter', 'latex');
+
+    ga = get(gca, 'position');
+    cb = colorbar;
+    ylabel(cb, 'APC Diameter (x)', ...
+    'interpreter', 'latex', ...
+    'fontsize', 20);
+%     set(gca, 'position', ga);
+   
+    set(gca, 'fontsize', 20);
+    xlim(xl);
+
     
 end
 
-set(gcf, 'color', 'white');
+set(gcf, 'color', 'white', 'position', gf);
 
 
-% 
-% % job_file_dir = '/Users/matthewgiarra/Desktop/apc';
-% % job_file_name = 'A_deghost_apc_00001_00600.mat';
-% 
-% job_file_path_apc = fullfile(job_file_dir, job_file_name_apc);
-% job_file_path_rpc = fullfile(job_file_dir, job_file_name_rpc);
-% job_file_path_scc = fullfile(job_file_dir, job_file_name_scc);
-% 
-% % Load it
-% apc_job = load(job_file_path_apc);
-% rpc_job = load(job_file_path_rpc);
-% scc_job = load(job_file_path_scc);
-% 
-% 
-% 
-% 
-% tx_apc = apc_job.JobFile.Processing(pass_num).Results.Displacement.Raw.X(:, 1);
-% ty_apc = apc_job.JobFile.Processing(pass_num).Results.Displacement.Raw.Y(:, 1);
-% 
-% tx_rpc = rpc_job.JobFile.Processing(pass_num).Results.Displacement.Raw.X(:, 1);
-% ty_rpc = rpc_job.JobFile.Processing(pass_num).Results.Displacement.Raw.Y(:, 1);
-% 
-% tx_scc = scc_job.JobFile.Processing(pass_num).Results.Displacement.Raw.X(:, 1);
-% ty_scc = scc_job.JobFile.Processing(pass_num).Results.Displacement.Raw.Y(:, 1);
-% 
-% 
-% 
-% 
-% % quiver(gx(1 : Skip : end, 1 : Skip : end), ...
-% %        gy(1 : Skip : end, 1 : Skip : end), ...
-% %        Scale * tx(1 : Skip : end, 1 : Skip : end), ...
-% %        Scale * ty(1 : Skip : end, 1 : Skip : end), 0, 'b', 'linewidth', 2);
+Skip = 2;
+Scale = 1;
+
+% % Plotting velocities
+% for k = 1 : num_files
+%    subtightplot(2, 2, k);
 %    
-% % axis image;
+%     
+%     
+%     imagesc(gx{k, p}, gy{k, p}, sx_grid{k, p});
+%     axis image;
+%     caxis(c);
+%     
+%     hold on
+%     quiver(gx{k, p}(1 : Skip : end, 1 : Skip : end), ...
+%            gy{k, p}(1 : Skip : end, 1 : Skip : end), ...
+%            Scale * tx{k, p}(1 : Skip : end, 1 : Skip : end), ...
+%            Scale * ty{k, p}(1 : Skip : end, 1 : Skip : end), ...
+%            0, 'black');
+%     hold off
+%     
+%     title(strrep(job_file_name{k}, '_', '\_'), 'fontsize', 16);
+%     set(gca, 'xtick', '');
+%     set(gca, 'ytick', '');
+%     
 % 
-% % hold on;
-% 
-% 
-% 
-% tx_grid_apc = reshape(tx_apc, [ny, nx]);
-% ty_grid_apc = reshape(ty_apc, [ny, nx]);
-% 
-% tx_grid_rpc = reshape(tx_rpc, [ny, nx]);
-% ty_grid_rpc = reshape(ty_rpc, [ny, nx]);
-% 
-% tx_grid_scc = reshape(tx_scc, [ny, nx]);
-% ty_grid_scc = reshape(ty_scc, [ny, nx]);
-% 
-% subtightplot(3, 1, 1);
-% imagesc(gx, gy, tx_grid_apc);
-% axis image;
-% ylabel('APC hybrid-instantaneous', 'FontSize', fsize_y, 'interpreter', 'latex');
-% set(gca, 'xtick', '');
-% set(gca, 'ytick', '');
-% c = caxis;
-% c_apc = colorbar;
-% ylabel(c_apc, 'Horizontal velocity (pix / frame)', 'interpreter', 'latex')
-% set(c_apc, 'fontsize', fSize_colorbar);
-% title({'Instantanous correlations, 5-pass deform', 'PIV Challenge 2014A, no image pre-processing'}, 'interpreter', 'latex', 'fontsize', 25);
-% 
-% subtightplot(3, 1, 2);
-% 
-% subtightplot(3, 1, 3);
-% imagesc(gx, gy, tx_grid_scc);
-% axis image;
-% ylabel('SCC instantaneous', 'FontSize', fsize_y, 'interpreter', 'latex');
-% set(gca, 'xtick', '');
-% set(gca, 'ytick', '');
-% caxis(c);
-% c_scc = colorbar;
-% ylabel(c_scc, 'Horizontal velocity (pix / frame)', 'interpreter', 'latex')
-% set(c_scc, 'fontsize', fSize_colorbar);
-% 
-% 
-% 
-% 
-% 
+%     
+%     
+% end
+
+
+
+
 
 
 

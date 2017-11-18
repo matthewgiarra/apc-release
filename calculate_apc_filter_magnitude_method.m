@@ -23,12 +23,12 @@ function [APC_FILTER, APC_STD_Y, APC_STD_X] = ...
     % The fit can crap out and come back with
     % a standard deviation of less than 1. This is nonphysical
     % and can be used as a flag.
-%     if sx <= 1
-%         sx = rpc_std_dev_x;
-%     end
-%     if sy <= 1
-%         sy = rpc_std_dev_y;
-%     end
+    if sx <= 1
+        sx = rpc_std_dev_x;
+    end
+    if sy <= 1
+        sy = rpc_std_dev_y;
+    end
     
     % Take the APC diameter as the minimum
     % between the RPC equivalent std dev

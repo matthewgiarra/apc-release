@@ -163,7 +163,7 @@ n = 1;
 
 % Append to the job list.
 JOBLIST(n) = JobFile;
-JOBLIST(n).Data.Outputs.Vectors.BaseName = 'A_raw_apc_ensemble_rpcd_3_no_min_';
+JOBLIST(n).Data.Outputs.Vectors.BaseName = 'A_raw_apc_ensemble_rpcd_3_with_min_';
 for p = 1 : num_passes_total
    JOBLIST(n).Processing(p).Correlation.SpectralWeighting.Method = 'apc';
    JOBLIST(n).Processing(p).Correlation.RPC.EffectiveDiameter = 3;
@@ -176,7 +176,7 @@ n = n + 1;
 
 % Append to the job list.
 JOBLIST(n) = JobFile;
-JOBLIST(n).Data.Outputs.Vectors.BaseName = 'A_raw_apc_ensemble_rpcd_6_no_min_';
+JOBLIST(n).Data.Outputs.Vectors.BaseName = 'A_raw_apc_ensemble_rpcd_6_with_min_';
 for p = 1 : num_passes_total
    JOBLIST(n).Processing(p).Correlation.SpectralWeighting.Method = 'apc';
    JOBLIST(n).Processing(p).Correlation.RPC.EffectiveDiameter = 6;
@@ -196,7 +196,7 @@ JobFile.Data.Inputs.Images.Directory = '/home/shannon/b/aether/piv_test_images/p
 n = n + 1;
 
 JOBLIST(n) = JobFile;
-JOBLIST(n).Data.Outputs.Vectors.BaseName = 'A_deghost_apc_ensemble_rpcd_3_no_min_';
+JOBLIST(n).Data.Outputs.Vectors.BaseName = 'A_deghost_apc_ensemble_rpcd_3_with_min_';
 for p = 1 : num_passes_total
    JOBLIST(n).Processing(p).Correlation.SpectralWeighting.Method = 'apc';
    JOBLIST(n).Processing(p).Correlation.RPC.EffectiveDiameter = 3;
@@ -209,7 +209,7 @@ n = n + 1;
 
 % Append to the job list.
 JOBLIST(n) = JobFile;
-JOBLIST(n).Data.Outputs.Vectors.BaseName = 'A_deghost_apc_ensemble_rpcd_6_no_min_';
+JOBLIST(n).Data.Outputs.Vectors.BaseName = 'A_deghost_apc_ensemble_rpcd_6_with_min_';
 for p = 1 : num_passes_total
    JOBLIST(n).Processing(p).Correlation.SpectralWeighting.Method = 'apc';
    JOBLIST(n).Processing(p).Correlation.RPC.EffectiveDiameter = 6;
