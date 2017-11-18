@@ -12,7 +12,7 @@ fSize_colorbar = 20;
 fsize_y = 24;
 
 
-job_file_dir = '/Users/matthewgiarra/Desktop/piv_test_images/pivchallenge/2014/A/vect/test/';
+job_file_dir = '/Users/matthewgiarra/Desktop/apc';
 % job_file_name = 'A_deghost_from_source_00001_00001.mat';
 % job_file_name_rpc = 'A_raw_from_source_rpc_00001_00001.mat';
 % job_file_name_apc = 'A_raw_from_source_apc_00001_00001.mat';
@@ -28,7 +28,9 @@ files = dir(fullfile(job_file_dir, './*.mat'));
 % Number of files
 num_files = length(files);
 
-c = [-24, 55];
+% c = [-24, 55];
+
+pts = load('~/Desktop/grid_points.mat');
 
 for k = 1 : num_files
     
@@ -37,34 +39,53 @@ for k = 1 : num_files
     
     load(job_file_path);
     
-    tx = JobFile.Processing(pass_num).Results.Displacement.Raw.X(:, 1);
-    ty = JobFile.Processing(pass_num).Results.Displacement.Raw.Y(:, 1);
+    tx{k} = JobFile.Processing(pass_num).Results.Displacement.Raw.X(:, 1);
+    ty{k} = JobFile.Processing(pass_num).Results.Displacement.Raw.Y(:, 1);
 
-    gx = JobFile.Processing(pass_num).Grid.Points.Full.X;
-    gy = JobFile.Processing(pass_num).Grid.Points.Full.Y;
+    gx{k} = JobFile.Processing(pass_num).Grid.Points.Full.X;
+    gy{k} = JobFile.Processing(pass_num).Grid.Points.Full.Y;
     
-    ny = length(unique(gy));
-    nx = length(unique(gx));
+    sx = JobFile.Processing(pass_num).Results.Filtering.APC.Diameter.X(:, 1);
+    sy = JobFile.Processing(pass_num).Results.Filtering.APC.Diameter.Y(:, 1);
     
-    tx_grid = reshape(tx, [ny, nx]);
-    ty_grid = reshape(ty, [ny, nx]);
+    ny = length(unique(gy{k}));
+    nx = length(unique(gx{k}));
+    
+    tx_grid = reshape(tx{k}, [ny, nx]);
+    ty_grid = reshape(ty{k}, [ny, nx]);
+    sx_grid{k} = reshape(sx, [ny, nx]);
+    sy_grid{k} = reshape(sy, [ny, nx]);
 
-    subtightplot(2, 3, k);
     
-    imagesc(gx, gy, tx_grid);
+% pause;
+
+
+    
+end
+
+p = 68;
+
+for k = 1 : num_files
+   subtightplot(2, 2, k);
+    
+    imagesc(gx{k}, gy{k}, sx_grid{k});
     axis image;
+    hold on;
+    plot(pts.gx, pts.gy, '.w', 'markersize', 10);
+    plot(pts.gx(p), pts.gy(p), '.k', 'markersize', 10);
+    hold off;
+    
+    
 %     ylabel('RPC instantaneous', 'FontSize', fsize_y, 'interpreter', 'latex');
     set(gca, 'xtick', '');
     set(gca, 'ytick', '');
-    caxis(c);
+%     caxis(c);
 %     cbar = colorbar;
 %     ylabel(cbar, 'Horizontal velocity (pix / frame)', 'interpreter', 'latex')
 %     set(cbar, 'fontsize', fSize_colorbar);
     title(strrep(job_file_name, '_', '\_'), 'fontsize', 16);
 
-% pause;
-
-
+    
     
 end
 
