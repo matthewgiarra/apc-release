@@ -23,7 +23,7 @@ num_passes_total = length(region_height_list);
 % Number of passes
 % zero means run all of them.
 JobOptions.NumberOfPasses = 0;
-JobOptions.StartPass = 6;
+JobOptions.StartPass = 1;
 
 % Data: Input images
 % Data.Inputs.Images.Directory = '/Users/matthewgiarra/Documents/School/VT/Research/Aether/data/piv/piv_challenge/2014/A/images/proc/ghost';
@@ -49,7 +49,7 @@ Data.Inputs.Vectors.Extension = '.mat';
 Data.Inputs.SourceFilePath = '/Users/matthewgiarra/Desktop/apc/old/A_apc_00001_00600.mat';
 
 % Data: output vectors
-Data.Outputs.Vectors.Directory = '/Users/matthewgiarra/Desktop/piv_test_images/piv_challenge/2014/A/vect_2017-11-17/apc';
+Data.Outputs.Vectors.Directory = '/Users/matthewgiarra/Desktop/piv_test_images/piv_challenge/2014/A/vect_2017-11-17/apc/cropped';
 % Data.Outputs.Vectors.BaseName = 'A_deghost_from_source_';
 Data.Outputs.Vectors.BaseName = 'A_raw_from_source_';
 Data.Outputs.Vectors.Digits = 5;
@@ -69,10 +69,10 @@ Processing(1).Grid.Spacing.Y = 64;
 Processing(1).Grid.Spacing.X = 64;
 Processing(1).Grid.Shift.Y = -16;
 Processing(1).Grid.Shift.X = 0;
-% Processing(1).Grid.Buffer.Y = 0;
-% Processing(1).Grid.Buffer.X = 0;
+Processing(1).Grid.Buffer.Y = 0;
+Processing(1).Grid.Buffer.X = 0;
 Processing(1).Grid.Buffer.Y = [430, 530];
-Processing(1).Grid.Buffer.X = [1600, 750];
+Processing(1).Grid.Buffer.X = [1600, 800];
 Processing(1).Grid.Mask.Directory = '/Users/matthewgiarra/Documents/School/VT/Research/Aether/data/piv/piv_challenge/2014/A/images/masks';
 Processing(1).Grid.Mask.Name = 'imgAmask3.tif';
 % Processing(1).Grid.Mask.Name = 'mask_jet_subregion.tif';
@@ -82,7 +82,7 @@ Processing(1).Grid.Mask.Name = 'imgAmask3.tif';
 % Frame parameters.
 Processing(1).Frames.Start = 1;
 Processing(1).Frames.End = 600;
-Processing(1).Frames.Step = 1;
+Processing(1).Frames.Step = 10;
 
 % Correlation parameters
 % Processing(1).Correlation.Method = 'apc';
@@ -172,7 +172,7 @@ n = 1;
 
 % Append to the job list.
 JOBLIST(n) = JobFile;
-JOBLIST(n).Data.Outputs.Vectors.BaseName = 'A_raw_apc_ensemble_rpcd_3_';
+JOBLIST(n).Data.Outputs.Vectors.BaseName = 'A_raw_apc_ensemble_rpcd_3_with_min_cropped_';
 for p = 1 : num_passes_total
    JOBLIST(n).Processing(p).Correlation.SpectralWeighting.Method = 'apc';
    JOBLIST(n).Processing(p).Correlation.RPC.EffectiveDiameter = 3;

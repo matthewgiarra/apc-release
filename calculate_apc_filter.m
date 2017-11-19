@@ -18,7 +18,7 @@ end
 % Default to no lower limit on the RPC diameger
 if nargin < 2
     RPC_DIAMETER = 0;
-end;
+end
 
 % Pick between APC methods
 switch lower(METHOD)

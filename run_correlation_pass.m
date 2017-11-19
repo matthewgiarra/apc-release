@@ -460,7 +460,7 @@ for n = 1 : num_pairs_correlate
         dp_y_full(grid_indices, n) = particle_diameters_y;
         dp_x_full(grid_indices, n) = particle_diameters_x;       
     end
-    
+        
     % Print a carriage return after
     % the image pair is done processing
     fprintf(1, '\n');
@@ -500,6 +500,7 @@ if do_temporal_ensemble
         repmat(particle_diameters_x, [1, num_pairs_correlate]);
     dp_x_full(grid_indices, :) = ...
         repmat(particle_diameters_y, [1, num_pairs_correlate]); 
+    
 end
 
 % Allocate the "output" vectors
@@ -711,8 +712,8 @@ JOBFILE.Processing(PASS_NUMBER).Results.Displacement.Final.X = tx_full_output;
 JOBFILE.Processing(PASS_NUMBER).Results.Displacement.Final.Y = ty_full_output;
 
 % Delete the correlation planes
-JOBFILE.Processing(PASS_NUMBER).Correlation = ...
-    rmfield(JOBFILE.Processing(PASS_NUMBER).Correlation, 'Planes');
+% JOBFILE.Processing(PASS_NUMBER).Correlation = ...
+%     rmfield(JOBFILE.Processing(PASS_NUMBER).Correlation, 'Planes');
 
 % If APC was done then save the effective
 % particle diameters to the pass results.
