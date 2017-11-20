@@ -819,7 +819,7 @@ if isAPC
     % Add the horizontal (columns direction)
     % APC diameter to the results.
     JOBFILE.Processing(PASS_NUMBER).Results. ...
-        Filtering.APC.Diameter.Raw.X = dp_x_full;
+        Filtering.APC.Diameter.X = dp_x_full;
     
     % Add the vertical (rows direction)
     % APC diameter to the results.

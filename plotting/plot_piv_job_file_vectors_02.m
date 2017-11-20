@@ -15,9 +15,10 @@ fsize_y = 24;
 % job_file_dir = '/Users/matthewgiarra/Desktop/apc/new_rpcd6';
 % job_file_dir = '/Users/matthewgiarra/Desktop/apc/old';
 % job_file_dir = '/Users/matthewgiarra/Desktop/apc/original';
-job_file_dir = '/Users/matthewgiarra/Desktop/apc/compare_thresholds';
+% job_file_dir = '/Users/matthewgiarra/Desktop/apc/compare_thresholds';
 % job_file_dir = '/Users/matthewgiarra/Desktop/apc/compare_fields';
 % job_file_dir = '/Users/matthewgiarra/Desktop/apc/cropped';
+job_file_dir = '/Users/matthewgiarra/Desktop/apc/filter_validation';
 files = dir(fullfile(job_file_dir, './*.mat'));
 
 % Number of files
@@ -85,13 +86,13 @@ num_files = size(tx, 1);
 c = [0, 15];
 
 
-gf = [784   511   731   827];
+gf = [ 1000         201         942        1137];
 xl = [120, 2400];
 
 Skip = 3;
 Scale = 1;
-p = 2;
-plot_vectors = false;
+p = 6;
+plot_vectors = true;
 lw = 1;
 % Plotting filter diameters.
 for k = 1 : num_files
@@ -105,24 +106,29 @@ for k = 1 : num_files
 %         plot_num = 1;
 %     end
 
-    is_new = ~isempty(regexpi(job_file_name{k}, 'no_min'));
+    is_new = ~isempty(regexpi(job_file_name{k}, 'val'));
     if is_new
-        y_label = 'No lower threshold';
+        y_label = 'UOD on CC + autocorr + threshold';
         plot_num = 2;
     else
-        y_label = 'With lower threshold';
+        y_label = 'UOD on CC only ';
         plot_num = 1;
     end
     
     
     plot_num = k;
     subtightplot(2, 1, plot_num, [], [0.2, 0.2], []);
-    outlier_inds = find(is_outlier_grid{k, p}(:) > 0);
-    
-    x = gx{k, p}(outlier_inds);
-    y = gy{k, p}(outlier_inds);
+%     outlier_inds = find(is_outlier_grid{k, p}(:) > 0);
+%     
+%     x = gx{k, p}(outlier_inds);
+%     y = gy{k, p}(outlier_inds);
 
-    imagesc(gx{k, p}, gy{k, p}, sx_grid{k, p});
+    if is_new
+        imagesc(gx{k, p}, gy{k, p}, sx_grid{k, p});
+    else
+        imagesc(gx{k, p}, gy{k, p}, sx_val_grid{k, p});
+    end
+    
     axis image;
     caxis(c);
     hold on;
@@ -148,7 +154,7 @@ for k = 1 : num_files
 %     ylabel(y_label, 'fontsize', 16, 'interpreter', 'latex');
 %     title(strrep(job_file_name{k}, '_', '\_'), 'fontsize', 12);
     if plot_num == 1
-        title('Raw vector fields (no validation on filters or vectors)',...
+        title('Validated APC diameters, raw velocities',...
             'fontsize', 16, ...
             'interpreter', 'latex');
     end
