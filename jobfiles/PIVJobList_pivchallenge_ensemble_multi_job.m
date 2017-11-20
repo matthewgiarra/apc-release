@@ -37,20 +37,12 @@ Data.Inputs.Images.Extension = '.tif';
 Data.Inputs.Images.Trailers = {'_a', '_b'};
 % Data.Inputs.Images.Trailers = {''};
 
-
-% Data: Input vectors for initializing, e.g., image deformation.
-Data.Inputs.Vectors.Directory = '/Users/matthewgiarra/Desktop/apc';
-Data.Inputs.Vectors.BaseName = 'A_deghost_';
-Data.Inputs.Vectors.Digits = 5;
-Data.Inputs.Vectors.Extension = '.mat';
-
 % Source file path
 % Data.Inputs.SourceFilePath = '/Users/matthewgiarra/Desktop/apc/A_deghost_apc_00001_00600.mat';
 Data.Inputs.SourceFilePath = '/Users/matthewgiarra/Desktop/apc/old/A_apc_00001_00600.mat';
 
 % Data: output vectors
 Data.Outputs.Vectors.Directory = '/Users/matthewgiarra/Desktop/piv_test_images/piv_challenge/2014/A/vect_2017-11-17/apc/cropped';
-% Data.Outputs.Vectors.BaseName = 'A_deghost_from_source_';
 Data.Outputs.Vectors.BaseName = 'A_raw_from_source_';
 Data.Outputs.Vectors.Digits = 5;
 Data.Outputs.Vectors.Extension = '.mat';
@@ -81,8 +73,8 @@ Processing(1).Grid.Mask.Name = 'imgAmask3.tif';
 
 % Frame parameters.
 Processing(1).Frames.Start = 1;
-Processing(1).Frames.End = 1;
-Processing(1).Frames.Step = 1;
+Processing(1).Frames.End = 600;
+Processing(1).Frames.Step = 10;
 
 % Correlation parameters
 % Processing(1).Correlation.Method = 'apc';
@@ -100,7 +92,6 @@ Processing(1).Correlation.SpectralWeighting.Method = 'scc';
 Processing(1).Correlation.SpectralWeighting.APC.FilterDiameterUpperBound = 6;
 Processing(1).Correlation.SpectralWeighting.APC.Shuffle.Range = [0, 0];
 Processing(1).Correlation.SpectralWeighting.APC.Shuffle.Step = [0, 0];
-Processing(1).Correlation.SpectralWeighting.APC.Thresh.Min.X = 0;
 Processing(1).Correlation.SpectralWeighting.APC.Thresh.X = [0, inf];
 Processing(1).Correlation.SpectralWeighting.APC.Thresh.Y = [0, inf];
 Processing(1).Correlation.SpectralWeighting.APC.Method = 'magnitude';
