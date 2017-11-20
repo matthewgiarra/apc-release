@@ -8,7 +8,7 @@ num_jobs = length(JobList);
 for n = 1 : num_jobs
    
     % Get the path to the jobfile
-    JobFilePath = determine_jobfile_save_pat(JobList(n));
+    JobFilePath = determine_jobfile_save_path(JobList(n));
     
     % Load the jobfile
     load(JobFilePath);
