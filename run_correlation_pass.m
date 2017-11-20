@@ -128,9 +128,19 @@ end
 [spatial_window_01, spatial_window_02] = ...
     make_spatial_windows(JOBFILE, PASS_NUMBER);
 
-% Allocate the correlation planes
+% Allocate the cross correlation planes
 cross_corr_array = zeros(...
             region_height, region_width, num_regions_correlate);
+        
+% Allocate the auto correlation planes 
+% for the first image
+auto_corr_array_01 = zeros(...
+    region_height, region_width, num_regions_correlate);
+
+% Allocate the auto correlation planes 
+% for the second image
+auto_corr_array_02 = zeros(...
+    region_height, region_width, num_regions_correlate);
         
 % Count the number of passes
 % that the job will perform
@@ -284,6 +294,8 @@ for n = 1 : num_pairs_correlate
     % Tic tock
     t1 = tic;
     
+    ind = find(grid_correlate_x == 1232 & grid_correlate_y == 657);
+    
     % Loop over the regions
     for k = 1 : num_regions_correlate
         
@@ -306,6 +318,12 @@ for n = 1 : num_pairs_correlate
         % transforms of the two interrogation regions.
         cross_corr_spectral = fftshift((FT_01 .* conj(FT_02)));
         
+        % Calculate the autocorrelation of the region from image 1
+        auto_corr_spectral_01 = fftshift((FT_01 .* conj(FT_01)));
+        
+        % Calculate the autocorrelation of the region from image 1
+        auto_corr_spectral_02 = fftshift((FT_02 .* conj(FT_02)));
+        
         % Once the cross correlation has been calculated,
         % we must decide where to put it. This decision
         % changes depending on how and whether
@@ -313,7 +331,7 @@ for n = 1 : num_pairs_correlate
         % 
         % Here is the "decision tree" for where
         % to put the cross correlation plane. 
-        % I'm making this up as I go so please be gentle.
+        % I'm making this up as I go, so please be gentle.
         %
         % No ensemble:
         %   The array of correlation planes
@@ -379,6 +397,9 @@ for n = 1 : num_pairs_correlate
                             calculate_apc_filter(cross_corr_spectral, ...
                             particle_diameter, apc_method);
                         
+                        % To do: add autocorrelation backup filter
+                        % to instantaneous APC filter method (here).
+                        
                     case 'rpc'
                         % If RPC was specified then 
                         % set the spectral filter to 
@@ -424,18 +445,92 @@ for n = 1 : num_pairs_correlate
                 cross_corr_array(:, :, k) = ...
                     cross_corr_array(:, :, k) + ...
                     cross_corr_spectral;
+                
+                % Add the autocorrelation from the first image
+                % to the ensemble autocorrelation for the first image.
+                auto_corr_array_01(:, :, k) = ...
+                    auto_corr_array_01(:, :, k) + ...
+                    auto_corr_spectral_01;
+                
+                % Add the autocorrelation from the second image
+                % to the ensemble autocorrelation for the second image.                
+                auto_corr_array_02(:, :, k) = ...
+                    auto_corr_array_02(:, :, k) + ...
+                    auto_corr_spectral_02;
+                
+%                 if k == ind
+%                    
+%                    cc = cross_corr_array(:, :, k);
+%                    ac1 = auto_corr_array_01(:, :, k);
+%                    ac2 = auto_corr_array_02(:, :, k);
+%                    
+%                    cc_mag = abs(cc) ./ max(abs(cc(:)));
+%                    
+%                    ac_mag = sqrt(abs(ac1 .* ac2));
+%                    ac_norm = ac_mag ./ max(ac_mag(:));
+%                    ac1_mag = abs(ac1) ./ max(abs(ac1(:)));
+%                    ac2_mag = abs(ac2) ./ max(abs(ac2(:))); 
+%                    
+%                    subtightplot(2, 2, 1)
+%                    surf(cc_mag);
+%                    xlim([1, region_width]);
+%                    ylim([1, region_height]);
+%                    zlim(1.1 * [0, 1]);
+%                    title('Cross corr mag', 'FontSize', 16, ...
+%                        'interpreter', 'latex');
+%                    axis square;
+%                    
+%                    subtightplot(2, 2, 2)
+%                    surf(ac_norm);
+%                    xlim([1, region_width]);
+%                    ylim([1, region_height]);
+%                    zlim(1.1 * [0, 1]);
+%                    title('AC mag', 'FontSize', 16, ...
+%                        'interpreter', 'latex');
+%                    axis square;
+%                    
+%                    subtightplot(2, 2, 3)
+%                    surf(ac1_mag);
+%                    xlim([1, region_width]);
+%                    ylim([1, region_height]);
+%                    zlim(1.1 * [0, 1]);
+%                    title('Auto Corr 1', 'FontSize', 16, ...
+%                        'interpreter', 'latex');
+%                    axis square;
+%                    
+%                    subtightplot(2, 2, 4)
+%                    surf(ac2_mag);
+%                    xlim([1, region_width]);
+%                    ylim([1, region_height]);
+%                    zlim(1.1 * [0, 1]);
+%                    title('Auto Corr 2', 'FontSize', 16, ...
+%                        'interpreter', 'latex');
+%                    axis square;
+%                    
+%                    set(gcf, 'color', 'white');
+%                    
+%                    drawnow;
+%                     
+%                 end
+                
         end 
     end
     t2 = toc(t1);
     fprintf(1, 'Correlated %d regions in %02f seconds.\n', ...
         num_regions_correlate, t2);
     
-    % Save the correlation planes to the jobfile.
+    % Save the cross correlation planes to the jobfile.
     % This is done to avoid passing multiple variables
     % to the different functions.
     % These will be deleted before the jobfile is saved.
-    JOBFILE.Processing(PASS_NUMBER).Correlation.Planes = ...
+    JOBFILE.Processing(PASS_NUMBER).Correlation.CrossCorrPlanes = ...
         cross_corr_array;
+    
+    % Save the auto correlation planes to the jobfile.
+    JOBFILE.Processing(PASS_NUMBER).Correlation.AutoCorrPlanes.Image1 = ...
+        auto_corr_array_01;
+    JOBFILE.Processing(PASS_NUMBER).Correlation.AutoCorrPlanes.Image2 = ...
+        auto_corr_array_02;
     
     % Extract displacements 
     % if the temporal enemble wasn't specified.
@@ -712,8 +807,10 @@ JOBFILE.Processing(PASS_NUMBER).Results.Displacement.Final.X = tx_full_output;
 JOBFILE.Processing(PASS_NUMBER).Results.Displacement.Final.Y = ty_full_output;
 
 % Delete the correlation planes
-% JOBFILE.Processing(PASS_NUMBER).Correlation = ...
-%     rmfield(JOBFILE.Processing(PASS_NUMBER).Correlation, 'Planes');
+JOBFILE.Processing(PASS_NUMBER).Correlation = ...
+    rmfield(JOBFILE.Processing(PASS_NUMBER).Correlation, 'CrossCorrPlanes');
+JOBFILE.Processing(PASS_NUMBER).Correlation = ...
+    rmfield(JOBFILE.Processing(PASS_NUMBER).Correlation, 'AutoCorrPlanes');
 
 % If APC was done then save the effective
 % particle diameters to the pass results.
@@ -722,7 +819,7 @@ if isAPC
     % Add the horizontal (columns direction)
     % APC diameter to the results.
     JOBFILE.Processing(PASS_NUMBER).Results. ...
-        Filtering.APC.Diameter.X = dp_x_full;
+        Filtering.APC.Diameter.Raw.X = dp_x_full;
     
     % Add the vertical (rows direction)
     % APC diameter to the results.

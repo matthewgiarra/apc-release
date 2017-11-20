@@ -27,7 +27,7 @@ switch lower(METHOD)
         % This is Matt Giarra's method that
         % his paper talks about. 
         [APC_FILTER, APC_STD_Y, APC_STD_X] = ...
-            calculate_apc_filter_magnitude_method(SPECTRAL_CORRELATION_COMPLEX, RPC_DIAMETER);
+            calculate_apc_filter_magnitude_method(SPECTRAL_CORRELATION_COMPLEX);
         
         % Phase-quality based APC filter calculation
     case 'phase'

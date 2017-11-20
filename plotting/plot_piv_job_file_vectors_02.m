@@ -90,8 +90,8 @@ xl = [120, 2400];
 
 Skip = 3;
 Scale = 1;
-p = 6;
-plot_vectors = true;
+p = 2;
+plot_vectors = false;
 lw = 1;
 % Plotting filter diameters.
 for k = 1 : num_files

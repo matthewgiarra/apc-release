@@ -71,8 +71,8 @@ Processing(1).Grid.Shift.Y = -16;
 Processing(1).Grid.Shift.X = 0;
 Processing(1).Grid.Buffer.Y = 0;
 Processing(1).Grid.Buffer.X = 0;
-Processing(1).Grid.Buffer.Y = [430, 530];
-Processing(1).Grid.Buffer.X = [1600, 800];
+% Processing(1).Grid.Buffer.Y = [430, 530];
+% Processing(1).Grid.Buffer.X = [1600, 800];
 Processing(1).Grid.Mask.Directory = '/Users/matthewgiarra/Documents/School/VT/Research/Aether/data/piv/piv_challenge/2014/A/images/masks';
 Processing(1).Grid.Mask.Name = 'imgAmask3.tif';
 % Processing(1).Grid.Mask.Name = 'mask_jet_subregion.tif';
@@ -81,8 +81,8 @@ Processing(1).Grid.Mask.Name = 'imgAmask3.tif';
 
 % Frame parameters.
 Processing(1).Frames.Start = 1;
-Processing(1).Frames.End = 600;
-Processing(1).Frames.Step = 10;
+Processing(1).Frames.End = 1;
+Processing(1).Frames.Step = 1;
 
 % Correlation parameters
 % Processing(1).Correlation.Method = 'apc';
@@ -100,7 +100,11 @@ Processing(1).Correlation.SpectralWeighting.Method = 'scc';
 Processing(1).Correlation.SpectralWeighting.APC.FilterDiameterUpperBound = 6;
 Processing(1).Correlation.SpectralWeighting.APC.Shuffle.Range = [0, 0];
 Processing(1).Correlation.SpectralWeighting.APC.Shuffle.Step = [0, 0];
+Processing(1).Correlation.SpectralWeighting.APC.Thresh.Min.X = 0;
+Processing(1).Correlation.SpectralWeighting.APC.Thresh.X = [0, inf];
+Processing(1).Correlation.SpectralWeighting.APC.Thresh.Y = [0, inf];
 Processing(1).Correlation.SpectralWeighting.APC.Method = 'magnitude';
+
 
 Processing(1).Correlation.DisplacementEstimate.Domain = 'spatial';
 
@@ -172,7 +176,7 @@ n = 1;
 
 % Append to the job list.
 JOBLIST(n) = JobFile;
-JOBLIST(n).Data.Outputs.Vectors.BaseName = 'A_raw_apc_ensemble_rpcd_3_with_min_cropped_';
+JOBLIST(n).Data.Outputs.Vectors.BaseName = 'A_raw_apc_ensemble_rpcd_3_no_min_ac_';
 for p = 1 : num_passes_total
    JOBLIST(n).Processing(p).Correlation.SpectralWeighting.Method = 'apc';
    JOBLIST(n).Processing(p).Correlation.RPC.EffectiveDiameter = 3;

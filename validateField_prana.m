@@ -1,4 +1,4 @@
-function [UVAL, VVAL, ISOUTLIER] = validateField_prana(X, Y, U, V, UOD_EXPECTED_DIFF)
+function [UVAL, VVAL, OUTLIER_FLAG_OUTPUT] = validateField_prana(X, Y, U, V, UOD_EXPECTED_DIFF, OUTLIER_FLAG_INPUT)
 % Size of the grid
 
 % Default value
@@ -12,7 +12,12 @@ if length(UOD_EXPECTED_DIFF) == 1
 end
 
 % Hard code a bunch of validation parameters
-Eval = zeros(size(U));
+if nargin < 6
+    Eval = zeros(size(U));
+else
+    Eval = OUTLIER_FLAG_INPUT;
+end
+
 ThreshSwitch = 0;
 UODswitch = 1;
 BootSwitch = 0;
@@ -31,7 +36,7 @@ d = zeros(length(X(:)), 1);
 % y = flipud(Y);
 
 % Do UOD
-[UVAL, VVAL, ISOUTLIER] = VAL(X(:), Y(:), U(:), V(:), Eval(:), c(:), d(:),ThreshSwitch,UODswitch,BootSwitch,extraPeakSwitch,...
+[UVAL, VVAL, OUTLIER_FLAG_OUTPUT] = VAL(X(:), Y(:), U(:), V(:), Eval(:), c(:), d(:),ThreshSwitch,UODswitch,BootSwitch,extraPeakSwitch,...
                         Uthresh,Vthresh,UODwinsize,UODthresh, UOD_EXPECTED_DIFF, BootPer,BootIter,BootKMax);
 
 end

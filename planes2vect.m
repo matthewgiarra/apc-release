@@ -7,7 +7,11 @@ ensemble_type_string = lower( ...
     get_ensemble_type(JOBFILE, PASS_NUMBER));
 
 % Extract the correlation planes from the job file
-cross_corr_array = JOBFILE.Processing(PASS_NUMBER).Correlation.Planes;
+cross_corr_array = JOBFILE.Processing(PASS_NUMBER).Correlation.CrossCorrPlanes;
+
+% Extract the auto correlation arrays
+auto_corr_array_01 = JOBFILE.Processing(PASS_NUMBER).Correlation.AutoCorrPlanes.Image1;
+auto_corr_array_02 = JOBFILE.Processing(PASS_NUMBER).Correlation.AutoCorrPlanes.Image2;
 
 % Check if all the imaginary components
 % of the correlation array are equal to zero.
@@ -75,11 +79,36 @@ particle_diameter_list_y = zeros(num_correlation_planes, 1);
 particle_diameter_list_x(:) = particle_diameter;
 particle_diameter_list_y(:) = particle_diameter;
 
+% Specifying these here so that the parfor loop can run.
+% They'll be replaced with jobfile-specified options
+% if they're needed.
 apc_method = 'magnitude';
 spc_unwrap_method_string = 'goldstein';
 spc_run_compiled = false;
-X = 0;
-Y = 0;
+
+% Make a grid
+xv = (1 : region_width) - fourier_zero(region_width);
+yv = (1 : region_height) - fourier_zero(region_height);
+
+% Make coordinate arrays
+[X, Y] = meshgrid(xv, yv);
+
+% Diameter thresholds
+% Minimum size on the APC filter (x-direction)
+dp_thresh_min_x = JOBFILE.Processing(PASS_NUMBER). ...
+    Correlation.SpectralWeighting.APC.Thresh.X(1);
+
+% Maximium size on the APC filter (x-direction)
+dp_thresh_max_x = JOBFILE.Processing(PASS_NUMBER). ...
+    Correlation.SpectralWeighting.APC.Thresh.X(2);
+
+% Minimum size on the APC filter (y-direction)
+dp_thresh_min_y = JOBFILE.Processing(PASS_NUMBER). ...
+    Correlation.SpectralWeighting.APC.Thresh.Y(1);
+
+% Maximium size on the APC filter (y-direction)
+dp_thresh_max_y = JOBFILE.Processing(PASS_NUMBER). ...
+    Correlation.SpectralWeighting.APC.Thresh.Y(2);
 
 % Method specific options
 switch lower(spectral_weighting_method_string)
@@ -92,10 +121,159 @@ switch lower(spectral_weighting_method_string)
     spectral_weighting_filter_static = ones(region_height, region_width);
     
     case 'apc' 
+        
+        % Get grid indices where correlations are performed
+        inds = JOBFILE.Processing(PASS_NUMBER).Grid.Points.Correlate.Indices;
+        
         % If APC was selected, then check the APC method.
         % Read the APC method
         apc_method = JOBFILE.Processing(PASS_NUMBER). ...
             Correlation.SpectralWeighting.APC.Method;
+        
+        % Calculate all the APC filter diameters
+        JOBFILE = calculate_apc_filter_diameters_all(JOBFILE, PASS_NUMBER);
+        
+        % Get the grid points
+        gx = JOBFILE.Processing(PASS_NUMBER).Grid.Points.Full.X;
+        gy = JOBFILE.Processing(PASS_NUMBER).Grid.Points.Full.Y;
+        
+        % Allocate cross correlation particle diameters
+        % for all the grid points
+        dp_cc_full_x = nan(size(gx));
+        dp_cc_full_y = nan(size(gy));
+        
+        % Allocate autocorrelation particle diameters
+        % for all the grid points
+        dp_ac_full_x = nan(size(gx));
+        dp_ac_full_y = nan(size(gy));
+        
+        % Allocate cross correlation particle diameters
+        % just for the correlated grid points
+        dp_cc_x = zeros(size(inds));
+        dp_cc_y = zeros(size(inds));
+        
+        % Allocate autocorrelation particle diameters
+        % just for the correlated grid points
+        dp_ac_x = zeros(size(inds));
+        dp_ac_y = zeros(size(inds));
+        
+        % Loop over all the planes
+        parfor k = 1 : num_correlation_planes
+            
+            fprintf(1, 'Calculating filters %d of %d\n', k, num_correlation_planes);
+            
+            % Extract the given region
+            cross_corr_spectral = cross_corr_array(:, :, k);
+            
+            % Auto correlation of the region from image 1
+            ac_01 = auto_corr_array_01(:, :, k);
+            
+            % Auto correlation of the region from image 2
+            ac_02 = auto_corr_array_02(:, :, k);
+            
+            % Product of auto correlations
+            ac_prod = sqrt(abs(ac_01 .* ac_02));
+            
+            % Calculate the autocorrelation APC filter
+            [~, ac_filter_std_y, ac_filter_std_x] = ...
+                calculate_apc_filter_magnitude_method(ac_prod);
+            
+            % Calculate the APC filter
+            [~, cc_filter_std_y, cc_filter_std_x] = ...
+                calculate_apc_filter(cross_corr_spectral, ...
+                particle_diameter, apc_method);
+
+            % Equivalent particle diameter in the columns
+            % direction, calculated from the APC filter.
+            dp_cc_x(k) = filter_std_dev_to_particle_diameter(...
+                cc_filter_std_x, region_width);
+
+            % Equivalent particle diameter in the rows
+            % direction, calculated from the APC filter.
+            dp_cc_y(k) = filter_std_dev_to_particle_diameter(...
+                cc_filter_std_y, region_height);
+            
+            % Equivalent particle diameter in the columns
+            % direction, calculated from the autocorrelation.
+            dp_ac_x(k) = filter_std_dev_to_particle_diameter(...
+                ac_filter_std_x, region_width);
+            
+            % Equivalent particle diameter in the columns
+            % direction, calculated from the autocorrelation.           
+            dp_ac_y(k) = filter_std_dev_to_particle_diameter(...
+                ac_filter_std_y, region_width);
+            
+        end
+        
+        % Put the calculated particle sizes from the
+        % cross correlation filters into the full list 
+        % of cross correlation diameters
+        dp_cc_full_x(inds) = dp_cc_x;
+        dp_cc_full_y(inds) = dp_cc_y;
+        
+        % Put the calculated particle sizes from the
+        % autocorrelation filters into the full list 
+        % of autocorrelation diameters
+        dp_ac_full_x(inds) = dp_ac_x;
+        dp_ac_full_y(inds) = dp_ac_y;
+        
+        % Run UOD validation on the cross correlation filters
+        [dp_cc_val_x, dp_cc_val_y, outlier_flags_cc] = ...
+                validateField_prana(gx, gy, dp_cc_full_x, dp_cc_full_y, 0.5 * [1, 1]);
+            
+        % Run UOD validation on the autocorrelation filters   
+        [dp_ac_val_x, dp_ac_val_y, outlier_flags_ac] = ...
+                validateField_prana(gx, gy, dp_ac_full_x, dp_ac_full_y, 0.5 * [1, 1]);
+        
+        % Find the indices of masked grid points
+        mask_inds = setdiff(1 : numel(gx), inds);
+        
+        % Set masked indices to nan
+        % (they come out of validateField_prana as zeros)
+        dp_cc_val_x(mask_inds) = nan;
+        dp_cc_val_y(mask_inds) = nan;
+        dp_ac_val_x(mask_inds) = nan;
+        dp_ac_val_y(mask_inds) = nan;
+        
+        % Replace thresholded filters with the AC filters (x-direction)
+        dp_cc_val_x(dp_cc_val_x < dp_thresh_min_x | ...
+                          dp_cc_val_x > dp_thresh_max_x) = ...
+                          dp_ac_val_x(dp_cc_val_x < dp_thresh_min_x | ...
+                          dp_cc_val_x > dp_thresh_max_x);
+                          
+        % Replace thresholded filters with the AC filters (y-direction)                  
+        dp_cc_val_y(dp_cc_val_y < dp_thresh_min_y | ...
+                          dp_cc_val_y > dp_thresh_max_y) = ...
+                          dp_ac_val_y(dp_cc_val_y < dp_thresh_min_y | ...
+                          dp_cc_val_y > dp_thresh_max_y);
+                      
+        % Combine the outlier flags
+        outlier_flags_combined = max(outlier_flags_cc, outlier_flags_ac);
+                      
+        % Run outlier replacement once more
+        [dp_cc_val_x, dp_cc_val_y, ~] = ...
+            validateField_prana(gx, gy, ...
+            dp_cc_val_x, dp_cc_val_y, ...
+            0.5 * [1, 1], outlier_flags_combined);
+        
+        % Replace with nans again
+        dp_cc_val_x(mask_inds) = nan;
+        dp_cc_val_y(mask_inds) = nan;
+          
+        % Replace remaining "outliers" with user-defined particle diameter
+        dp_cc_val_x(dp_cc_val_x < dp_thresh_min_x | ...
+                          dp_cc_val_x > dp_thresh_max_x) = particle_diameter;            
+        dp_cc_val_y(dp_cc_val_y < dp_thresh_min_y | ...
+                          dp_cc_val_y > dp_thresh_max_y) = particle_diameter;
+                               
+        % Raw particle diameters
+        particle_diameter_list_raw_x = dp_cc_full_x;
+        particle_diameter_list_raw_y = dp_cc_full_y;
+            
+        % Validated particle diameters
+        particle_diameter_list_x = dp_cc_val_x(inds);
+        particle_diameter_list_y = dp_cc_val_y(inds);
+        
         
     case 'hybrid'
         % Hybrid spectral weighting.
@@ -105,20 +283,12 @@ switch lower(spectral_weighting_method_string)
         % Get the indicies of the regions
         inds = JOBFILE.Data.Inputs.SourceJobFile.Processing(PASS_NUMBER). ...
             Grid.Points.Correlate.Indices;
-
+        
         % Get the filter diameters
         particle_diameter_list_x = JOBFILE.Data.Inputs.SourceJobFile.Processing(PASS_NUMBER). ...
             Results.Filtering.APC.Diameter.X(inds, 1);
         particle_diameter_list_y = JOBFILE.Data.Inputs.SourceJobFile.Processing(PASS_NUMBER). ...
             Results.Filtering.APC.Diameter.Y(inds, 1);
-        
-        % Make coordinate vectors for the correlation weighting filter
-        xv = (1 : region_width) - fourier_zero(region_width);
-        yv = (1 : region_height) - fourier_zero(region_height);
-     
-        % Make coordinate arrays
-        [X, Y] = meshgrid(xv, yv);
-  
 end
 
 % Allocate arrays to hold vectors
@@ -158,6 +328,7 @@ end
 
 % spectral_filter_temp = zeros(region_height, region_width);
 
+
 switch lower(ensemble_domain_string)
     case 'spectral'
         
@@ -178,25 +349,8 @@ switch lower(ensemble_domain_string)
                 case 'scc'           
                     spectral_filter_temp = spectral_corr_mag;
                     
-                case 'apc'  
-                    
-                    % Calculate the APC filter
-                    [spectral_filter_temp, filter_std_y, filter_std_x] = ...
-                    calculate_apc_filter(cross_corr_spectral, ...
-                    particle_diameter, apc_method);
-                
-                    % Equivalent particle diameter in the columns
-                    % direction, calculated from the APC filter.
-                    particle_diameter_list_x(k) = filter_std_dev_to_particle_diameter(...
-                        filter_std_x, region_width);
-                    
-                    % Equivalent particle diameter in the rows
-                    % direction, calculated from the APC filter.
-                    particle_diameter_list_y(k) = filter_std_dev_to_particle_diameter(...
-                        filter_std_y, region_height);
-                    
-                case 'hybrid'
-
+                case {'apc', 'hybrid'}  
+                                    
                     % Standard deviations of the
                     % correlation weighting filter (horizontal)
                     apc_std_dev_x = ...
@@ -208,12 +362,12 @@ switch lower(ensemble_domain_string)
                     apc_std_dev_y = ...
                         particle_diameter_to_filter_std_dev(...
                         particle_diameter_list_y(k), region_height);
-                    
-                    % Make the spectral filter
+                
+                   % Make the spectral filter
                     spectral_filter_temp = ...
                         exp(-X.^2 / (2 * apc_std_dev_x^2) - ...
                         Y.^2 / (2 * apc_std_dev_y^2));
-                    
+        
                 otherwise
                     spectral_filter_temp = spectral_weighting_filter_static;
             end

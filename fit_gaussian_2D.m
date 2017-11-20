@@ -27,7 +27,6 @@ else
     else
         std_dev_guess = STD_DEV_GUESS;
     end
-    
 end
 
 % Amplitude guess
