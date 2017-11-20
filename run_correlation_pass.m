@@ -294,10 +294,10 @@ for n = 1 : num_pairs_correlate
     % Tic tock
     t1 = tic;
     
-    ind = find(grid_correlate_x == 1232 & grid_correlate_y == 657);
+%     ind = find(grid_correlate_x == 1232 & grid_correlate_y == 657);
     
     % Loop over the regions
-    for k = 1 : num_regions_correlate
+    parfor k = 1 : num_regions_correlate
         
         % Extract the subregions
         region_01 = region_mat_01(:, :, k);

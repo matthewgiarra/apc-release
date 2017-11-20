@@ -104,19 +104,17 @@ Processing(1).Correlation.SpectralWeighting.APC.Thresh.Min.X = 0;
 Processing(1).Correlation.SpectralWeighting.APC.Thresh.X = [0, inf];
 Processing(1).Correlation.SpectralWeighting.APC.Thresh.Y = [0, inf];
 Processing(1).Correlation.SpectralWeighting.APC.Method = 'magnitude';
-
-
 Processing(1).Correlation.DisplacementEstimate.Domain = 'spatial';
 
 % Parameters specific to RPC
-Processing(1).Correlation.RPC.EffectiveDiameter = 6;
+Processing(1).Correlation.RPC.EffectiveDiameter = 3;
 
 % Estimated particle diameter
-Processing(1).Correlation.EstimatedParticleDiameter = 6;
+Processing(1).Correlation.EstimatedParticleDiameter = 3;
 
 % Subpixel fit parameters
 Processing(1).SubPixel.Method = '3-point fit';
-Processing(1).SubPixel.EstimatedParticleDiameter = 6;
+Processing(1).SubPixel.EstimatedParticleDiameter = 3;
 
 % Parameters for vector validation
 Processing(1).Validation.DoValidation = 1;

@@ -129,10 +129,7 @@ switch lower(spectral_weighting_method_string)
         % Read the APC method
         apc_method = JOBFILE.Processing(PASS_NUMBER). ...
             Correlation.SpectralWeighting.APC.Method;
-        
-        % Calculate all the APC filter diameters
-        JOBFILE = calculate_apc_filter_diameters_all(JOBFILE, PASS_NUMBER);
-        
+                
         % Get the grid points
         gx = JOBFILE.Processing(PASS_NUMBER).Grid.Points.Full.X;
         gy = JOBFILE.Processing(PASS_NUMBER).Grid.Points.Full.Y;
@@ -157,10 +154,11 @@ switch lower(spectral_weighting_method_string)
         dp_ac_x = zeros(size(inds));
         dp_ac_y = zeros(size(inds));
         
+        % Inform the user
+        fprintf(1, 'Calculating APC filters...\n');
+        
         % Loop over all the planes
         parfor k = 1 : num_correlation_planes
-            
-            fprintf(1, 'Calculating filters %d of %d\n', k, num_correlation_planes);
             
             % Extract the given region
             cross_corr_spectral = cross_corr_array(:, :, k);
