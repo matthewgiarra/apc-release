@@ -9,6 +9,7 @@ for k = 1 : num_jobs
     
    % Extract the job file
    JobFile = JobList(k);
+   SourceFilePath = determine_nobfile_save_path(JobFile);
    SourceFilePath = JobFile.Data.Inputs.SourceFilePath;
    StartPass = JobFile.JobOptions.StartPass;
    
