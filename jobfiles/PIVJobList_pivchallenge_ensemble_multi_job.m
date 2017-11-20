@@ -1,13 +1,13 @@
 function JOBLIST = PIVJobList_pivchallenge_ensemble_multi_job()
 
 % Number of passes to run
-num_passes_spec = 6;
+num_passes_spec = 7;
 
 % % Pass parameters
-region_height_list_raw = [64,  64,  64, 32, 32, 32];
-region_width_list_raw  = [128, 128, 64, 32, 32, 32];
-window_fract_list_raw = {[0.5, 0.5; 0.5, 1], 0.5, 0.5, 1.0, 24/32, 24/32};
-grid_spacing_list_raw = [32, 32, 32, 16, 16, 16];
+region_height_list_raw = [64,  64,  64, 32, 32, 32, 32];
+region_width_list_raw  = [128, 128, 64, 32, 32, 32, 32];
+window_fract_list_raw = {[0.5, 0.5; 0.5, 1], 0.5, 0.5, 1.0, 24/32, 24/32, 24/32};
+grid_spacing_list_raw = [32, 32, 32, 16, 16, 16, 2];
 grid_spacing_list_raw_x = grid_spacing_list_raw;
 grid_spacing_list_raw_y = grid_spacing_list_raw;
 
@@ -23,7 +23,7 @@ num_passes_total = length(region_height_list);
 % Number of passes
 % zero means run all of them.
 JobOptions.NumberOfPasses = 0;
-JobOptions.StartPass = 1;
+JobOptions.StartPass = 7;
 
 % Data: Input images
 % Data.Inputs.Images.Directory = '/Users/matthewgiarra/Documents/School/VT/Research/Aether/data/piv/piv_challenge/2014/A/images/proc/ghost';

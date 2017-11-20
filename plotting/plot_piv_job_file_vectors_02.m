@@ -19,6 +19,8 @@ fsize_y = 24;
 % job_file_dir = '/Users/matthewgiarra/Desktop/apc/compare_fields';
 % job_file_dir = '/Users/matthewgiarra/Desktop/apc/cropped';
 job_file_dir = '/Users/matthewgiarra/Desktop/apc/filter_validation';
+% job_file_dir = '/Users/matthewgiarra/Desktop/apc/ensemble_size';
+
 files = dir(fullfile(job_file_dir, './*.mat'));
 
 % Number of files
@@ -51,8 +53,8 @@ for k = 1 : num_files
         ny{k, p} = length(unique(gy{k, p}));
         nx{k, p} = length(unique(gx{k, p}));
 
-        tx_grid = reshape(tx{k, p}, [ny{k, p}, nx{k, p}]);
-        ty_grid = reshape(ty{k, p}, [ny{k, p}, nx{k, p}]);
+        tx_grid{k, p} = reshape(tx{k, p}, [ny{k, p}, nx{k, p}]);
+        ty_grid{k, p} = reshape(ty{k, p}, [ny{k, p}, nx{k, p}]);
         sx_grid{k, p} = reshape(sx, [ny{k, p}, nx{k, p}]);
         sy_grid{k, p} = reshape(sy, [ny{k, p}, nx{k, p}]);
 
@@ -86,14 +88,20 @@ num_files = size(tx, 1);
 c = [0, 15];
 
 
-gf = [ 1000         201         942        1137];
+gf = [ 1181          26         761        1312];
 xl = [120, 2400];
 
-Skip = 3;
-Scale = 1;
-p = 6;
+Skip = 6;
+Scale = 1.5;
+p = 5;
 plot_vectors = true;
 lw = 1;
+
+fSize_title = 20;
+fSize_labels = 15;
+fSize_legend = 16;
+fSize_axes = 16;
+
 % Plotting filter diameters.
 for k = 1 : num_files
     
@@ -106,34 +114,37 @@ for k = 1 : num_files
 %         plot_num = 1;
 %     end
 
-    is_new = ~isempty(regexpi(job_file_name{k}, 'val'));
+    is_new = ~isempty(regexpi(job_file_name{k}, 'no_min_ac'));
+    is_original = ~isempty(regexpi(job_file_name{k}, 'original'));
     if is_new
-        y_label = 'UOD on CC + autocorr + threshold';
-        plot_num = 2;
-    else
-        y_label = 'UOD on CC only ';
+        y_label = 'New code, new filter val (newest results)';
+        plot_num = 3;
+    elseif is_original
+        y_label = 'Original processing (in manuscript)';
         plot_num = 1;
+    else
+        y_label = 'New code, no filter val (few days ago)';
+        plot_num = 2;
     end
-    
     
     plot_num = k;
-    subtightplot(2, 1, plot_num, [], [0.2, 0.2], []);
-%     outlier_inds = find(is_outlier_grid{k, p}(:) > 0);
-%     
-%     x = gx{k, p}(outlier_inds);
-%     y = gy{k, p}(outlier_inds);
-
-    if is_new
-        imagesc(gx{k, p}, gy{k, p}, sx_grid{k, p});
-    else
-        imagesc(gx{k, p}, gy{k, p}, sx_val_grid{k, p});
-    end
     
+    subtightplot(3, 1, plot_num, [], [0.2, 0.2], []);
+
+    % Plot the filters
+    imagesc(gx{k, p}, gy{k, p}, sx_grid{k, p});
+    ga = get(gca, 'position');
+    cb = colorbar;
+    set(gca, 'position', ga);
     axis image;
     caxis(c);
+    set(gca, 'fontsize', fSize_axes);
+    ylabel(cb, 'APC Diameter (x)', ...
+    'interpreter', 'latex', ...
+    'fontsize', fSize_legend);
     hold on;
-%     plot(x, y, '.w', 'markersize', 5);
-    ylabel(y_label, 'interpreter', 'latex', 'fontsize', 16);
+%     set(gca, 'fontsize', fSize_legend);
+
     
     % Plot vectors
     if plot_vectors
@@ -141,12 +152,11 @@ for k = 1 : num_files
            gy{k, p}(1 : Skip : end, 1 : Skip : end), ...
            Scale * tx{k, p}(1 : Skip : end, 1 : Skip : end), ...
            Scale * ty{k, p}(1 : Skip : end, 1 : Skip : end), ...
-           0, 'black', 'linewidth', lw);
-        
+           0, 'black', 'linewidth', lw);    
     end
-    
-    
     hold off;
+    ylabel(y_label, 'interpreter', 'latex', 'fontsize', fSize_labels);
+    
     set(gca, 'xtick', '');
     set(gca, 'ytick', '');
     
@@ -154,23 +164,98 @@ for k = 1 : num_files
 %     ylabel(y_label, 'fontsize', 16, 'interpreter', 'latex');
 %     title(strrep(job_file_name{k}, '_', '\_'), 'fontsize', 12);
     if plot_num == 1
-        title('Validated APC diameters, raw velocities',...
-            'fontsize', 16, ...
+        title({'Colors show APC diameter in terms of particle size',...
+            'No image preprocessing; 5-pass ensemble w/deform', ...
+            'Raw velocity (no UOD on final pass of vectors)'},...
+            'fontsize', fSize_title, ...
             'interpreter', 'latex');
     end
     
-    ga = get(gca, 'position');
-    cb = colorbar;
-    ylabel(cb, 'APC Diameter (x)', ...
-    'interpreter', 'latex', ...
-    'fontsize', 20);
-    set(gca, 'position', ga);
-   
-    set(gca, 'fontsize', 20);
+    % Xlimits
     xlim(xl);
 
-    % set(gcf, 'color', 'white', 'position', gf);
-    set(gcf, 'color', 'white');
+    set(gcf, 'color', 'white', 'position', gf);
+%     set(gcf, 'color', 'white');
+    
+    
+end
+
+
+figure(2);
+c_velocity = [-15, 50];
+for k = 1 : num_files
+    
+%     is_deghost = ~isempty(regexpi(job_file_name{k}, 'deghost'));
+%     if is_deghost
+%         y_label = 'Deghosted images';
+%         plot_num = 2;
+%     else
+%         y_label = 'Raw images';
+%         plot_num = 1;
+%     end
+
+    is_new = ~isempty(regexpi(job_file_name{k}, 'no_min_ac'));
+    is_original = ~isempty(regexpi(job_file_name{k}, 'original'));
+    if is_new
+        y_label = 'New code, new filter val (newest results)';
+        plot_num = 3;
+    elseif is_original
+        y_label = 'Original processing (in manuscript)';
+        plot_num = 1;
+    else
+        y_label = 'New code, no filter val (few days ago)';
+        plot_num = 2;
+    end
+    
+    plot_num = k;
+    
+    subtightplot(3, 1, plot_num, [], [0.2, 0.2], []);
+
+    % Plot the filters
+    imagesc(gx{k, p}, gy{k, p}, tx_grid{k, p});
+    ga = get(gca, 'position');
+    cb = colorbar;
+    set(gca, 'position', ga);
+    axis image;
+    set(gca, 'fontsize', fSize_axes);
+    ylabel(cb, 'U velocity (pix/frame)', ...
+    'interpreter', 'latex', ...
+    'fontsize', fSize_legend);
+    hold on;
+    caxis(c_velocity);
+%     set(gca, 'fontsize', fSize_legend);
+
+    
+    % Plot vectors
+    if plot_vectors
+        quiver(gx{k, p}(1 : Skip : end, 1 : Skip : end), ...
+           gy{k, p}(1 : Skip : end, 1 : Skip : end), ...
+           Scale * tx{k, p}(1 : Skip : end, 1 : Skip : end), ...
+           Scale * ty{k, p}(1 : Skip : end, 1 : Skip : end), ...
+           0, 'black', 'linewidth', lw);    
+    end
+    hold off;
+    ylabel(y_label, 'interpreter', 'latex', 'fontsize', fSize_labels);
+    
+    set(gca, 'xtick', '');
+    set(gca, 'ytick', '');
+    
+
+%     ylabel(y_label, 'fontsize', 16, 'interpreter', 'latex');
+%     title(strrep(job_file_name{k}, '_', '\_'), 'fontsize', 12);
+    if plot_num == 1
+        title({'Colors show U-velocity', ...
+            'No image preprocessing; 5-pass ensemble w/deform', ...
+            'Raw velocity (no UOD on final pass of vectors)'},...
+            'fontsize', fSize_title, ...
+            'interpreter', 'latex');
+    end
+    
+    % Xlimits
+    xlim(xl);
+
+    set(gcf, 'color', 'white', 'position', gf);
+%     set(gcf, 'color', 'white');
     
     
 end
