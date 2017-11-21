@@ -4,10 +4,10 @@ function JOBLIST = PIVJobList_pivchallenge_from_source_multi_job()
 num_passes_spec = 6;
 
 % % Pass parameters
-region_height_list_raw = [64,  64,  64, 32, 32, 32];
-region_width_list_raw  = [128, 128, 64, 32, 32, 32];
-window_fract_list_raw = {[0.5, 0.5; 0.5, 1], 0.5, 0.5, 1.0, 24/32, 24/32};
-grid_spacing_list_raw = [32, 32, 32, 16, 16, 2];
+region_height_list_raw = [64,  64,  64, 32, 32, 32, 32];
+region_width_list_raw  = [128, 128, 64, 32, 32, 32, 32];
+window_fract_list_raw = {[0.5, 0.5; 0.5, 1], 0.5, 0.5, 1.0, 24/32, 24/32, 24/32};
+grid_spacing_list_raw = [32, 32, 32, 16, 16, 16, 2];
 grid_spacing_list_raw_x = grid_spacing_list_raw;
 grid_spacing_list_raw_y = grid_spacing_list_raw;
 
@@ -23,7 +23,7 @@ num_passes_total = length(region_height_list);
 % Number of passes
 % zero means run all of them.
 JobOptions.NumberOfPasses = 0;
-JobOptions.StartPass = 6;
+JobOptions.StartPass = 1;
 
 % Data: Input images
 % Data.Inputs.Images.Directory = '/Users/matthewgiarra/Documents/School/VT/Research/Aether/data/piv/piv_challenge/2014/A/images/proc/ghost';
@@ -79,7 +79,7 @@ Processing(1).Grid.Mask.Name = 'imgAmask3.tif';
 
 % Frame parameters.
 Processing(1).Frames.Start = 1;
-Processing(1).Frames.End = 600;
+Processing(1).Frames.End = 1;
 Processing(1).Frames.Step = 1;
 
 % Correlation parameters
@@ -98,6 +98,8 @@ Processing(1).Correlation.SpectralWeighting.Method = 'scc';
 Processing(1).Correlation.SpectralWeighting.APC.FilterDiameterUpperBound = 6;
 Processing(1).Correlation.SpectralWeighting.APC.Shuffle.Range = [0, 0];
 Processing(1).Correlation.SpectralWeighting.APC.Shuffle.Step = [0, 0];
+Processing(1).Correlation.SpectralWeighting.APC.Thresh.X = [0, inf];
+Processing(1).Correlation.SpectralWeighting.APC.Thresh.Y = [0, inf];
 Processing(1).Correlation.SpectralWeighting.APC.Method = 'magnitude';
 
 Processing(1).Correlation.DisplacementEstimate.Domain = 'spatial';
@@ -163,8 +165,17 @@ JobFile.Data = Data;
 JobFile.Processing = Processing;
 JobFile.JobOptions = JobOptions;
 
+% Start the job counter
+n = 0;
+
+
+% Update where to get the images.
+JobFile.Data.Inputs.Images.Directory = '/Users/matthewgiarra/Documents/School/VT/Research/Aether/data/piv/piv_challenge/2014/A/images/raw';
+JobFile.Data.Inputs.Images.BaseName = 'A_';
+JobFile.Data.Inputs.SourceFilePath = '/Users/matthewgiarra/Desktop/apc/fine_grid/A_raw_apc_ensemble_rpcd_3_no_min_ac_00001_00600.mat';
+
 % Count the number of jobs
-n = 1;
+n = n + 1;
 
 % Append to the job list.
 JOBLIST(n) = JobFile;
@@ -197,7 +208,7 @@ end
 % Update where to get the images.
 JobFile.Data.Inputs.Images.Directory = '/Users/matthewgiarra/Documents/School/VT/Research/Aether/data/piv/piv_challenge/2014/A/images/proc/ghost';
 JobFile.Data.Inputs.Images.BaseName = 'A_deghost_';
-JobFile.Data.Inputs.SourceFilePath = '/Users/matthewgiarra/Desktop/apc/A_deghost_apc_00001_00600.mat';
+JobFile.Data.Inputs.SourceFilePath = '/Users/matthewgiarra/Desktop/apc/fine_grid/A_deghost_apc_ensemble_rpcd_3_no_min_ac_00001_00600.mat';
 JobFile.Data.Outputs.Vectors.BaseName = 'A_deghost_instantaneous_apc_hybrid_';
 
 

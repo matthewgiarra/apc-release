@@ -18,8 +18,9 @@ fsize_y = 24;
 % job_file_dir = '/Users/matthewgiarra/Desktop/apc/compare_thresholds';
 % job_file_dir = '/Users/matthewgiarra/Desktop/apc/compare_fields';
 % job_file_dir = '/Users/matthewgiarra/Desktop/apc/cropped';
-job_file_dir = '/Users/matthewgiarra/Desktop/apc/filter_validation';
+% job_file_dir = '/Users/matthewgiarra/Desktop/apc/filter_validation';
 % job_file_dir = '/Users/matthewgiarra/Desktop/apc/ensemble_size';
+job_file_dir = '/Users/matthewgiarra/Desktop/apc/fine_grid';
 
 files = dir(fullfile(job_file_dir, './*.mat'));
 
@@ -39,7 +40,7 @@ for k = 1 : num_files
     % Number of passes
     num_passes = length(JobFile.Processing);
     
-    for p = 1 : num_passes
+    parfor p = 1 : num_passes
     
         tx{k, p} = JobFile.Processing(p).Results.Displacement.Raw.X(:, 1);
         ty{k, p} = JobFile.Processing(p).Results.Displacement.Raw.Y(:, 1);
@@ -91,10 +92,10 @@ c = [0, 15];
 gf = [ 1181          26         761        1312];
 xl = [120, 2400];
 
-Skip = 6;
+Skip = 69;
 Scale = 1.5;
-p = 5;
-plot_vectors = true;
+p = 7;
+plot_vectors = false;
 lw = 1;
 
 fSize_title = 20;
@@ -105,27 +106,27 @@ fSize_axes = 16;
 % Plotting filter diameters.
 for k = 1 : num_files
     
-%     is_deghost = ~isempty(regexpi(job_file_name{k}, 'deghost'));
-%     if is_deghost
-%         y_label = 'Deghosted images';
-%         plot_num = 2;
-%     else
-%         y_label = 'Raw images';
-%         plot_num = 1;
-%     end
-
-    is_new = ~isempty(regexpi(job_file_name{k}, 'no_min_ac'));
-    is_original = ~isempty(regexpi(job_file_name{k}, 'original'));
-    if is_new
-        y_label = 'New code, new filter val (newest results)';
-        plot_num = 3;
-    elseif is_original
-        y_label = 'Original processing (in manuscript)';
-        plot_num = 1;
-    else
-        y_label = 'New code, no filter val (few days ago)';
+    is_deghost = ~isempty(regexpi(job_file_name{k}, 'deghost'));
+    if is_deghost
+        y_label = 'Deghosted images';
         plot_num = 2;
+    else
+        y_label = 'Raw images';
+        plot_num = 1;
     end
+
+%     is_new = ~isempty(regexpi(job_file_name{k}, 'no_min_ac'));
+%     is_original = ~isempty(regexpi(job_file_name{k}, 'original'));
+%     if is_new
+%         y_label = 'New code, new filter val (newest results)';
+%         plot_num = 3;
+%     elseif is_original
+%         y_label = 'Original processing (in manuscript)';
+%         plot_num = 1;
+%     else
+%         y_label = 'New code, no filter val (few days ago)';
+%         plot_num = 2;
+%     end
     
     plot_num = k;
     
@@ -165,7 +166,7 @@ for k = 1 : num_files
 %     title(strrep(job_file_name{k}, '_', '\_'), 'fontsize', 12);
     if plot_num == 1
         title({'Colors show APC diameter in terms of particle size',...
-            'No image preprocessing; 5-pass ensemble w/deform', ...
+            '6-pass ensemble w/deform, final grid 16x16', ...
             'Raw velocity (no UOD on final pass of vectors)'},...
             'fontsize', fSize_title, ...
             'interpreter', 'latex');
@@ -185,27 +186,27 @@ figure(2);
 c_velocity = [-15, 50];
 for k = 1 : num_files
     
-%     is_deghost = ~isempty(regexpi(job_file_name{k}, 'deghost'));
-%     if is_deghost
-%         y_label = 'Deghosted images';
-%         plot_num = 2;
-%     else
-%         y_label = 'Raw images';
-%         plot_num = 1;
-%     end
-
-    is_new = ~isempty(regexpi(job_file_name{k}, 'no_min_ac'));
-    is_original = ~isempty(regexpi(job_file_name{k}, 'original'));
-    if is_new
-        y_label = 'New code, new filter val (newest results)';
-        plot_num = 3;
-    elseif is_original
-        y_label = 'Original processing (in manuscript)';
-        plot_num = 1;
-    else
-        y_label = 'New code, no filter val (few days ago)';
+    is_deghost = ~isempty(regexpi(job_file_name{k}, 'deghost'));
+    if is_deghost
+        y_label = 'Deghosted images';
         plot_num = 2;
+    else
+        y_label = 'Raw images';
+        plot_num = 1;
     end
+% 
+%     is_new = ~isempty(regexpi(job_file_name{k}, 'no_min_ac'));
+%     is_original = ~isempty(regexpi(job_file_name{k}, 'original'));
+%     if is_new
+%         y_label = 'New code, new filter val (newest results)';
+%         plot_num = 3;
+%     elseif is_original
+%         y_label = 'Original processing (in manuscript)';
+%         plot_num = 1;
+%     else
+%         y_label = 'New code, no filter val (few days ago)';
+%         plot_num = 2;
+%     end
     
     plot_num = k;
     
@@ -245,7 +246,7 @@ for k = 1 : num_files
 %     title(strrep(job_file_name{k}, '_', '\_'), 'fontsize', 12);
     if plot_num == 1
         title({'Colors show U-velocity', ...
-            'No image preprocessing; 5-pass ensemble w/deform', ...
+            '6-pass ensemble w/deform, final grid 16x16', ...
             'Raw velocity (no UOD on final pass of vectors)'},...
             'fontsize', fSize_title, ...
             'interpreter', 'latex');

@@ -110,7 +110,7 @@ gcc_filter = ones(region_height, region_width);
 % Might want to move this
 % out of the correlation pass code.
 switch lower(spetral_weighting_method)
-    case 'apc'
+    case {'apc', 'hybrid'}
         apc_field = JOBFILE.Processing(PASS_NUMBER).Correlation.SpectralWeighting.APC;
         if isfield(apc_field, 'Method')
             apc_method = lower(...
@@ -807,10 +807,10 @@ JOBFILE.Processing(PASS_NUMBER).Results.Displacement.Final.X = tx_full_output;
 JOBFILE.Processing(PASS_NUMBER).Results.Displacement.Final.Y = ty_full_output;
 
 % Delete the correlation planes
-JOBFILE.Processing(PASS_NUMBER).Correlation = ...
-    rmfield(JOBFILE.Processing(PASS_NUMBER).Correlation, 'CrossCorrPlanes');
-JOBFILE.Processing(PASS_NUMBER).Correlation = ...
-    rmfield(JOBFILE.Processing(PASS_NUMBER).Correlation, 'AutoCorrPlanes');
+% JOBFILE.Processing(PASS_NUMBER).Correlation = ...
+%     rmfield(JOBFILE.Processing(PASS_NUMBER).Correlation, 'CrossCorrPlanes');
+% JOBFILE.Processing(PASS_NUMBER).Correlation = ...
+%     rmfield(JOBFILE.Processing(PASS_NUMBER).Correlation, 'AutoCorrPlanes');
 
 % If APC was done then save the effective
 % particle diameters to the pass results.
