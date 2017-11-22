@@ -457,62 +457,6 @@ for n = 1 : num_pairs_correlate
                 auto_corr_array_02(:, :, k) = ...
                     auto_corr_array_02(:, :, k) + ...
                     auto_corr_spectral_02;
-                
-%                 if k == ind
-%                    
-%                    cc = cross_corr_array(:, :, k);
-%                    ac1 = auto_corr_array_01(:, :, k);
-%                    ac2 = auto_corr_array_02(:, :, k);
-%                    
-%                    cc_mag = abs(cc) ./ max(abs(cc(:)));
-%                    
-%                    ac_mag = sqrt(abs(ac1 .* ac2));
-%                    ac_norm = ac_mag ./ max(ac_mag(:));
-%                    ac1_mag = abs(ac1) ./ max(abs(ac1(:)));
-%                    ac2_mag = abs(ac2) ./ max(abs(ac2(:))); 
-%                    
-%                    subtightplot(2, 2, 1)
-%                    surf(cc_mag);
-%                    xlim([1, region_width]);
-%                    ylim([1, region_height]);
-%                    zlim(1.1 * [0, 1]);
-%                    title('Cross corr mag', 'FontSize', 16, ...
-%                        'interpreter', 'latex');
-%                    axis square;
-%                    
-%                    subtightplot(2, 2, 2)
-%                    surf(ac_norm);
-%                    xlim([1, region_width]);
-%                    ylim([1, region_height]);
-%                    zlim(1.1 * [0, 1]);
-%                    title('AC mag', 'FontSize', 16, ...
-%                        'interpreter', 'latex');
-%                    axis square;
-%                    
-%                    subtightplot(2, 2, 3)
-%                    surf(ac1_mag);
-%                    xlim([1, region_width]);
-%                    ylim([1, region_height]);
-%                    zlim(1.1 * [0, 1]);
-%                    title('Auto Corr 1', 'FontSize', 16, ...
-%                        'interpreter', 'latex');
-%                    axis square;
-%                    
-%                    subtightplot(2, 2, 4)
-%                    surf(ac2_mag);
-%                    xlim([1, region_width]);
-%                    ylim([1, region_height]);
-%                    zlim(1.1 * [0, 1]);
-%                    title('Auto Corr 2', 'FontSize', 16, ...
-%                        'interpreter', 'latex');
-%                    axis square;
-%                    
-%                    set(gcf, 'color', 'white');
-%                    
-%                    drawnow;
-%                     
-%                 end
-                
         end 
     end
     t2 = toc(t1);
