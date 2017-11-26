@@ -1,7 +1,7 @@
-function JOBLIST = PIVJobList_pivchallenge_ensemble_linux()
+function JOBLIST = PIVJobList_pivchallenge_ensemble()
 
 % Number of passes to run
-num_passes_spec = 6;
+num_passes_spec = 2;
 
 % % Pass parameters
 region_height_list_raw = [64,  64,  32, 32, 32, 32];
@@ -30,7 +30,7 @@ JobOptions.StartPass = 1;
 
 % Data: Input images
 % Data.Inputs.Images.Directory = '/Users/matthewgiarra/Documents/School/VT/Research/Aether/data/piv/piv_challenge/2014/A/images/proc/ghost';
-Data.Inputs.Images.Directory = '/home/shannon/b/aether/piv_test_images/pivchallenge/2014/A/images/raw';
+Data.Inputs.Images.Directory = '/Users/matthewgiarra/Documents/School/VT/Research/Aether/data/piv/piv_challenge/2014/A/images/raw';
 % Data.Inputs.Images.Directory = '/Users/matthewgiarra/Documents/School/VT/Research/Aether/piv_test_images/poiseuille_diffusion_0.00/raw';
 % Data.Inputs.Images.BaseName = 'A_deghost_';
 Data.Inputs.Images.BaseName = 'A_';
@@ -41,10 +41,10 @@ Data.Inputs.Images.Trailers = {'_a', '_b'};
 % Data.Inputs.Images.Trailers = {''};
 
 % Source file path
-% Data.Inputs.SourceFilePath = '/home/shannon/b/aether/piv_test_images/pivchallenge/2014/A/vect/apc/A_apc_00001_00600.mat';
-% 
+% Data.Inputs.SourceFilePath = '/Users/matthewgiarra/Desktop/apc/A_deghost_apc_00001_00600.mat';
+
 % Data: output vectors
-Data.Outputs.Vectors.Directory = '/home/shannon/b/aether/piv_test_images/pivchallenge/2014/A/vect_2017-11-21/apc';
+Data.Outputs.Vectors.Directory = '/Users/matthewgiarra/Desktop/piv_test_images/piv_challenge/2014/A/vect_2017-11-26/apc/';
 Data.Outputs.Vectors.BaseName = 'A_apc_';
 Data.Outputs.Vectors.Digits = 5;
 Data.Outputs.Vectors.Extension = '.mat';
@@ -65,7 +65,7 @@ Processing(1).Grid.Shift.Y = -16;
 Processing(1).Grid.Shift.X = 0;
 Processing(1).Grid.Buffer.Y = 0;
 Processing(1).Grid.Buffer.X = 0;
-Processing(1).Grid.Mask.Directory = '/home/shannon/b/aether/piv_test_images/pivchallenge/2014/A/images/masks';
+Processing(1).Grid.Mask.Directory = '/Users/matthewgiarra/Documents/School/VT/Research/Aether/data/piv/piv_challenge/2014/A/images/masks';
 Processing(1).Grid.Mask.Name = 'imgAmask3.tif';
 % Processing(1).Grid.Mask.Name = 'mask_jet_subregion.tif';
 % Processing(1).Grid.Mask.Directory = '';
@@ -73,7 +73,7 @@ Processing(1).Grid.Mask.Name = 'imgAmask3.tif';
 
 % Frame parameters.
 Processing(1).Frames.Start = 1;
-Processing(1).Frames.End = 600;
+Processing(1).Frames.End = 2;
 Processing(1).Frames.Step = 1;
 
 % Correlation parameters
@@ -177,7 +177,7 @@ end
 
 % Update where to get the images.
 JobFile.Data.Inputs.Images.BaseName = 'A_deghost_';
-JobFile.Data.Inputs.Images.Directory = '/home/shannon/b/aether/piv_test_images/pivchallenge/2014/A/images/proc/ghost';
+JobFile.Data.Inputs.Images.Directory = '/Users/matthewgiarra/Documents/School/VT/Research/Aether/data/piv/piv_challenge/2014/A/images/proc/ghost';
 
 % Increment the number of jobs
 n = n + 1;
@@ -194,6 +194,8 @@ end
 
 
 end
+
+
 
 
 

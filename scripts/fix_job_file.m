@@ -9,6 +9,8 @@ load(job_file_path);
 % Number of passes
 num_passes = length(JobFile.Processing);
 
+JOBFILE = JobFile;
+
 for p = 1 : num_passes
    
     % Read the APC diameters
@@ -29,9 +31,9 @@ for p = 1 : num_passes
     % Delete the correlation planes
     % so that the file isn't 2 GB
     JobFile.Processing(p).Correlation = ...
-        rmfield(JOBFILE.Processing(p).Correlation, 'CrossCorrPlanes');
+        rmfield(JobFile.Processing(p).Correlation, 'CrossCorrPlanes');
     JobFile.Processing(p).Correlation = ...
-        rmfield(JOBFILE.Processing(p).Correlation, 'AutoCorrPlanes');
+        rmfield(JobFile.Processing(p).Correlation, 'AutoCorrPlanes');
 
 end
 

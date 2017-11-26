@@ -1,21 +1,9 @@
 function JOBLIST = PIVJobList_pivchallenge_instantaneous()
 
 % Number of passes to run
-num_passes_spec = 2;
+num_passes_spec = 5;
 
 % % % Pass parameters
-% region_height_list_raw = [64,  64,  32, 32, 32, 32];
-% region_width_list_raw  = [128, 128, 32, 32, 32, 32];
-% window_fract_list_raw = {[0.5, 0.5; 0.5, 1], ...
-%                          [0.5, 0.5; 0.5, 1], ...
-%                          0.5, 0.5, 0.5, 0.5};
-% 
-% % Grid stuff
-% grid_spacing_list_raw = [32, 32, 16, 16, 16, 8];
-% grid_spacing_list_raw_x = grid_spacing_list_raw;
-% grid_spacing_list_raw_y = grid_spacing_list_raw;
-
-% % Region stuff
 region_height_list_raw = [64,  64,  32, 32, 32, 32];
 region_width_list_raw  = [128, 128, 32, 32, 32, 32];
 window_fract_list_raw = {[0.5, 0.5; 0.5, 1], ...
@@ -23,10 +11,20 @@ window_fract_list_raw = {[0.5, 0.5; 0.5, 1], ...
                          0.5, 0.5, 0.5, 0.5};
 
 % Grid stuff
-grid_spacing_list_raw = [128, 128, 16, 16, 16, 8];
+grid_spacing_list_raw = [32, 32, 16, 16, 16, 8];
 grid_spacing_list_raw_x = grid_spacing_list_raw;
 grid_spacing_list_raw_y = grid_spacing_list_raw;
 
+% % Region stuff
+% region_height_list_raw = [64,  64,  32, 32, 32, 32];
+% region_width_list_raw  = [128, 128, 32, 32, 32, 32];
+% window_fract_list_raw = {[0.5, 0.5; 0.5, 1], ...
+%                          [0.5, 0.5; 0.5, 1], ...
+%                          0.5, 0.5, 0.5, 0.5};
+% % Grid stuff
+% grid_spacing_list_raw = [128, 128, 16, 16, 16, 8];
+% grid_spacing_list_raw_x = grid_spacing_list_raw;
+% grid_spacing_list_raw_y = grid_spacing_list_raw;
 
 region_height_list = region_height_list_raw(1 : num_passes_spec);
 region_width_list = region_width_list_raw(1 : num_passes_spec);
@@ -56,7 +54,7 @@ Data.Inputs.Images.Trailers = {'_a', '_b'};
 % Data.Inputs.Images.Trailers = {''};
 
 % Source file path
-% Data.Inputs.SourceFilePath = '/Users/matthewgiarra/Desktop/apc/A_deghost_apc_00001_00600.mat';
+Data.Inputs.SourceFilePath = '/Users/matthewgiarra/Desktop/apc/source/A_raw_apc_ensemble_00001_00600.mat';
 
 % Data: output vectors
 Data.Outputs.Vectors.Directory = '/Users/matthewgiarra/Desktop/piv_test_images/piv_challenge/2014/A/vect_2017-11-26/scc/';
@@ -177,13 +175,16 @@ JobFile.JobOptions = JobOptions;
 n = 1;
 
 % % % RAW % % % %
+JobFile.Data.Inputs.Images.BaseName = 'A_';
+JobFile.Data.Inputs.Images.Directory = '/Users/matthewgiarra/Documents/School/VT/Research/Aether/data/piv/piv_challenge/2014/A/images/raw';
+JobFile.Data.Inputs.SourceFilePath = '/Users/matthewgiarra/Desktop/apc/source/A_raw_apc_ensemble_00001_00600.mat';
 
 % Append to the job list.
 JOBLIST(n) = JobFile;
-JOBLIST(n).Data.Outputs.Vectors.Directory = '/Users/matthewgiarra/Desktop/piv_test_images/piv_challenge/2014/A/vect_2017-11-26/scc/';
-JOBLIST(n).Data.Outputs.Vectors.BaseName = 'A_raw_scc_';
+JOBLIST(n).Data.Outputs.Vectors.Directory = '/Users/matthewgiarra/Desktop/piv_test_images/piv_challenge/2014/A/vect_2017-11-26/hybrid/';
+JOBLIST(n).Data.Outputs.Vectors.BaseName = 'A_raw_hybrid_';
 for p = 1 : num_passes_total
-   JOBLIST(n).Processing(p).Correlation.SpectralWeighting.Method = 'scc';
+   JOBLIST(n).Processing(p).Correlation.SpectralWeighting.Method = 'hybrid';
    JOBLIST(n).Processing(p).Correlation.RPC.EffectiveDiameter = 3;
    JOBLIST(n).Processing(p).Correlation.EstimatedParticleDiameter = 3;
    JOBLIST(n).Processing(p).SubPixel.EstimatedParticleDiameter = 3;

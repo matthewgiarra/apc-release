@@ -1,7 +1,7 @@
 function JOBLIST = PIVJobList_pivchallenge_ensemble_new_grid()
 
 % Number of passes to run
-num_passes_spec = 6;
+num_passes_spec = 2;
 
 % % Pass parameters
 region_height_list_raw = [64,  64,  32, 32, 32, 32];
@@ -44,7 +44,7 @@ Data.Inputs.Images.Trailers = {'_a', '_b'};
 % Data.Inputs.SourceFilePath = '/Users/matthewgiarra/Desktop/apc/A_deghost_apc_00001_00600.mat';
 
 % Data: output vectors
-Data.Outputs.Vectors.Directory = '/Users/matthewgiarra/Desktop/piv_test_images/piv_challenge/2014/A/vect_2017-11-21/apc/';
+Data.Outputs.Vectors.Directory = '/Users/matthewgiarra/Desktop/piv_test_images/piv_challenge/2014/A/vect_2017-11-26/apc/';
 Data.Outputs.Vectors.BaseName = 'A_apc_';
 Data.Outputs.Vectors.Digits = 5;
 Data.Outputs.Vectors.Extension = '.mat';
@@ -73,7 +73,7 @@ Processing(1).Grid.Mask.Name = 'imgAmask3.tif';
 
 % Frame parameters.
 Processing(1).Frames.Start = 1;
-Processing(1).Frames.End = 600;
+Processing(1).Frames.End = 2;
 Processing(1).Frames.Step = 1;
 
 % Correlation parameters

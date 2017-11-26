@@ -20,7 +20,9 @@ fsize_y = 24;
 % job_file_dir = '/Users/matthewgiarra/Desktop/apc/cropped';
 % job_file_dir = '/Users/matthewgiarra/Desktop/apc/filter_validation';
 % job_file_dir = '/Users/matthewgiarra/Desktop/apc/ensemble_size';
-job_file_dir = '/Users/matthewgiarra/Desktop/apc/fine_grid';
+% job_file_dir = '/Users/matthewgiarra/Desktop/apc/fine_grid';
+% job_file_dir = '/Users/matthewgiarra/Desktop/apc/skip_passes';
+job_file_dir = '/Users/matthewgiarra/Desktop/apc/old_vs_new';
 
 files = dir(fullfile(job_file_dir, './*.mat'));
 
@@ -39,8 +41,11 @@ for k = 1 : num_files
   
     % Number of passes
     num_passes = length(JobFile.Processing);
+%     num_passes = 5;
     
-    parfor p = 1 : num_passes
+    for p = 1 : num_passes
+        
+        fprintf('File %d, pass %d of %d\n', k, p, num_passes);
     
         tx{k, p} = JobFile.Processing(p).Results.Displacement.Raw.X(:, 1);
         ty{k, p} = JobFile.Processing(p).Results.Displacement.Raw.Y(:, 1);
@@ -60,41 +65,37 @@ for k = 1 : num_files
         sy_grid{k, p} = reshape(sy, [ny{k, p}, nx{k, p}]);
 
         % Validate the filters
-        [sx_val_temp, sy_val_temp, is_outlier_temp] = ...
-                validateField_prana(gx{k, p}, gy{k, p}, sx, sy, 0.5 * [1, 1]);
+%         [sx_val_temp, sy_val_temp, is_outlier_temp] = ...
+%                 validateField_prana(gx{k, p}, gy{k, p}, sx, sy, 0.5 * [1, 1]);
             
         % Set nans     
-        sx_val_temp(isnan(tx{k, p}) | tx{k, p} == 0) = nan;
-        sy_val_temp(isnan(ty{k, p}) | ty{k, p} == 0) = nan;
-        is_outlier_temp(isnan(tx{k, p}) | tx{k, p} == 0) = nan;
+%         sx_val_temp(isnan(tx{k, p}) | tx{k, p} == 0) = nan;
+%         sy_val_temp(isnan(ty{k, p}) | ty{k, p} == 0) = nan;
+%         is_outlier_temp(isnan(tx{k, p}) | tx{k, p} == 0) = nan;
         
-        sx_val{k, p} = sx_val_temp;
-        sy_val{k, p} = sy_val_temp;
+%         sx_val{k, p} = sx_val_temp;
+%         sy_val{k, p} = sy_val_temp;
         
-        sx_val_grid{k, p} =  reshape(sx_val_temp, [ny{k, p}, nx{k, p}]);
-        sy_val_grid{k, p} =  reshape(sy_val_temp, [ny{k, p}, nx{k, p}]);
+%         sx_val_grid{k, p} =  reshape(sx_val_temp, [ny{k, p}, nx{k, p}]);
+%         sy_val_grid{k, p} =  reshape(sy_val_temp, [ny{k, p}, nx{k, p}]);
         
-        is_outlier_grid{k, p} = reshape(is_outlier_temp, [ny{k, p}, nx{k, p}]);
-        
-        
+%         is_outlier_grid{k, p} = reshape(is_outlier_temp, [ny{k, p}, nx{k, p}]);
     end
 
 end
 
 num_files = size(tx, 1);
 
-
-
 % p = 68;
-c = [0, 15];
+c = [5, 20];
 
 
-gf = [ 1181          26         761        1312];
+gf = [ 1181          26         731        871];
 xl = [120, 2400];
 
 Skip = 69;
 Scale = 1.5;
-p = 7;
+p = 5;
 plot_vectors = false;
 lw = 1;
 
@@ -106,31 +107,29 @@ fSize_axes = 16;
 % Plotting filter diameters.
 for k = 1 : num_files
     
-    is_deghost = ~isempty(regexpi(job_file_name{k}, 'deghost'));
-    if is_deghost
-        y_label = 'Deghosted images';
-        plot_num = 2;
-    else
-        y_label = 'Raw images';
-        plot_num = 1;
-    end
+%     is_deghost = ~isempty(regexpi(job_file_name{k}, 'deghost'));
+%     if is_deghost
+%         y_label = 'Deghosted images';
+%         plot_num = 2;
+%     else
+%         y_label = 'Raw images';
+%         plot_num = 1;
+%     end
 
 %     is_new = ~isempty(regexpi(job_file_name{k}, 'no_min_ac'));
-%     is_original = ~isempty(regexpi(job_file_name{k}, 'original'));
-%     if is_new
-%         y_label = 'New code, new filter val (newest results)';
-%         plot_num = 3;
-%     elseif is_original
-%         y_label = 'Original processing (in manuscript)';
-%         plot_num = 1;
-%     else
-%         y_label = 'New code, no filter val (few days ago)';
-%         plot_num = 2;
-%     end
+    is_original = ~isempty(regexpi(job_file_name{k}, 'original'));
     
-    plot_num = k;
+    if is_original
+        y_label = 'Original processing (in manuscript)';
+        plot_num = 1;
+    else
+        y_label = 'Newest results';
+        plot_num = 2;
+    end
     
-    subtightplot(3, 1, plot_num, [], [0.2, 0.2], []);
+%     plot_num = k;
+    
+    subtightplot(2, 1, plot_num, [], [0.2, 0.2], []);
 
     % Plot the filters
     imagesc(gx{k, p}, gy{k, p}, sx_grid{k, p});
@@ -166,8 +165,12 @@ for k = 1 : num_files
 %     title(strrep(job_file_name{k}, '_', '\_'), 'fontsize', 12);
     if plot_num == 1
         title({'Colors show APC diameter in terms of particle size',...
-            '6-pass ensemble w/deform, final grid 16x16', ...
-            'Raw velocity (no UOD on final pass of vectors)'},...
+            'Ensemble w/ deform (32x32 windows, 16x16 grid)'},...
+            'fontsize', fSize_title, ...
+            'interpreter', 'latex');
+        
+        title({'Colors show APC diameter in terms of particle size',...
+            '6-pass ensemble w/deform, final grid 8x8'},...
             'fontsize', fSize_title, ...
             'interpreter', 'latex');
     end
@@ -264,7 +267,7 @@ end
 
 
 
-
+% save('~/Desktop/results_fine_grid.mat', 'job_file_name', 'tx', 'ty', 'gx', 'gy', 'tx_grid', 'ty_grid' ,'sx_grid', 'sy_grid', 'sx_val', 'sy_val', 'sx_val_grid', 'sy_val_grid', 'is_outlier_grid', 'ny', 'nx');
 
 
 
