@@ -479,12 +479,17 @@ for n = 1 : num_pairs_correlate
     % Extract displacements 
     % if the temporal enemble wasn't specified.
     if not(do_temporal_ensemble)
+        
+        % Set the parallel flag to false
+        planes2vect_parallel = false;
+        
         % Measure the displacements from
         % the correlation planes.
         [ty, tx, ...
             particle_diameters_y, ...
             particle_diameters_x] = ...
-            planes2vect(JOBFILE, PASS_NUMBER);
+            planes2vect(JOBFILE, PASS_NUMBER, ...
+            planes2vect_parallel);
         
         % Add the measured displacements to the 
         % temporary array of displacements.
@@ -509,12 +514,16 @@ end
 % temporal correlation WAS specified.
 if do_temporal_ensemble
     
+    % Set the parallel flag to true
+    planes2vect_parallel = true;
+    
     % Measure the displacements from
     % the correlation planes.
     [ty, tx, ...
         particle_diameters_y, ...
         particle_diameters_x] =...
-        planes2vect(JOBFILE, PASS_NUMBER);
+        planes2vect(JOBFILE, PASS_NUMBER, ...
+        planes2vect_parallel);
     
     % Add the measured displacements to the 
     % temporary array of displacements.

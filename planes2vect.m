@@ -1,6 +1,16 @@
-function [TY, TX, PARTICLE_DIAMETER_Y, PARTICLE_DIAMETER_X] = planes2vect(JOBFILE, PASS_NUMBER)
+function [TY, TX, PARTICLE_DIAMETER_Y, PARTICLE_DIAMETER_X] = planes2vect(JOBFILE, PASS_NUMBER, PARALLEL)
 % This function measures displacements (TY, TX) from
 % a list of either real or complex correlation planes. 
+
+if nargin < 3
+    PARALLEL = false;
+end
+
+if PARALLEL
+   parfor_arg = inf; 
+else
+    parfor_arg = 0;
+end
 
 % Read the ensemble type
 ensemble_type_string = lower( ...
@@ -158,7 +168,7 @@ switch lower(spectral_weighting_method_string)
         fprintf(1, 'Calculating APC filters...\n');
         
         % Loop over all the planes
-        parfor k = 1 : num_correlation_planes
+        parfor(k = 1 : num_correlation_planes, parfor_arg)
             
             % Extract the given region
             cross_corr_spectral = cross_corr_array(:, :, k);
@@ -333,7 +343,7 @@ switch lower(ensemble_domain_string)
         % Inform the user
         fprintf(1, 'Calculating inverse FTs...\n');
         % Do the inverse transform for each region.
-        parfor k = 1 : num_correlation_planes
+        parfor(k = 1 : num_correlation_planes, parfor_arg)
             
             % Extract the given region
             cross_corr_spectral = cross_corr_array(:, :, k);
