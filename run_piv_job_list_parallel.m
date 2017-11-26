@@ -24,10 +24,10 @@ end
 num_jobs = length(JOBLIST_INPUT);
 
 % Get parallel pool size
-pool = gcp;
+pool = gcp('nocreate');
 
 % Get number of processors
-num_cores = pool.NumWorkers;
+poolsize = pool.NumWorkers;
 
 % Start a timer
 t1 = tic;
@@ -39,7 +39,7 @@ for n = 1 : num_jobs
     JobFile = JOBLIST_INPUT(n);
    
     % Split the job
-    parallel_job_list = split_piv_job_file(JobFile, num_cores);
+    parallel_job_list = split_piv_job_file(JobFile, poolsize);
     
     % Number of parallel jobs
     num_parallel_jobs = length(parallel_job_list);
@@ -51,8 +51,11 @@ for n = 1 : num_jobs
         parallel_job = parallel_job_list(p);
         
         % Run the parallel job
-        OUTPUT_FILE_PATHS{n, p} = run_piv_job_file(parallel_job);        
+        output_file_paths_temp{n, p} = run_piv_job_file(parallel_job);        
     end
+    
+    [~, OUTPUT_FILE_PATHS{n}] = gather_job_file_results(JobFile, poolsize);
+  
 end
 t2 = toc(t1);
 
@@ -60,3 +63,6 @@ t2 = toc(t1);
 fprintf('Total job list time: %0.1f sec\n', t2);
 
 end
+
+
+

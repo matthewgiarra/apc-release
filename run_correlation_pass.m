@@ -5,6 +5,16 @@ if nargin < 2
     PASS_NUMBER = 1; 
 end
 
+% Read option to run pass in parallel
+run_parallel = JOBFILE.JobOptions.Parallel;
+
+% Set some parallel arguments
+if run_parallel
+   parfor_arg = inf;
+else
+   parfor_arg = 0;
+end
+
 % Create image path list.
 JOBFILE = create_image_pair_path_list(JOBFILE, PASS_NUMBER);
 
@@ -26,10 +36,7 @@ JOBFILE = allocate_results(JOBFILE, PASS_NUMBER);
 
 % Read the correlation method
 % Read the spectral weighting method ('SCC', 'GCC', 'RPC', 'APC')
-spetral_weighting_method = get_spectral_weighting_method(JOBFILE, PASS_NUMBER);
-
-% Figure out if we're doing APC
-isAPC = ~isempty(regexpi(spetral_weighting_method, 'apc'));
+spectral_weighting_method = get_spectral_weighting_method(JOBFILE, PASS_NUMBER);
 
 % Read the enemble parameters
 %
@@ -109,7 +116,7 @@ gcc_filter = ones(region_height, region_width);
 % 
 % Might want to move this
 % out of the correlation pass code.
-switch lower(spetral_weighting_method)
+switch lower(spectral_weighting_method)
     case {'apc', 'hybrid'}
         apc_field = JOBFILE.Processing(PASS_NUMBER).Correlation.SpectralWeighting.APC;
         if isfield(apc_field, 'Method')
@@ -117,7 +124,11 @@ switch lower(spetral_weighting_method)
             JOBFILE.Processing(PASS_NUMBER).Correlation.SpectralWeighting.APC.Method);
         else
             apc_method = 'magnitude';
-        end       
+        end 
+    
+    % Set this just so the code runs
+    otherwise
+        apc_method = '';
 end
 
 % Fit method
@@ -183,7 +194,7 @@ for n = 1 : num_pairs_correlate
     
     % Inform the use
     fprintf(1, '%s Pass %d of %d, pair %d of %d\n', ...
-        upper(spetral_weighting_method),  ...
+        upper(spectral_weighting_method),  ...
         PASS_NUMBER, num_passes, n, num_pairs_correlate);
     fprintf(1, '%s and %s\n', file_name_01, file_name_02);
    
@@ -295,7 +306,7 @@ for n = 1 : num_pairs_correlate
     t1 = tic;
     
     % Loop over the regions
-    parfor k = 1 : num_regions_correlate
+    parfor(k = 1 : num_regions_correlate, parfor_arg)
         
         % Extract the subregions
         region_01 = region_mat_01(:, :, k);
@@ -383,7 +394,7 @@ for n = 1 : num_pairs_correlate
                     split_complex(cross_corr_spectral);
  
                 % Switch between correlation methods
-                switch lower(spetral_weighting_method)
+                switch lower(spectral_weighting_method)
                     case 'scc'                          
                         % For SCC, take the original magnitude
                         % as the spectral filter. 
@@ -457,6 +468,7 @@ for n = 1 : num_pairs_correlate
                     auto_corr_spectral_02;
         end 
     end
+    
     t2 = toc(t1);
     fprintf(1, 'Correlated %d regions in %02f seconds.\n', ...
         num_regions_correlate, t2);
@@ -478,16 +490,13 @@ for n = 1 : num_pairs_correlate
     % if the temporal enemble wasn't specified.
     if not(do_temporal_ensemble)
         
-        % Set the parallel flag to false
-        planes2vect_parallel = false;
-        
         % Measure the displacements from
         % the correlation planes.
         [ty, tx, ...
             particle_diameters_y, ...
             particle_diameters_x] = ...
             planes2vect(JOBFILE, PASS_NUMBER, ...
-            planes2vect_parallel);
+            run_parallel);
         
         % Add the measured displacements to the 
         % temporary array of displacements.
@@ -512,16 +521,13 @@ end
 % temporal correlation WAS specified.
 if do_temporal_ensemble
     
-    % Set the parallel flag to true
-    planes2vect_parallel = true;
-    
     % Measure the displacements from
     % the correlation planes.
     [ty, tx, ...
         particle_diameters_y, ...
         particle_diameters_x] =...
         planes2vect(JOBFILE, PASS_NUMBER, ...
-        planes2vect_parallel);
+        run_parallel);
     
     % Add the measured displacements to the 
     % temporary array of displacements.
@@ -762,21 +768,15 @@ JOBFILE.Processing(PASS_NUMBER).Correlation = ...
 JOBFILE.Processing(PASS_NUMBER).Correlation = ...
     rmfield(JOBFILE.Processing(PASS_NUMBER).Correlation, 'AutoCorrPlanes');
 
-% If APC was done then save the effective
-% particle diameters to the pass results.
-if isAPC
-    
-    % Add the horizontal (columns direction)
-    % APC diameter to the results.
-    JOBFILE.Processing(PASS_NUMBER).Results. ...
-        Filtering.APC.Diameter.X = dp_x_full;
-    
-    % Add the vertical (rows direction)
-    % APC diameter to the results.
-    JOBFILE.Processing(PASS_NUMBER).Results. ...
-        Filtering.APC.Diameter.Y = dp_y_full;
-end
+% Add the horizontal (columns direction)
+% APC diameter to the results.
+JOBFILE.Processing(PASS_NUMBER).Results. ...
+    Filtering.Diameter.X = dp_x_full;
 
+% Add the vertical (rows direction)
+% APC diameter to the results.
+JOBFILE.Processing(PASS_NUMBER).Results. ...
+    Filtering.Diameter.Y = dp_y_full;
 
 end
 

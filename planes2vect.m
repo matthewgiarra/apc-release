@@ -6,6 +6,7 @@ if nargin < 3
     PARALLEL = false;
 end
 
+% Set some parallel flags
 if PARALLEL
    parfor_arg = inf;
    parfor_arg_str = 'parallel';
@@ -297,9 +298,9 @@ switch lower(spectral_weighting_method_string)
         
         % Get the filter diameters
         particle_diameter_list_x = JOBFILE.Data.Inputs.SourceJobFile.Processing(PASS_NUMBER). ...
-            Results.Filtering.APC.Diameter.X(inds, 1);
+            Results.Filtering.Diameter.X(inds, 1);
         particle_diameter_list_y = JOBFILE.Data.Inputs.SourceJobFile.Processing(PASS_NUMBER). ...
-            Results.Filtering.APC.Diameter.Y(inds, 1);
+            Results.Filtering.Diameter.Y(inds, 1);
 end
 
 % Allocate arrays to hold vectors

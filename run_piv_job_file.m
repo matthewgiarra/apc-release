@@ -37,11 +37,19 @@ for p = start_pass : num_passes
     % Check whether ensemble is happening
     do_ensemble = JOBFILE.Processing(p).Correlation.Ensemble.DoEnsemble;
     
-%     if do_ensemble
-%         JOBFILE = run_correlation_pass_parallel(JOBFILE, p);
-%     else
-         JOBFILE = run_correlation_pass(JOBFILE, p);
-%     end
+    % Determine whether or not to run the pass with parallel processing
+    if do_ensemble
+        % Set the job pass in parallel if we're doing ensemble
+        JOBFILE.JobOptions.Parallel = true;
+    else
+        % Dont run the pass in parallel if we aren't doing
+        % ensemble, because in this case we'll probably
+        % run the entire job in parallel. 
+        JOBFILE.JobOptions.Parallel = false;
+    end
+    
+    % Run the pass
+    JOBFILE = run_correlation_pass(JOBFILE, p);
 
     % Save the results
     save_piv_jobfile_results(JOBFILE);

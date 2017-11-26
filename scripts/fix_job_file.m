@@ -19,9 +19,20 @@ for p = 1 : num_passes
     sx_temp = JobFile.Processing(p).Results.Filtering.APC.Diameter.Y;
     
     % Replace them
-    JobFile.Processing(p).Results.Filtering.APC.Diameter.X = sx_temp;
-    JobFile.Processing(p).Results.Filtering.APC.Diameter.Y = sy_temp;
+    JobFile.Processing(p).Results.Filtering.Diameter.X = sx_temp;
+    JobFile.Processing(p).Results.Filtering.Diameter.Y = sy_temp;
     
+    % Remove the APC field from the filtering field.
+    JobFile.Processing(p).Results.Filtering = ...
+        rmfield(JobFile.Processing(p).Results.Filtering, 'APC');
+    
+    % Delete the correlation planes
+    % so that the file isn't 2 GB
+    JobFile.Processing(p).Correlation = ...
+        rmfield(JOBFILE.Processing(p).Correlation, 'CrossCorrPlanes');
+    JobFile.Processing(p).Correlation = ...
+        rmfield(JOBFILE.Processing(p).Correlation, 'AutoCorrPlanes');
+
 end
 
 save(job_file_path, 'JobFile', '-v7.3');
