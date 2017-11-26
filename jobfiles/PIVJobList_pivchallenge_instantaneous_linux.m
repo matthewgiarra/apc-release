@@ -220,6 +220,7 @@ JobFile.Data.Inputs.SourceFilePath = '/home/shannon/b/aether/piv_test_images/piv
 n = n + 1;
 
 JOBLIST(n) = JobFile;
+JOBLIST(n).Data.Outputs.Vectors.Directory = '/home/shannon/b/aether/piv_test_images/pivchallenge/2014/A/vect_2017-11-26/scc';
 JOBLIST(n).Data.Outputs.Vectors.BaseName = 'A_deghost_scc_';
 for p = 1 : num_passes_total
    JOBLIST(n).Processing(p).Correlation.SpectralWeighting.Method = 'scc';
@@ -232,6 +233,7 @@ end
 n = n + 1;
 
 JOBLIST(n) = JobFile;
+JOBLIST(n).Data.Outputs.Vectors.Directory = '/home/shannon/b/aether/piv_test_images/pivchallenge/2014/A/vect_2017-11-26/rpc';
 JOBLIST(n).Data.Outputs.Vectors.BaseName = 'A_deghost_rpc_';
 for p = 1 : num_passes_total
    JOBLIST(n).Processing(p).Correlation.SpectralWeighting.Method = 'rpc';
@@ -244,6 +246,7 @@ end
 n = n + 1;
 
 JOBLIST(n) = JobFile;
+JOBLIST(n).Data.Outputs.Vectors.Directory = '/home/shannon/b/aether/piv_test_images/pivchallenge/2014/A/vect_2017-11-26/hybrid';
 JOBLIST(n).Data.Outputs.Vectors.BaseName = 'A_deghost_hybrid_';
 for p = 1 : num_passes_total
    JOBLIST(n).Processing(p).Correlation.SpectralWeighting.Method = 'hybrid';
