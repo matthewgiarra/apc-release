@@ -1,5 +1,8 @@
-function [FIRST, LAST] = split_frames_list(START_FRAME, END_FRAME, ...
-    STEP_FRAME, NUM_SPLITS, IDX)
+function [FIRST, LAST] = split_frames_list(START_FRAME, END_FRAME, ...    
+STEP_FRAME, NUM_SPLITS, IDX)
+% [FIRST, LAST] = split_frames_list(START_FRAME, END_FRAME, STEP_FRAME, NUM_SPLITS, IDX)
+% This function splits a list of increasing numbers into NUM_SPLITS chunks,
+% and returns the first and last number of the IDX'th chunk.
 
     % Set minimum num splits to 1
     num_splits = max(NUM_SPLITS, 1);

@@ -7,9 +7,11 @@ if nargin < 3
 end
 
 if PARALLEL
-   parfor_arg = inf; 
+   parfor_arg = inf;
+   parfor_arg_str = 'parallel';
 else
     parfor_arg = 0;
+    parfor_arg_str = 'serial';
 end
 
 % Read the ensemble type
@@ -165,7 +167,8 @@ switch lower(spectral_weighting_method_string)
         dp_ac_y = zeros(size(inds));
         
         % Inform the user
-        fprintf(1, 'Calculating APC filters...\n');
+        fprintf(1, 'Calculating APC filters (%s processing)...\n',...
+            parfor_arg_str);
         
         % Loop over all the planes
         parfor(k = 1 : num_correlation_planes, parfor_arg)

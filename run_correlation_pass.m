@@ -294,8 +294,6 @@ for n = 1 : num_pairs_correlate
     % Tic tock
     t1 = tic;
     
-%     ind = find(grid_correlate_x == 1232 & grid_correlate_y == 657);
-    
     % Loop over the regions
     parfor k = 1 : num_regions_correlate
         
@@ -759,10 +757,10 @@ JOBFILE.Processing(PASS_NUMBER).Results.Displacement.Final.X = tx_full_output;
 JOBFILE.Processing(PASS_NUMBER).Results.Displacement.Final.Y = ty_full_output;
 
 % Delete the correlation planes
-% JOBFILE.Processing(PASS_NUMBER).Correlation = ...
-%     rmfield(JOBFILE.Processing(PASS_NUMBER).Correlation, 'CrossCorrPlanes');
-% JOBFILE.Processing(PASS_NUMBER).Correlation = ...
-%     rmfield(JOBFILE.Processing(PASS_NUMBER).Correlation, 'AutoCorrPlanes');
+JOBFILE.Processing(PASS_NUMBER).Correlation = ...
+    rmfield(JOBFILE.Processing(PASS_NUMBER).Correlation, 'CrossCorrPlanes');
+JOBFILE.Processing(PASS_NUMBER).Correlation = ...
+    rmfield(JOBFILE.Processing(PASS_NUMBER).Correlation, 'AutoCorrPlanes');
 
 % If APC was done then save the effective
 % particle diameters to the pass results.

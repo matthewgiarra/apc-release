@@ -8,16 +8,19 @@ end
 % Add jobfiles directory
 addpath jobfiles;
 
+% Job list name
+job_list_name = 'PIVJobList_pivchallenge_ensemble_new_grid';
+
 % Load the jobfile
-JobList = PIVJobList_pivchallenge_ensemble_new_grid_linux;
+JobList = eval(job_list_name);
 
 % Count the number of jobs in the job list
 num_jobs = length(JobList);
 
 if job_number_to_run > num_jobs
    error(['Error: the input argument "job_number_to_run" is greater than ' ...
-       'the number of jobs in the job file (%s). Set job_number_to_run = 1 or 2.'], ...
-       'jobfiles/PIVJobList_pivchallenge_ensemble_new_grid_linux.m') 
+       'the number of jobs in the job file (\"%s\"). Set job_number_to_run = 1 or 2.'], ...
+       job_list_name) 
 end
 
 % Determine how many cores are available on the system
