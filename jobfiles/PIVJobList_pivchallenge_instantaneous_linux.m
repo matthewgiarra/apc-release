@@ -1,7 +1,7 @@
-function JOBLIST = PIVJobList_pivchallenge_instantaneous()
+function JOBLIST = PIVJobList_pivchallenge_instantaneous_linux()
 
 % Number of passes to run
-num_passes_spec = 5;
+num_passes_spec = 1;
 
 % % % Pass parameters
 region_height_list_raw = [64,  64,  32, 32, 32, 32];
@@ -28,11 +28,11 @@ num_passes_total = length(region_height_list);
 % zero means run all of them.
 JobOptions.NumberOfPasses = 0;
 JobOptions.StartPass = 1;
-JobOptions.Parallel = true;
+JobOptions.Parallel = false;
 
 % Data: Input images
 % Data.Inputs.Images.Directory = '/Users/matthewgiarra/Documents/School/VT/Research/Aether/data/piv/piv_challenge/2014/A/images/proc/ghost';
-Data.Inputs.Images.Directory = '/Users/matthewgiarra/Documents/School/VT/Research/Aether/data/piv/piv_challenge/2014/A/images/raw';
+Data.Inputs.Images.Directory = '/home/shannon/b/aether/piv_test_images/pivchallenge/2014/A/images/raw';
 % Data.Inputs.Images.Directory = '/Users/matthewgiarra/Documents/School/VT/Research/Aether/piv_test_images/poiseuille_diffusion_0.00/raw';
 % Data.Inputs.Images.BaseName = 'A_deghost_';
 Data.Inputs.Images.BaseName = 'A_';
@@ -43,10 +43,10 @@ Data.Inputs.Images.Trailers = {'_a', '_b'};
 % Data.Inputs.Images.Trailers = {''};
 
 % Source file path
-Data.Inputs.SourceFilePath = '/Users/matthewgiarra/Desktop/apc/source/A_raw_apc_ensemble_00001_00600.mat';
+Data.Inputs.SourceFilePath = '/home/shannon/b/aether/piv_test_images/pivchallenge/2014/A/vect_2017-11-21/apc/A_raw_apc_ensemble_00001_00600.mat';
 
 % Data: output vectors
-Data.Outputs.Vectors.Directory = '/Users/matthewgiarra/Desktop/piv_test_images/piv_challenge/2014/A/vect_2017-11-26/scc/';
+Data.Outputs.Vectors.Directory = '/home/shannon/b/aether/piv_test_images/pivchallenge/2014/A/vect_2017-11-26/apc';
 Data.Outputs.Vectors.BaseName = 'A_apc_';
 Data.Outputs.Vectors.Digits = 5;
 Data.Outputs.Vectors.Extension = '.mat';
@@ -67,7 +67,7 @@ Processing(1).Grid.Shift.Y = -16;
 Processing(1).Grid.Shift.X = 0;
 Processing(1).Grid.Buffer.Y = 0;
 Processing(1).Grid.Buffer.X = 0;
-Processing(1).Grid.Mask.Directory = '/Users/matthewgiarra/Documents/School/VT/Research/Aether/data/piv/piv_challenge/2014/A/images/masks';
+Processing(1).Grid.Mask.Directory = '/home/shannon/b/aether/piv_test_images/pivchallenge/2014/A/images/masks';
 Processing(1).Grid.Mask.Name = 'imgAmask3.tif';
 % Processing(1).Grid.Mask.Name = 'mask_jet_subregion.tif';
 % Processing(1).Grid.Mask.Directory = '';
@@ -75,7 +75,7 @@ Processing(1).Grid.Mask.Name = 'imgAmask3.tif';
 
 % Frame parameters.
 Processing(1).Frames.Start = 1;
-Processing(1).Frames.End = 16;
+Processing(1).Frames.End = 1;
 Processing(1).Frames.Step = 1;
 
 % Correlation parameters
@@ -164,13 +164,42 @@ JobFile.JobOptions = JobOptions;
 n = 1;
 
 % % % RAW % % % %
+
+% SCC
 JobFile.Data.Inputs.Images.BaseName = 'A_';
-JobFile.Data.Inputs.Images.Directory = '/Users/matthewgiarra/Documents/School/VT/Research/Aether/data/piv/piv_challenge/2014/A/images/raw';
-JobFile.Data.Inputs.SourceFilePath = '/Users/matthewgiarra/Desktop/apc/source/A_raw_apc_ensemble_00001_00600.mat';
+JobFile.Data.Inputs.Images.Directory = '/home/shannon/b/aether/piv_test_images/pivchallenge/2014/A/images/raw';
+JobFile.Data.Inputs.SourceFilePath = '/home/shannon/b/aether/piv_test_images/pivchallenge/2014/A/vect_2017-11-21/apc/A_raw_apc_ensemble_00001_00600.mat';
 
 % Append to the job list.
 JOBLIST(n) = JobFile;
-JOBLIST(n).Data.Outputs.Vectors.Directory = '/Users/matthewgiarra/Desktop/piv_test_images/piv_challenge/2014/A/vect_2017-11-26/hybrid/';
+JOBLIST(n).Data.Outputs.Vectors.Directory = '/home/shannon/b/aether/piv_test_images/pivchallenge/2014/A/vect_2017-11-26/scc';
+JOBLIST(n).Data.Outputs.Vectors.BaseName = 'A_raw_scc_';
+for p = 1 : num_passes_total
+   JOBLIST(n).Processing(p).Correlation.SpectralWeighting.Method = 'scc';
+   JOBLIST(n).Processing(p).Correlation.RPC.EffectiveDiameter = 3;
+   JOBLIST(n).Processing(p).Correlation.EstimatedParticleDiameter = 3;
+   JOBLIST(n).Processing(p).SubPixel.EstimatedParticleDiameter = 3;
+end
+
+
+% RPC
+n = n + 1;
+% Append to the job list.
+JOBLIST(n) = JobFile;
+JOBLIST(n).Data.Outputs.Vectors.Directory = '/home/shannon/b/aether/piv_test_images/pivchallenge/2014/A/vect_2017-11-26/rpc';
+JOBLIST(n).Data.Outputs.Vectors.BaseName = 'A_raw_rpc_';
+for p = 1 : num_passes_total
+   JOBLIST(n).Processing(p).Correlation.SpectralWeighting.Method = 'rpc';
+   JOBLIST(n).Processing(p).Correlation.RPC.EffectiveDiameter = 3;
+   JOBLIST(n).Processing(p).Correlation.EstimatedParticleDiameter = 3;
+   JOBLIST(n).Processing(p).SubPixel.EstimatedParticleDiameter = 3;
+end
+
+% Hybrid
+n = n + 1;
+% Append to the job list.
+JOBLIST(n) = JobFile;
+JOBLIST(n).Data.Outputs.Vectors.Directory = '/home/shannon/b/aether/piv_test_images/pivchallenge/2014/A/vect_2017-11-26/hybrid';
 JOBLIST(n).Data.Outputs.Vectors.BaseName = 'A_raw_hybrid_';
 for p = 1 : num_passes_total
    JOBLIST(n).Processing(p).Correlation.SpectralWeighting.Method = 'hybrid';
@@ -179,25 +208,49 @@ for p = 1 : num_passes_total
    JOBLIST(n).Processing(p).SubPixel.EstimatedParticleDiameter = 3;
 end
 
+
 % % % DEGHOST % % % %
 
 % Update where to get the images.
 JobFile.Data.Inputs.Images.BaseName = 'A_deghost_';
-JobFile.Data.Inputs.Images.Directory = '/Users/matthewgiarra/Documents/School/VT/Research/Aether/data/piv/piv_challenge/2014/A/images/proc/ghost';
+JobFile.Data.Inputs.Images.Directory = '/home/shannon/b/aether/piv_test_images/pivchallenge/2014/A/images/proc/ghost';
+JobFile.Data.Inputs.SourceFilePath = '/home/shannon/b/aether/piv_test_images/pivchallenge/2014/A/vect_2017-11-21/apc/A_deghost_apc_ensemble_00001_00600.mat';
 
 % Increment the number of jobs
 n = n + 1;
 
 JOBLIST(n) = JobFile;
-JOBLIST(n).Data.Outputs.Vectors.BaseName = 'A_deghost_apc_ensemble_';
+JOBLIST(n).Data.Outputs.Vectors.BaseName = 'A_deghost_scc_';
 for p = 1 : num_passes_total
-   JOBLIST(n).Processing(p).Correlation.SpectralWeighting.Method = 'apc';
+   JOBLIST(n).Processing(p).Correlation.SpectralWeighting.Method = 'scc';
    JOBLIST(n).Processing(p).Correlation.RPC.EffectiveDiameter = 3;
    JOBLIST(n).Processing(p).Correlation.EstimatedParticleDiameter = 3;
    JOBLIST(n).Processing(p).SubPixel.EstimatedParticleDiameter = 3;
 end
 
+% Increment the number of jobs
+n = n + 1;
 
+JOBLIST(n) = JobFile;
+JOBLIST(n).Data.Outputs.Vectors.BaseName = 'A_deghost_rpc_';
+for p = 1 : num_passes_total
+   JOBLIST(n).Processing(p).Correlation.SpectralWeighting.Method = 'rpc';
+   JOBLIST(n).Processing(p).Correlation.RPC.EffectiveDiameter = 3;
+   JOBLIST(n).Processing(p).Correlation.EstimatedParticleDiameter = 3;
+   JOBLIST(n).Processing(p).SubPixel.EstimatedParticleDiameter = 3;
+end
+
+% Increment the number of jobs
+n = n + 1;
+
+JOBLIST(n) = JobFile;
+JOBLIST(n).Data.Outputs.Vectors.BaseName = 'A_deghost_hybrid_';
+for p = 1 : num_passes_total
+   JOBLIST(n).Processing(p).Correlation.SpectralWeighting.Method = 'hybrid';
+   JOBLIST(n).Processing(p).Correlation.RPC.EffectiveDiameter = 3;
+   JOBLIST(n).Processing(p).Correlation.EstimatedParticleDiameter = 3;
+   JOBLIST(n).Processing(p).SubPixel.EstimatedParticleDiameter = 3;
+end
 
 end
 
