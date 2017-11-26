@@ -497,9 +497,9 @@ if do_temporal_ensemble
     % This is only done in case they need
     % to be saved later if APC was done.
     dp_y_full(grid_indices, :) = ...
-        repmat(particle_diameters_x, [1, num_pairs_correlate]);
+        repmat(particle_diameters_y, [1, num_pairs_correlate]);
     dp_x_full(grid_indices, :) = ...
-        repmat(particle_diameters_y, [1, num_pairs_correlate]); 
+        repmat(particle_diameters_x, [1, num_pairs_correlate]); 
 end
 
 % Allocate the "output" vectors

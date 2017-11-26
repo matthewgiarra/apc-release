@@ -536,9 +536,9 @@ if do_temporal_ensemble
     % This is only done in case they need
     % to be saved later if APC was done.
     dp_y_full(grid_indices, :) = ...
-        repmat(particle_diameters_x, [1, num_pairs_correlate]);
+        repmat(particle_diameters_y, [1, num_pairs_correlate]);
     dp_x_full(grid_indices, :) = ...
-        repmat(particle_diameters_y, [1, num_pairs_correlate]); 
+        repmat(particle_diameters_x, [1, num_pairs_correlate]); 
     
 end
 
@@ -647,8 +647,7 @@ if do_validation == true
             Validated.Y(:, n) = ty_val_full;
         JOBFILE.Processing(PASS_NUMBER).Results.Displacement. ...
             Validated.IsOutlier(:, n) = is_outlier_full;
-        
-        
+ 
     end
     
     % If fewer fields were validated
