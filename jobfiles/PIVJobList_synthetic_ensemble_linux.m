@@ -106,6 +106,11 @@ Processing(1).Iterative.Source.Directory = '';
 Processing(1).Iterative.Source.Name = '';
 Processing(1).Iterative.Source.PassNumber = 0;
 
+% Allocate these fields so they aren't empty.
+Processing(1).Region.Height = [];
+Processing(1).Region.Width = [];
+Processing(1).Window.Fraction = [];
+
 % Default Processing
 default_processing = Processing(1);
 
