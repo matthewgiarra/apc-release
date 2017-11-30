@@ -1,4 +1,9 @@
-function output_file_path = determine_jobfile_save_path(JOBFILE)
+function output_file_path = determine_jobfile_save_path(JOBFILE, make_dirs)
+
+% Default to making the directories.
+if nargin < 2
+    make_dirs = true;
+end
 
 % Figure out the largest range of frames run
 num_passes = determine_number_of_passes(JOBFILE);
@@ -29,15 +34,18 @@ end_frame_string   = sprintf(sprintf('%%0%dd', num_digits), end_frame);
 % Output file directory
 output_file_directory = JOBFILE.Data.Outputs.Vectors.Directory;
 
-% Create the output file directory if it doesn't already exist
-if ~exist(output_file_directory, 'dir')
-    
-    % Inform the user that a jobfile is being created
-    fprintf(1, 'Creating output directory:\n%s\n', output_file_directory);
-    
-    % Create the output directory
-    mkdir(output_file_directory);
-    
+
+if make_dirs
+    % Create the output file directory if it doesn't already exist
+    if ~exist(output_file_directory, 'dir')
+
+        % Inform the user that a jobfile is being created
+        fprintf(1, 'Creating output directory:\n%s\n', output_file_directory);
+
+        % Create the output directory
+        mkdir(output_file_directory);
+
+    end
 end
 
 % Output file base name
