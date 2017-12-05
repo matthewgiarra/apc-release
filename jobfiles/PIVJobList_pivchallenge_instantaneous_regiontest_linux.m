@@ -40,14 +40,14 @@ Processing(1).Grid.Spacing.Y = 32;
 Processing(1).Grid.Spacing.X = 32;
 Processing(1).Grid.Shift.Y = -16;
 Processing(1).Grid.Shift.X = 0;
-Processing(1).Grid.Buffer.Y = 32;
+Processing(1).Grid.Buffer.Y = 0;
 Processing(1).Grid.Buffer.X = 64;
 Processing(1).Grid.Mask.Directory = '/home/shannon/b/aether/piv_test_images/pivchallenge/2014/A/images/masks';
 Processing(1).Grid.Mask.Name = 'imgAmask3.tif';
 
 % Frame parameters.
 Processing(1).Frames.Start = 1;
-Processing(1).Frames.End = 1;
+Processing(1).Frames.End = 600;
 Processing(1).Frames.Step = 1;
 
 % Correlation parameters
