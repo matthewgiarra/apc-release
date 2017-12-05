@@ -1,4 +1,4 @@
-function JOBLIST = PIVJobList_synthetic_ensemble_linux()
+function JOBLIST = PIVJobList_synthetic_linux()
 
 % Number of passes to run
 num_passes_spec = 1;
@@ -161,12 +161,12 @@ n = n + 1;
 JOBLIST(n) = JobFile;
 JOBLIST(n).Processing(1).Correlation.Ensemble.DoEnsemble = false;
 JOBLIST(n).Processing(1).Correlation.Ensemble.Type = 'none';
-JOBLIST(n).Processing(1).Correlation.SpectralWeighting.Method = 'apc';
+JOBLIST(n).Processing(1).Correlation.SpectralWeighting.Method = 'hybrid';
 JOBLIST(n).Data.Inputs.SourceFilePath = determine_jobfile_save_path(JOBLIST(n-1), false);
 JOBLIST(n).Data.Inputs.Images.BaseName = 'poiseuille_diffusion_1.50_';
 JOBLIST(n).Data.Inputs.Images.Directory = '/home/shannon/b/aether/piv_test_images/poiseuille_diffusion_1.50/raw';
-JOBLIST(n).Data.Outputs.Vectors.BaseName = 'poiseuille_vect_h128_w128_diff_std_1.50_apc_';
-JOBLIST(n).Data.Outputs.Vectors.Directory = '/home/shannon/b/aether/piv_test_images/poiseuille_diffusion_1.50/vect/instantaneous/apc';
+JOBLIST(n).Data.Outputs.Vectors.BaseName = 'poiseuille_vect_h128_w128_diff_std_1.50_hybrid_';
+JOBLIST(n).Data.Outputs.Vectors.Directory = '/home/shannon/b/aether/piv_test_images/poiseuille_diffusion_1.50/vect/instantaneous/hybrid';
 
 % Poiseuille diffusion 1.50 instantaneous RPC
 n = n + 1;
@@ -210,12 +210,12 @@ n = n + 1;
 JOBLIST(n) = JobFile;
 JOBLIST(n).Processing(1).Correlation.Ensemble.DoEnsemble = false;
 JOBLIST(n).Processing(1).Correlation.Ensemble.Type = 'none';
-JOBLIST(n).Processing(1).Correlation.SpectralWeighting.Method = 'apc';
+JOBLIST(n).Processing(1).Correlation.SpectralWeighting.Method = 'hybrid';
 JOBLIST(n).Data.Inputs.SourceFilePath = determine_jobfile_save_path(JOBLIST(n-1), false);
 JOBLIST(n).Data.Inputs.Images.BaseName = 'poiseuille_diffusion_3.00_';
 JOBLIST(n).Data.Inputs.Images.Directory = '/home/shannon/b/aether/piv_test_images/poiseuille_diffusion_3.00/raw';
-JOBLIST(n).Data.Outputs.Vectors.BaseName = 'poiseuille_vect_h128_w128_diff_std_3.00_apc_';
-JOBLIST(n).Data.Outputs.Vectors.Directory = '/home/shannon/b/aether/piv_test_images/poiseuille_diffusion_3.00/vect/instantaneous/apc';
+JOBLIST(n).Data.Outputs.Vectors.BaseName = 'poiseuille_vect_h128_w128_diff_std_3.00_hybrid_';
+JOBLIST(n).Data.Outputs.Vectors.Directory = '/home/shannon/b/aether/piv_test_images/poiseuille_diffusion_3.00/vect/instantaneous/hybrid';
 
 % Poiseuille diffusion 3.00 instantaneous RPC
 n = n + 1;
@@ -259,12 +259,12 @@ n = n + 1;
 JOBLIST(n) = JobFile;
 JOBLIST(n).Processing(1).Correlation.Ensemble.DoEnsemble = false;
 JOBLIST(n).Processing(1).Correlation.Ensemble.Type = 'none';
-JOBLIST(n).Processing(1).Correlation.SpectralWeighting.Method = 'apc';
+JOBLIST(n).Processing(1).Correlation.SpectralWeighting.Method = 'hybrid';
 JOBLIST(n).Data.Inputs.SourceFilePath = determine_jobfile_save_path(JOBLIST(n-1), false);
 JOBLIST(n).Data.Inputs.Images.BaseName = 'poiseuille_diffusion_4.50_';
 JOBLIST(n).Data.Inputs.Images.Directory = '/home/shannon/b/aether/piv_test_images/poiseuille_diffusion_4.50/raw';
-JOBLIST(n).Data.Outputs.Vectors.BaseName = 'poiseuille_vect_h128_w128_diff_std_4.50_apc_';
-JOBLIST(n).Data.Outputs.Vectors.Directory = '/home/shannon/b/aether/piv_test_images/poiseuille_diffusion_4.50/vect/instantaneous/apc';
+JOBLIST(n).Data.Outputs.Vectors.BaseName = 'poiseuille_vect_h128_w128_diff_std_4.50_hybrid_';
+JOBLIST(n).Data.Outputs.Vectors.Directory = '/home/shannon/b/aether/piv_test_images/poiseuille_diffusion_4.50/vect/instantaneous/hybrid';
 
 % Poiseuille diffusion 4.50 instantaneous RPC
 n = n + 1;
