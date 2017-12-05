@@ -110,11 +110,11 @@ JobFile.JobOptions = JobOptions;
 % % % RAW % % % %
 
 % APC hybrid
-JobFile.Data.Inputs.Images.BaseName = 'A_';
-JobFile.Data.Inputs.Images.Directory = '/home/shannon/b/aether/piv_test_images/pivchallenge/2014/A/images/raw';
-JobFile.Data.Inputs.SourceFilePath = '/home/shannon/b/aether/piv_test_images/pivchallenge/2014/A/vect_2017-11-21/apc/A_raw_apc_ensemble_00001_00600.mat';
-JobFile.Data.Outputs.Vectors.Directory = '/home/shannon/b/aether/piv_test_images/pivchallenge/2014/A/vect_2017-11-26/regiontest';
-
+JobFile.Data.Inputs.Images.BaseName = 'A_deghost_';
+JobFile.Data.Inputs.Images.Directory = '/home/shannon/b/aether/piv_test_images/pivchallenge/2014/A/images/proc/ghost';
+JobFile.Data.Inputs.SourceFilePath = '/home/shannon/b/aether/piv_test_images/pivchallenge/2014/A/vect_2017-11-21/apc/A_deghost_apc_ensemble_00001_00600.mat';
+JobFile.Data.Outputs.Vectors.Directory = '/home/shannon/b/aether/piv_test_images/pivchallenge/2014/A/vect_2017-11-26/regiontest/deghost';
+JobFile.Data.Outputs.Vectors.BaseName = 'A_deghost_apc_';
 for n = 1 : length(region_width_list)
     region_width_current = region_width_list(n);
     JOBLIST(n) = JobFile;
