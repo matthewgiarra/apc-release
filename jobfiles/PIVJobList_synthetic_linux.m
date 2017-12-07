@@ -1,15 +1,15 @@
 function JOBLIST = PIVJobList_synthetic_linux()
 
 % Number of passes to run
-num_passes_spec = 1;
+num_passes_spec = 4;
 
 % Region properties                     
-region_height_list_raw = [128];
-region_width_list_raw  = [128];
-window_fract_list_raw  = {0.5};
+region_height_list_raw = [128, 128, 128, 128];
+region_width_list_raw  = [128, 128, 128, 128];
+window_fract_list_raw  = {0.5, 0.5, 0.5, 0.5};
 
 % Grid spacing
-grid_spacing_list_raw = [64];
+grid_spacing_list_raw = [64, 64, 64, 64];
 grid_spacing_list_raw_x = grid_spacing_list_raw;
 grid_spacing_list_raw_y = grid_spacing_list_raw;
 
@@ -31,8 +31,8 @@ JobOptions.StartPass = 1;
 % Data: Input images
 % Data.Inputs.Images.Directory = '/home/shannon/b/aether/piv_test_images/pivchallenge/2014/A/images/raw';
 % Data.Inputs.Images.BaseName = 'poiseuille_diffusion_0.00_';
-Data.Inputs.Images.Digits = 6;
-Data.Inputs.Images.Extension = '.tiff';
+Data.Inputs.Images.Digits = 5;
+Data.Inputs.Images.Extension = '.tif';
 Data.Inputs.Images.Trailers = {''};
 
 % Source file path
