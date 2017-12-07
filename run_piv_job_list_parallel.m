@@ -37,25 +37,35 @@ for n = 1 : num_jobs
     
     % Extract the job file
     JobFile = JOBLIST_INPUT(n);
+    
+    % Check whether to do ensemble
+    do_ensemble = JobFile.Processing(1).Correlation.Ensemble.DoEnsemble;
    
-    % Split the job
-    parallel_job_list = split_piv_job_file(JobFile, poolsize);
+    % Choose between doing the correlations in parallel (ensemble)
+    % or doing the pairs in parallel (instantaneous)
+    if do_ensemble
+        OUTPUT_FILE_PATHS{n} = run_piv_job_file(JobFile);
+    else
+        % Split the job
+        parallel_job_list = split_piv_job_file(JobFile, poolsize);
     
-    % Number of parallel jobs
-    num_parallel_jobs = length(parallel_job_list);
+        % Number of parallel jobs
+        num_parallel_jobs = length(parallel_job_list);
     
-    % Parallel loop over the jobs
-    parfor p = 1 : num_parallel_jobs
+        % Parallel loop over the jobs
+        parfor p = 1 : num_parallel_jobs
        
-        % Extract the job
-        parallel_job = parallel_job_list(p);
+            % Extract the job
+            parallel_job = parallel_job_list(p);
         
-        % Run the parallel job
-        output_file_paths_temp{n, p} = run_piv_job_file(parallel_job);        
+            % Run the parallel job
+            output_file_paths_temp{n, p} = run_piv_job_file(parallel_job);        
+        end
+    
+        [~, OUTPUT_FILE_PATHS{n}] = gather_job_file_results(JobFile, poolsize);
+        
     end
     
-    [~, OUTPUT_FILE_PATHS{n}] = gather_job_file_results(JobFile, poolsize);
-  
 end
 t2 = toc(t1);
 
