@@ -1,4 +1,9 @@
-function OUTPUT_FILE_PATHS = run_piv_job_list_parallel(JOBLIST_INPUT)
+function OUTPUT_FILE_PATHS = run_piv_job_list_parallel(JOBLIST_INPUT, dynamic_cores)
+
+if nargin < 2
+    dynamic_cores = false
+end
+
 
 % First step: Verify that all files that the job
 % refers to can be located on the current filesystem. 
@@ -57,21 +62,25 @@ for n = 1 : num_jobs
     % or doing the pairs in parallel (instantaneous)
     if do_ensemble
         
-        if pool_size == 0
-            parpool(num_cores_ensemble)
-        elseif pool_size > 0 && pool_size ~= num_cores_ensemble
-            delete(gcp);
-            parpool(num_cores_ensemble)
+        if dynamic_cores
+            if pool_size == 0
+                parpool(num_cores_ensemble)
+            elseif pool_size > 0 && pool_size ~= num_cores_ensemble
+                delete(gcp);
+                parpool(num_cores_ensemble)
+            end
         end
         
         OUTPUT_FILE_PATHS{n} = run_piv_job_file(JobFile);
     else
         
-        if pool_size == 0
-            parpool(num_cores_instantaneous)
-        elseif pool_size > 0 && pool_size ~= num_cores_instantaneous
-            delete(gcp);
-            parpool(num_cores_instantaneous)
+        if dynamic_cores
+            if pool_size == 0
+                parpool(num_cores_instantaneous)
+            elseif pool_size > 0 && pool_size ~= num_cores_instantaneous
+                delete(gcp);
+                parpool(num_cores_instantaneous)
+            end
         end
         
         % Split the job
