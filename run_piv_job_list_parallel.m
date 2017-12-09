@@ -32,8 +32,20 @@ poolsize = pool.NumWorkers;
 % Start a timer
 t1 = tic;
 
+% Num cores
+num_cores_ensemble = feature('num_cores');
+num_cores_instantaneous = 15;
+
 % Loop over all the jobs
 for n = 1 : num_jobs
+    
+    % Get pool size
+    p = gcp('nocreate');
+    if isempty(p)
+        pool_size = 0;
+    else
+        pool_size = p.NumWorkers;
+    end
     
     % Extract the job file
     JobFile = JOBLIST_INPUT(n);
@@ -44,8 +56,24 @@ for n = 1 : num_jobs
     % Choose between doing the correlations in parallel (ensemble)
     % or doing the pairs in parallel (instantaneous)
     if do_ensemble
+        
+        if pool_size == 0
+            parpool(num_cores_ensemble)
+        elseif pool_size > 0 && pool_size ~= num_cores_ensemble
+            delete(gcp);
+            parpool(num_cores_ensemble)
+        end
+        
         OUTPUT_FILE_PATHS{n} = run_piv_job_file(JobFile);
     else
+        
+        if pool_size == 0
+            parpool(num_cores_instantaneous)
+        elseif pool_size > 0 && pool_size ~= num_cores_instantaneous
+            delete(gcp);
+            parpool(num_cores_instantaneous)
+        end
+        
         % Split the job
         parallel_job_list = split_piv_job_file(JobFile, poolsize);
     
