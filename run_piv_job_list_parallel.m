@@ -1,7 +1,7 @@
 function OUTPUT_FILE_PATHS = run_piv_job_list_parallel(JOBLIST_INPUT, dynamic_cores)
 
 if nargin < 2
-    dynamic_cores = false
+    dynamic_cores = false;
 end
 
 
@@ -38,7 +38,7 @@ poolsize = pool.NumWorkers;
 t1 = tic;
 
 % Num cores
-num_cores_ensemble = feature('num_cores');
+num_cores_ensemble = feature('numcores');
 num_cores_instantaneous = 15;
 
 % Loop over all the jobs
