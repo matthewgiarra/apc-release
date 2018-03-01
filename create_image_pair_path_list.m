@@ -42,6 +42,14 @@ function JOBFILE = create_image_pair_path_list(JOBFILE, PASS_NUMBER)
     % Count the number of pairs
     num_pairs = length(image_numbers_01);
     
+    % Make set first image numbers to first image
+    % if registration is requested
+    if isfield(JOBFILE.JobOptions, 'Register')
+        if JOBFILE.JobOptions.Register == true
+            image_numbers_01 = image_numbers_01(1) * ones(size(image_numbers_01));
+        end
+    end
+    
     % Loop over the pairs
     for pair_number = 1 :  num_pairs
         

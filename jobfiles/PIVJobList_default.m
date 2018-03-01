@@ -1,15 +1,19 @@
 function JOBLIST = PIVJobList_default()
 
 % Number of passes to run
-num_passes_spec = 2;
+num_passes_spec = 1;
 
-% % Pass parameters
-region_height_list_raw = [64,  64,  64, 32, 32, 32];
-region_width_list_raw  = [64, 128, 64, 32, 32, 32];
-window_fract_list_raw = {0.5, 0.5, 0.5, 1.0, 24/32, 24/32};
-grid_spacing_list_raw = [64, 64, 32, 16, 16, 2];
+% % % Pass parameters
+region_height_list_raw = [64,  64];
+region_width_list_raw  = [64, 64];
+window_fract_list_raw = {0.5, 0.5};
+
+% Grid stuff
+grid_spacing_list_raw = [32, 32];
 grid_spacing_list_raw_x = grid_spacing_list_raw;
 grid_spacing_list_raw_y = grid_spacing_list_raw;
+% grid_buffer_list_raw_x = {[32, 32], [32, 32]};
+% grid_buffer_list_raw_y = {[32, 32], [32, 32]};
 
 region_height_list = region_height_list_raw(1 : num_passes_spec);
 region_width_list = region_width_list_raw(1 : num_passes_spec);
@@ -22,91 +26,79 @@ num_passes_total = length(region_height_list);
 
 % Number of passes
 % zero means run all of them.
-JobOptions.NumberOfPasses = 1;
+JobOptions.NumberOfPasses = 0;
+JobOptions.StartPass = 1;
+JobOptions.Parallel = false;
+JobOptions.Register = false;
 
-% Data: Input images
-Data.Inputs.Images.Directory = '/Users/matthewgiarra/Desktop/blur/raw';
-Data.Inputs.Images.BaseName = 'sinusoidal_';
+% Input images
+Data.Inputs.Images.Directory = './images';
+Data.Inputs.Images.BaseName = 'frame_';
 Data.Inputs.Images.Digits = 5;
-Data.Inputs.Images.Extension = '.tiff';
-% Data.Inputs.Images.Trailers = {'_a', '_b'};
+Data.Inputs.Images.Extension = '.tif';
 Data.Inputs.Images.Trailers = {''};
 
-% Data: Input vectors for initializing, e.g., image deformation.
-Data.Inputs.Vectors.Directory = '';
-Data.Inputs.Vectors.BaseName = '';
-Data.Inputs.Vectors.Digits = 5;
-Data.Inputs.Vectors.Extension = '.mat';
+% Source file path
+Data.Inputs.SourceFilePath = '';
 
-% Data: output vectors
-Data.Outputs.Vectors.Directory = '/Users/matthewgiarra/Desktop/blur/raw';
-Data.Outputs.Vectors.BaseName = 'sinusoidal_';
+% Output vectors
+Data.Outputs.Vectors.Directory = './vect';
+Data.Outputs.Vectors.BaseName = 'vect_';
 Data.Outputs.Vectors.Digits = 5;
 Data.Outputs.Vectors.Extension = '.mat';
 
-% Interrogation region dimensions
+% Region stuff
 Processing(1).Region.Height = 64;
 Processing(1).Region.Width = 64;
 
-% Spatial window
-Processing(1).Window.Fraction = 0.5;
+% Window stuff
+Processing(1).Window.Fraction = [0.5, 0.5];
 
-% Grid parameters
-Processing(1).Grid.Spacing.Y = 64;
-Processing(1).Grid.Spacing.X = 64;
-Processing(1).Grid.Shift.Y = -16;
+% Grid stuff
+Processing(1).Grid.Spacing.X = 32;
+Processing(1).Grid.Spacing.Y = 32;
 Processing(1).Grid.Shift.X = 0;
-Processing(1).Grid.Buffer.Y = 0;
-Processing(1).Grid.Buffer.X = 0;
-Processing(1).Grid.Mask.Directory = '';
-Processing(1).Grid.Mask.Name = '';
+Processing(1).Grid.Shift.Y = 0;
+Processing(1).Grid.Buffer.X = 32;
+Processing(1).Grid.Buffer.Y = 32;
+
+% Grid masking
+Processing(1).Grid.Mask.Directory = './masks';
+Processing(1).Grid.Mask.Name = 'mask.tif';
 
 % Frame parameters.
 Processing(1).Frames.Start = 1;
-Processing(1).Frames.End = 10;
+Processing(1).Frames.End = 600;
 Processing(1).Frames.Step = 1;
 
 % Correlation parameters
-Processing(1).Correlation.Step = 1;
-Processing(1).Correlation.Ensemble.DoEnsemble = 1;
-Processing(1).Correlation.Ensemble.NumberOfPairs = 1;
+Processing(1).Correlation.Step = 0;
+Processing(1).Correlation.Ensemble.DoEnsemble = false;
+Processing(1).Correlation.Ensemble.NumberOfPairs = 10;
 Processing(1).Correlation.Ensemble.Domain = 'spectral';
-Processing(1).Correlation.Ensemble.Type = 'hybrid';
+Processing(1).Correlation.Ensemble.Type = 'spatial';
 
-% Spectral weighting: SCC, RPC, GCC, APC
+% Parameters to specify spectral weighting method (APC, rpc, hybrid, etc)
 Processing(1).Correlation.SpectralWeighting.Method = 'apc';
 
-% APC Parameters
 % Parameters specific to APC
+Processing(1).Correlation.SpectralWeighting.APC.FilterDiameterUpperBound = 6;
 Processing(1).Correlation.SpectralWeighting.APC.Shuffle.Range = [0, 0];
 Processing(1).Correlation.SpectralWeighting.APC.Shuffle.Step = [0, 0];
+Processing(1).Correlation.SpectralWeighting.APC.Thresh.X = [0, inf];
+Processing(1).Correlation.SpectralWeighting.APC.Thresh.Y = [0, inf];
 Processing(1).Correlation.SpectralWeighting.APC.Method = 'magnitude';
-
-% Spectral filtering parameters
-% These are things like the phase median filter,
-% SVD, etc. 
-Processing(1).Correlation.SpectralFiltering.FilterList = {''};
-Processing(1).Correlation.SpectralFiltering.KernelSizeList = {''};
-
-% This specifies the domain in which the displacement
-% estimate is calculated ('spatial' for peak-finding/fitting 
-% or 'spectral' for SPC plane fit);
 Processing(1).Correlation.DisplacementEstimate.Domain = 'spatial';
 
-% Options for spatial displacement estimate
-Processing(1).Correlation.DisplacementEstimate. ...
-    Spatial.SubPixel.Method = '3-point fit';
+% Parameters specific to RPC
+Processing(1).Correlation.RPC.EffectiveDiameter = 3;
 
 % Estimated particle diameter
 Processing(1).Correlation.EstimatedParticleDiameter = 3;
 
-% Options for spectral displacement estimate
-Processing(1).Correlation.DisplacementEstimate. ...
-    Spectral.UnwrappingMethod = 'goldstein';
-
-% Choose whether to run compiled codes
-Processing(1).Correlation.DisplacementEstimate. ...
-    Spectral.RunCompiled = true;
+% Subpixel fit parameters
+Processing(1).SubPixel.Method = '3-point fit';
+Processing(1).SubPixel.EstimatedParticleDiameter = 3;
 
 % Parameters for vector validation
 Processing(1).Validation.DoValidation = 1;
@@ -131,27 +123,26 @@ default_processing = Processing(1);
 
 % Loop over all the passes
 for p = 1 : num_passes_total
-    
-   % Copy the default pass
-   piv_pass = default_processing; 
-   
-   % Region size
-   piv_pass.Region.Height = region_height_list(p);
-   piv_pass.Region.Width  = region_width_list(p);
-   
-   % Grid buffers
-   piv_pass.Grid.Buffer.X = region_width_list(p)/2;
-   piv_pass.Grid.buffer.Y = region_height_list(p)/2;
-   
-   % Window
-   piv_pass.Window.Fraction = window_fract_list{p};
-   
-   % Grid
-   piv_pass.Grid.Spacing.Y = grid_spacing_list_y(p);
-   piv_pass.Grid.Spacing.X = grid_spacing_list_x(p);
-   
-   % Add to the structure
-   Processing(p) = piv_pass;    
+
+    % Copy the default pass
+    piv_pass = default_processing; 
+
+    % Region size
+    piv_pass.Region.Height = region_height_list(p);
+    piv_pass.Region.Width  = region_width_list(p);
+
+    % Grid
+    piv_pass.Grid.Spacing.Y = grid_spacing_list_y(p);
+    piv_pass.Grid.Spacing.X = grid_spacing_list_x(p);
+    piv_pass.Grid.Buffer.X = region_width_list(p)/2;
+    piv_pass.Grid.buffer.Y = region_height_list(p)/2;
+
+    % Window
+    piv_pass.Window.Fraction = window_fract_list{p};
+
+
+    % Add to the structure
+    Processing(p) = piv_pass;    
 end
 
 % Add the fields to the jobfile structure.
@@ -159,11 +150,12 @@ JobFile.Data = Data;
 JobFile.Processing = Processing;
 JobFile.JobOptions = JobOptions;
 
-% Append to the job list.
-JOBLIST(1) = JobFile;
-
+% Output variable
+JOBLIST = JobFile;
 
 end
+
+
 
 
 

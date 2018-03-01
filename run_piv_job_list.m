@@ -6,7 +6,6 @@ function OUTPUT_FILE_PATHS = run_piv_job_list(JOBLIST_INPUT)
 % Things to test: 
 job_list_is_valid = verify_job_list_file_paths(JOBLIST_INPUT);
 
-
 % Only proceed if all images were found
 if not(job_list_is_valid)
    error('Error: Files not found. Exiting.'); 

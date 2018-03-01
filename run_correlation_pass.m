@@ -184,8 +184,10 @@ for n = 1 : num_pairs_correlate
             end
     end
     
-    % Image paths
+    % First image path
     image_path_01 = JOBFILE.Processing(PASS_NUMBER).Frames.Paths{1}{n};
+    
+    % Second image path
     image_path_02 = JOBFILE.Processing(PASS_NUMBER).Frames.Paths{2}{n};
     
     % Get image names
