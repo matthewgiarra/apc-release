@@ -13,7 +13,7 @@ nx = length(unique(X));
 ny = length(unique(Y));
 
 % Image dimensions
-[imageHeight, imageWidth] = size(IMAGEIN); 
+[imageHeight, imageWidth, num_channels] = size(IMAGEIN);
 
 % Create the pixel coordinates.
 [xi_integer, yi_integer] = meshgrid(1:imageWidth, 1:imageHeight);
@@ -40,13 +40,28 @@ VI = interpolant_ty(YI, XI);
 XD = XI + UI;
 YD = YI + VI;
 
-switch lower(METHOD)
-    case 'blackman'
-        % Resample the images using sinc-blacman interpolation (slower)   
-        IMAGEOUT = whittaker_blackman(IMAGEIN, XD + 0.5, YD + 0.5, 8, true);
-    otherwise
-        % Resample the image using matlab interp2
-        IMAGEOUT = interp2(IMAGEIN, XD + 0.5, YD + 0.5, 'spline', 0);
+% Allocate the output image
+IMAGEOUT = zeros(size(IMAGEIN));
+
+% Loop over the different channels
+for k = 1 : num_channels
+    
+    % Extract the k'th channel
+    channel_in = IMAGEIN(:, :, k);
+
+    % Choose among interpolation methods.
+    switch lower(METHOD)
+        case 'blackman'
+            % Resample the images channel using sinc-blacman interpolation (slower)   
+            channel_out = whittaker_blackman(channel_in, XD + 0.5, YD + 0.5, 8, true);
+        otherwise
+            % Resample the image channel using matlab interp2
+            channel_out = interp2(channel_in, XD + 0.5, YD + 0.5, 'spline', 0);
+    end
+
+% Put the channel in the color image
+IMAGEOUT(:, :, k) = channel_out;
+
 end
 
 end
