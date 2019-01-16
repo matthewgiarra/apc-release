@@ -172,7 +172,8 @@ switch lower(spectral_weighting_method_string)
             parfor_arg_str);
         
         % Loop over all the planes
-        parfor(k = 1 : num_correlation_planes, parfor_arg)
+%         parfor(k = 1 : num_correlation_planes, parfor_arg)
+        for k =  1 : num_correlation_planes
             
             % Extract the given region
             cross_corr_spectral = cross_corr_array(:, :, k);
@@ -194,7 +195,7 @@ switch lower(spectral_weighting_method_string)
             [~, cc_filter_std_y, cc_filter_std_x] = ...
                 calculate_apc_filter(cross_corr_spectral, ...
                 particle_diameter, apc_method);
-
+            
             % Equivalent particle diameter in the columns
             % direction, calculated from the APC filter.
             dp_cc_x(k) = filter_std_dev_to_particle_diameter(...
@@ -217,17 +218,34 @@ switch lower(spectral_weighting_method_string)
             
         end
         
-        % Put the calculated particle sizes from the
-        % cross correlation filters into the full list 
-        % of cross correlation diameters
-        dp_cc_full_x(inds) = dp_cc_x;
-        dp_cc_full_y(inds) = dp_cc_y;
-        
-        % Put the calculated particle sizes from the
-        % autocorrelation filters into the full list 
-        % of autocorrelation diameters
-        dp_ac_full_x(inds) = dp_ac_x;
-        dp_ac_full_y(inds) = dp_ac_y;
+        switch lower(ensemble_type_string)
+            case 'spatial'
+                % Put the calculated particle sizes from the
+                % first (only) cross correlation filters 
+                % into the full list 
+                % of cross correlation diameters
+                dp_cc_full_x(inds) = dp_cc_x(1);
+                dp_cc_full_y(inds) = dp_cc_y(1);
+
+                % Put the calculated particle sizes from the
+                % autocorrelation filters into the full list 
+                % of autocorrelation diameters
+                dp_ac_full_x(inds) = dp_ac_x(1);
+                dp_ac_full_y(inds) = dp_ac_y(1);
+                
+            otherwise
+                % Put the calculated particle sizes from the
+                % cross correlation filters into the full list 
+                % of cross correlation diameters
+                dp_cc_full_x(inds) = dp_cc_x;
+                dp_cc_full_y(inds) = dp_cc_y;
+
+                % Put the calculated particle sizes from the
+                % autocorrelation filters into the full list 
+                % of autocorrelation diameters
+                dp_ac_full_x(inds) = dp_ac_x;
+                dp_ac_full_y(inds) = dp_ac_y;
+        end
         
         % Run UOD validation on the cross correlation filters
         [dp_cc_val_x, dp_cc_val_y, outlier_flags_cc] = ...
@@ -347,7 +365,8 @@ switch lower(ensemble_domain_string)
         % Inform the user
         fprintf(1, 'Calculating inverse FTs...\n');
         % Do the inverse transform for each region.
-        parfor(k = 1 : num_correlation_planes, parfor_arg)
+%         parfor(k = 1 : num_correlation_planes, parfor_arg)
+        for k = 1 : num_correlation_planes
             
             % Extract the given region
             cross_corr_spectral = cross_corr_array(:, :, k);
@@ -412,8 +431,8 @@ switch lower(ensemble_domain_string)
                     [TX(k), TY(k)] = ...
                         subpixel(cross_corr_filtered_spatial,...
                             region_width, region_height, sub_pixel_weights, ...
-                                1, 0, [dp_x, dp_y]);              
-                
+                                1, 0, [dp_x, dp_y]); 
+ 
                 % If the displacement-estimate domain
                 % was specified as "spectral" then
                 % do the SPC plane fit to estimate the

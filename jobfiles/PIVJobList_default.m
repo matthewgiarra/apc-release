@@ -9,7 +9,7 @@ region_width_list_raw  = [64, 64];
 window_fract_list_raw = {0.5, 0.5};
 
 % Grid stuff
-grid_spacing_list_raw = [32, 32];
+grid_spacing_list_raw = [48, 32];
 grid_spacing_list_raw_x = grid_spacing_list_raw;
 grid_spacing_list_raw_y = grid_spacing_list_raw;
 % grid_buffer_list_raw_x = {[32, 32], [32, 32]};
@@ -28,7 +28,7 @@ num_passes_total = length(region_height_list);
 % zero means run all of them.
 JobOptions.NumberOfPasses = 0;
 JobOptions.StartPass = 1;
-JobOptions.Parallel = false;
+JobOptions.Parallel = true;
 JobOptions.Register = false;
 
 % Input images
@@ -79,7 +79,7 @@ Processing(1).Correlation.Ensemble.Domain = 'spectral';
 Processing(1).Correlation.Ensemble.Type = 'spatial';
 
 % Parameters to specify spectral weighting method (APC, rpc, hybrid, etc)
-Processing(1).Correlation.SpectralWeighting.Method = 'apc';
+Processing(1).Correlation.SpectralWeighting.Method = 'rpc';
 
 % Parameters specific to APC
 Processing(1).Correlation.SpectralWeighting.APC.FilterDiameterUpperBound = 6;
@@ -91,14 +91,14 @@ Processing(1).Correlation.SpectralWeighting.APC.Method = 'magnitude';
 Processing(1).Correlation.DisplacementEstimate.Domain = 'spatial';
 
 % Parameters specific to RPC
-Processing(1).Correlation.RPC.EffectiveDiameter = 3;
+Processing(1).Correlation.RPC.EffectiveDiameter = 6;
 
 % Estimated particle diameter
-Processing(1).Correlation.EstimatedParticleDiameter = 3;
+Processing(1).Correlation.EstimatedParticleDiameter = 6;
 
 % Subpixel fit parameters
 Processing(1).SubPixel.Method = '3-point fit';
-Processing(1).SubPixel.EstimatedParticleDiameter = 3;
+Processing(1).SubPixel.EstimatedParticleDiameter = 6;
 
 % Parameters for vector validation
 Processing(1).Validation.DoValidation = 1;
@@ -135,11 +135,10 @@ for p = 1 : num_passes_total
     piv_pass.Grid.Spacing.Y = grid_spacing_list_y(p);
     piv_pass.Grid.Spacing.X = grid_spacing_list_x(p);
     piv_pass.Grid.Buffer.X = region_width_list(p)/2;
-    piv_pass.Grid.buffer.Y = region_height_list(p)/2;
+    piv_pass.Grid.Buffer.Y = region_height_list(p)/2;
 
     % Window
     piv_pass.Window.Fraction = window_fract_list{p};
-
 
     % Add to the structure
     Processing(p) = piv_pass;    
